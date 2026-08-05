@@ -1,5 +1,13 @@
 # PRD-001: Mi Archivo Médico — Aplicación web progresiva de uso familiar para almacenar, organizar, consultar y encontrar estudios médicos de forma segura
 
+> **Estado**: vigente · **Alcance**: MVP · **Última actualización**: 2026-08-05
+>
+> Este documento es la fuente única de verdad del alcance. Convenciones de lectura:
+> **RF-nn** requerimiento funcional, **RNF-nn** requerimiento no funcional, **AC-nn** criterio de aceptación
+> (cada AC declara entre paréntesis los requerimientos que verifica). Los identificadores son permanentes:
+> un identificador retirado se marca como tal y **nunca se reutiliza**. La selección tecnológica concreta se
+> documenta en `AGENTS.md`; este PRD define el qué, no el cómo.
+
 ## Contexto y Problema
 
 Los estudios médicos personales suelen quedar distribuidos entre correos electrónicos, aplicaciones de mensajería, carpetas locales, portales de clínicas y documentos impresos. Esta dispersión genera varios problemas:
@@ -74,6 +82,7 @@ La información utilizada para buscar los estudios será ingresada manualmente m
 
 - **RNF-01**: El 100 % de las comunicaciones debe utilizar HTTPS con TLS 1.2 o superior.
 - **RNF-02**: El 100 % de los archivos debe almacenarse cifrado en reposo mediante AES-256. La clave de cifrado no debe residir en el código fuente ni en archivos de configuración versionados.
+- **RNF-58**: La clave de cifrado de archivos debe custodiarse fuera del entorno principal y fuera de los respaldos, de modo que su pérdida no sea posible sin perder simultáneamente el entorno y la custodia, y que el acceso a un respaldo por sí solo no permita descifrar los archivos.
 - **RNF-03**: Las contraseñas deben almacenarse mediante Argon2id (memoria mínima 19 MiB, 2 iteraciones, paralelismo 1), bcrypt (factor de costo mínimo 12) o PBKDF2-HMAC-SHA256 con un mínimo de 100.000 iteraciones.
 - **RNF-04**: La sesión debe bloquearse después de 30 minutos de inactividad.
 - **RNF-05**: La sesión debe tener una duración absoluta máxima de 24 horas.
@@ -105,8 +114,8 @@ La información utilizada para buscar los estudios será ingresada manualmente m
 
 ### Rendimiento
 
-- **RNF-24**: Una búsqueda sobre una colección de hasta 10.000 estudios debe responder en menos de 1 segundo, p95.
-- **RNF-25**: El listado inicial debe responder en menos de 2 segundos, p95, sin incluir la descarga de archivos.
+- **RNF-24**: Una búsqueda sobre una colección de hasta 2.000 estudios debe responder en menos de 1 segundo, p95. Ese volumen es el techo de diseño del MVP: corresponde a las hasta 5 cuentas de un grupo familiar acumulando alrededor de 40 estudios por año durante 10 años, con margen. No se optimiza para volúmenes mayores.
+- **RNF-25**: El listado inicial debe responder en menos de 2 segundos, p95, sin incluir la descarga de archivos, sobre el volumen definido en RNF-24.
 - **RNF-26**: La carga de un estudio con archivos que sumen hasta 10 MB debe completarse en menos de 15 segundos con una conexión estable de 10 Mbps.
 - **RNF-27**: La aplicación debe paginar el listado cuando existan más de 25 estudios.
 - **RNF-28**: La aplicación no debe descargar archivos médicos hasta que el usuario solicite visualizarlos o descargarlos.
@@ -118,13 +127,14 @@ La información utilizada para buscar los estudios será ingresada manualmente m
 - **RNF-31**: La creación de un estudio debe completarse en un máximo de tres pantallas o pasos.
 - **RNF-32**: Los errores de validación deben mostrarse junto al campo o archivo que los produjo.
 - **RNF-33**: La aplicación debe solicitar confirmación antes de realizar una eliminación irreversible.
-- **RNF-55**: La búsqueda y los filtros sobre metadatos de texto libre deben ser insensibles a mayúsculas, minúsculas y acentos, y deben ignorar los espacios al inicio y al final del término ingresado.
+- **RNF-55**: La búsqueda y los filtros sobre metadatos de texto libre deben ser insensibles a mayúsculas, minúsculas y acentos, y deben ignorar los espacios al inicio y al final del término ingresado. Como SQLite no ofrece una intercalación insensible a acentos, la normalización (minúsculas, sin acentos, sin espacios sobrantes) debe resolverse en la aplicación: cada campo de texto buscable se persiste además en una columna normalizada e indexada, y el término ingresado se normaliza con la misma función antes de consultar.
 
 ### Respaldo y recuperación de infraestructura
 
-- **RNF-34**: La infraestructura debe generar al menos un respaldo automático diario de la base de datos y conservar los respaldos durante un mínimo de 30 días.
-- **RNF-35**: Los respaldos deben almacenarse en una cuenta o suscripción distinta de la del entorno principal, de modo que una credencial comprometida del entorno principal no permita alterarlos ni eliminarlos.
+- **RNF-34**: La infraestructura debe generar al menos un respaldo automático diario de la base de datos y conservar los respaldos durante un mínimo de 30 días. Al tratarse de una base SQLite (un único archivo en el servidor), el respaldo debe tomarse con un mecanismo consistente en caliente (`VACUUM INTO` o la API de backup en línea), nunca copiando el archivo mientras hay escrituras en curso.
+- **RNF-35**: Los respaldos deben almacenarse en una cuenta o suscripción distinta de la del entorno principal, de modo que una credencial comprometida del entorno principal no permita alterarlos ni eliminarlos. En particular, no deben quedar en el mismo disco ni en la misma carpeta que el archivo de base de datos ni que el almacenamiento de archivos médicos.
 - **RNF-36**: El proceso de respaldo debe incluir los metadatos necesarios para reconstruir la relación entre estudios y archivos.
+- **RNF-59**: El respaldo diario debe abarcar tanto la base de datos como el almacenamiento de archivos médicos, y ambos deben corresponder a un mismo punto en el tiempo, de modo que una restauración no deje estudios con archivos faltantes ni archivos huérfanos.
 - **RNF-37**: El responsable técnico debe realizar una prueba de recuperación al menos una vez cada tres meses.
 - **RNF-38**: Los respaldos y su restauración deben ser administrados exclusivamente a nivel de infraestructura.
 - **RNF-39**: La interfaz del usuario no debe ofrecer funciones de exportación, importación o restauración.
@@ -189,6 +199,8 @@ La información utilizada para buscar los estudios será ingresada manualmente m
 - **AC-25 (RNF-19)**: Dado un archivo cargado correctamente, cuando finaliza la operación, entonces el sistema registra su hash SHA-256.
 - **AC-26 (RNF-20)**: Dado un PDF con JavaScript embebido, cuando se visualiza, entonces el script no se ejecuta.
 - **AC-27 (RNF-21)**: Dado un archivo rechazado, cuando finaliza la operación, entonces el archivo no existe en el almacenamiento definitivo.
+- **AC-65 (RNF-22)**: Dado un archivo cargado con el nombre `informe.pdf`, cuando se inspecciona el almacenamiento, entonces el nombre físico es un GUID generado por el sistema y no contiene ninguna porción del nombre original.
+- **AC-66 (RNF-23)**: Dado un archivo cuyo nombre original es `../../etc/passwd.pdf`, cuando se carga, entonces el metadato almacenado no contiene separadores de ruta ni secuencias `..`, conserva la extensión `.pdf` y se muestra escapado en la interfaz.
 
 ### Búsqueda y filtros
 
@@ -225,8 +237,8 @@ La información utilizada para buscar los estudios será ingresada manualmente m
 
 ### Rendimiento
 
-- **AC-51 (RNF-24)**: Dada una colección de 10.000 estudios, cuando se ejecutan búsquedas por texto sobre metadatos, entonces el percentil 95 del tiempo de respuesta es inferior a 1 segundo.
-- **AC-52 (RNF-25)**: Dada una colección de 10.000 estudios, cuando se abre el listado inicial, entonces el percentil 95 del tiempo de respuesta es inferior a 2 segundos, sin contar la descarga de archivos.
+- **AC-51 (RNF-24)**: Dada una colección de 2.000 estudios, cuando se ejecutan búsquedas por texto sobre metadatos, entonces el percentil 95 del tiempo de respuesta es inferior a 1 segundo.
+- **AC-52 (RNF-25)**: Dada una colección de 2.000 estudios, cuando se abre el listado inicial, entonces el percentil 95 del tiempo de respuesta es inferior a 2 segundos, sin contar la descarga de archivos.
 - **AC-53 (RNF-26)**: Dado un estudio con archivos que suman 10 MB y una conexión estable de 10 Mbps, cuando el usuario confirma la carga, entonces la operación finaliza en menos de 15 segundos.
 - **AC-54 (RNF-27)**: Dada una colección de 26 estudios, cuando se abre el listado, entonces se muestran como máximo 25 estudios y existe un control para avanzar a la página siguiente.
 - **AC-55 (RNF-52)**: Dado un almacenamiento compartido que alcanzó los 20 GB, cuando cualquiera de las cuentas intenta cargar un archivo adicional, entonces el sistema rechaza la carga e informa que se alcanzó el límite de almacenamiento.
@@ -243,6 +255,8 @@ La información utilizada para buscar los estudios será ingresada manualmente m
 - **AC-59 (RNF-34)**: Dado un entorno en operación durante 30 días, cuando se consulta el historial de respaldos, entonces existe al menos un respaldo por día y los de los últimos 30 días siguen disponibles.
 - **AC-60 (RNF-35)**: Dadas las credenciales del entorno principal, cuando se intenta eliminar o modificar un respaldo, entonces la operación es rechazada.
 - **AC-61 (RNF-36)**: Dado un respaldo restaurado en un entorno limpio, cuando se abre un estudio que tenía tres archivos asociados, entonces el estudio conserva sus metadatos y sus tres archivos siguen vinculados a él.
+- **AC-67 (RNF-59)**: Dado un respaldo restaurado en un entorno limpio, cuando se recorre el listado completo de estudios, entonces ningún estudio referencia un archivo inexistente y no existen archivos sin estudio asociado.
+- **AC-68 (RNF-58, RNF-02)**: Dado un respaldo de la base de datos y del almacenamiento de archivos, cuando se restaura sin la clave de cifrado custodiada por separado, entonces los archivos no pueden descifrarse.
 
 ## Fuera de Alcance
 
@@ -315,8 +329,10 @@ Mitigación:
 
 Mitigación:
 
-- Respaldos automáticos diarios.
+- Respaldos automáticos diarios, que abarcan la base de datos y el almacenamiento de archivos en un mismo punto en el tiempo.
 - Almacenamiento de respaldos separado.
+- Custodia de la clave de cifrado fuera del entorno principal y fuera de los respaldos: un respaldo sin la clave no
+  permite descifrar, y la pérdida del entorno no implica la pérdida de la clave.
 - Pruebas trimestrales de recuperación.
 - Hash SHA-256 para validar la integridad de los archivos.
 - Monitoreo del proceso de respaldo.
@@ -339,7 +355,7 @@ Mitigación:
 
 Mitigación:
 
-- Utilizar búsqueda nativa de la base de datos.
+- Utilizar búsqueda nativa de la base de datos (SQLite embebido, sin costo de servicio administrado).
 - Evitar servicios OCR y de inteligencia artificial.
 - Evitar motores de búsqueda administrados.
 - Definir un límite mensual de infraestructura.
@@ -362,12 +378,13 @@ Mitigación:
 El MVP dependerá de:
 
 - Un proveedor de hosting o infraestructura.
-- Una base de datos para almacenar metadatos.
+- Una base de datos SQLite (archivo único en el servidor) para almacenar metadatos, sin servicio de base de datos administrado.
 - Un sistema de almacenamiento privado para los archivos.
 - Un certificado HTTPS válido.
 - Un mecanismo de autenticación seguro.
 - Un proceso automatizado de respaldo.
 - Un almacenamiento separado para los respaldos.
+- Un mecanismo de custodia de la clave de cifrado, independiente del entorno principal y de los respaldos.
 - Navegadores compatibles con PWA.
 
 El MVP **no** dependerá de APIs de inteligencia artificial, servicios de OCR, herramientas de importación o exportación, motores de búsqueda administrados, aplicaciones móviles nativas, integraciones con instituciones médicas ni servicios de mensajería o correo electrónico. El detalle y el alcance de estas exclusiones se define en [Fuera de Alcance](#fuera-de-alcance).
@@ -428,6 +445,10 @@ El MVP no extraerá texto de documentos ni permitirá importar, exportar o resta
 - La selección tecnológica se definirá en una especificación técnica separada.
 - Se priorizarán tecnologías conocidas por el desarrollador.
 - El MVP deberá poder desplegarse utilizando una única aplicación, una base de datos y un sistema de almacenamiento.
+- La base de datos será SQLite: un único archivo en disco del propio servidor, sin motor de base de datos separado ni servicio administrado. El archivo deberá ubicarse fuera de toda carpeta pública del servidor web, junto con sus archivos auxiliares (`-wal`, `-shm`).
+- La base deberá operar en modo WAL, adecuado para las hasta 5 cuentas concurrentes previstas; el MVP no contempla escrituras de alta concurrencia.
+- La normalización de texto para búsqueda (minúsculas, sin acentos) se resolverá en la aplicación y se persistirá en columnas normalizadas, porque SQLite no provee intercalaciones insensibles a acentos.
+- La búsqueda por subcadena sobre esas columnas normalizadas es suficiente para el volumen definido en RNF-24; el MVP no incorporará un índice de texto completo.
 - No se utilizará una arquitectura de microservicios.
 - La aplicación deberá permitir reemplazar el proveedor de almacenamiento sin modificar las reglas principales del dominio.
 - La búsqueda se realizará exclusivamente sobre metadatos.
