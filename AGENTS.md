@@ -28,6 +28,16 @@ dotnet build                    # verificación de compilación antes de dar alg
 Antes de levantar por primera vez: definir la cadena de conexión a SQLite (`Data Source=<ruta>/archivo-medico.db`) y la ruta de almacenamiento de archivos
 por user-secrets (`dotnet user-secrets set`) o variables de entorno, nunca en `appsettings.json` versionado.
 
+Claves de configuración externa (todas por user-secrets o variables de entorno):
+
+| Clave | Para qué |
+|---|---|
+| `ConnectionStrings:ArchivoMedico` | Base SQLite. Sin ella la aplicación falla al arrancar. |
+| `CuentasIniciales:<n>:NombreDeUsuario` / `:Email` / `:Contrasena` | Alta administrativa de cuentas, máximo 5 (RNF-54, RNF-56). Se aplica en cada arranque y omite las que ya existen. |
+
+El alta y el restablecimiento de contraseñas se hacen por esta vía: la aplicación no expone ninguna ruta de
+registro ni de recuperación.
+
 Nueva migración: `dotnet ef migrations add <Nombre>`.
 
 ## Definición de terminado
@@ -48,8 +58,10 @@ ficticios (RNF-10). Los archivos de prueba se generan; no se copian de un caso r
 - **Aislamiento por propietario**: preferir un filtro global de EF Core por `OwnerId` sobre repetir el `Where`
   en cada consulta, para que olvidarlo no sea posible. Un `Find`/`FindAsync` por clave primaria **no** aplica
   filtros globales: nunca usarlo para cargar datos médicos.
-- **Hashing de contraseñas**: ASP.NET Core Identity usa PBKDF2-HMAC-SHA256; verificar explícitamente que
-  `PasswordHasherOptions.IterationCount` sea ≥ 100.000, que es el mínimo exigido por RNF-03.
+- **Hashing de contraseñas**: el `PasswordHasher<T>` de Identity deriva con PBKDF2-**HMAC-SHA512**, que no es
+  ninguna de las tres combinaciones que admite RNF-03. Por eso el hasher está reemplazado por
+  `HasherPbkdf2Sha256` (PBKDF2-HMAC-SHA256, formato Identity V3). `PasswordHasherOptions.IterationCount`
+  sigue siendo la fuente de las iteraciones y debe ser ≥ 100.000: el hasher falla al construirse si no lo es.
 - **Archivos**: nombre físico GUID, nunca derivado del nombre original (RNF-22); el nombre original se sanitiza
   antes de guardarlo como metadato (RNF-23). Validar extensión + MIME + firma binaria antes de mover el archivo
   al almacenamiento definitivo, y borrar los rechazados (RNF-15 a RNF-17, RNF-21).

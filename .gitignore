@@ -1,0 +1,26 @@
+## Build
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+artifacts/
+*.user
+
+## Base de datos SQLite: nunca se versiona ni se expone (RNF-34, RNF-35)
+*.db
+*.db-wal
+*.db-shm
+App_Data/
+
+## Almacenamiento de archivos médicos: fuera del repositorio
+ArchivosMedicos/
+
+## Secretos: la clave de cifrado y las cadenas de conexión van por user-secrets (RNF-62)
+secrets.json
+*.env
+
+## Herramientas
+.vs/
+.vscode/
+.idea/
+.DS_Store
