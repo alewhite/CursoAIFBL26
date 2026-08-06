@@ -1,0 +1,70 @@
+@model MiArchivoMedico.Web.Data.Estudio
+@{
+    ViewData["Title"] = Model.Titulo;
+}
+
+<div class="d-flex flex-wrap gap-2 justify-content-between align-items-start mb-3">
+    <div>
+        <h1 class="h3 mb-1">@Model.Titulo</h1>
+        <div class="text-muted">@Model.Fecha.ToString("dd/MM/yyyy")</div>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Editar" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Editar</a>
+        <a asp-action="Eliminar" asp-route-id="@Model.Id" class="btn btn-outline-danger">Eliminar</a>
+    </div>
+</div>
+
+<dl class="row">
+    @if (!string.IsNullOrWhiteSpace(Model.Profesional))
+    {
+        <dt class="col-sm-3">Profesional</dt>
+        <dd class="col-sm-9">@Model.Profesional</dd>
+    }
+    @if (!string.IsNullOrWhiteSpace(Model.Institucion))
+    {
+        <dt class="col-sm-3">Institución</dt>
+        <dd class="col-sm-9">@Model.Institucion</dd>
+    }
+    @if (!string.IsNullOrWhiteSpace(Model.Descripcion))
+    {
+        <dt class="col-sm-3">Descripción</dt>
+        <dd class="col-sm-9">@Model.Descripcion</dd>
+    }
+    @if (Model.Etiquetas.Count > 0)
+    {
+        <dt class="col-sm-3">Etiquetas</dt>
+        <dd class="col-sm-9">
+            @foreach (var etiqueta in Model.Etiquetas)
+            {
+                <span class="badge text-bg-secondary me-1">@etiqueta.Texto</span>
+            }
+        </dd>
+    }
+</dl>
+
+<h2 class="h5 mt-4">Archivos</h2>
+
+@* Solo enlaces: el contenido no se transfiere hasta que el usuario lo pide (RNF-28, AC-78). *@
+@if (Model.Archivos.Count == 0)
+{
+    <p class="text-muted">Este estudio no tiene archivos asociados.</p>
+}
+else
+{
+    <ul class="list-unstyled">
+        @foreach (var archivo in Model.Archivos)
+        {
+            <li class="border-bottom py-2 d-flex flex-wrap gap-2 justify-content-between align-items-center">
+                <span class="text-break">@archivo.NombreOriginal</span>
+                <span class="d-flex gap-2">
+                    <a asp-controller="Archivos" asp-action="Ver" asp-route-id="@archivo.Id"
+                       class="btn btn-sm btn-outline-primary">Visualizar</a>
+                    <a asp-controller="Archivos" asp-action="Descargar" asp-route-id="@archivo.Id"
+                       class="btn btn-sm btn-outline-secondary">Descargar</a>
+                </span>
+            </li>
+        }
+    </ul>
+}
+
+<a asp-action="Index" class="btn btn-link px-0">Volver al listado</a>

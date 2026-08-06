@@ -1,0 +1,68 @@
+@model MiArchivoMedico.Web.Models.EstudioFormularioViewModel
+
+@* Una sola pantalla para metadatos y archivos: el alta no supera los tres pasos (RNF-31, AC-79). *@
+<div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+<div class="row g-3">
+    <div class="col-12 col-md-8">
+        <label asp-for="Titulo" class="form-label"></label>
+        <input asp-for="Titulo" class="form-control" />
+        @* El error viaja junto al campo que lo produjo (RNF-32, AC-80). *@
+        <span asp-validation-for="Titulo" class="text-danger"></span>
+    </div>
+
+    <div class="col-12 col-md-4">
+        <label asp-for="Fecha" class="form-label"></label>
+        <input asp-for="Fecha" type="date" class="form-control" />
+        <span asp-validation-for="Fecha" class="text-danger"></span>
+    </div>
+
+    <div class="col-12 col-md-6">
+        <label asp-for="Profesional" class="form-label"></label>
+        <input asp-for="Profesional" class="form-control" />
+        <span asp-validation-for="Profesional" class="text-danger"></span>
+    </div>
+
+    <div class="col-12 col-md-6">
+        <label asp-for="Institucion" class="form-label"></label>
+        <input asp-for="Institucion" class="form-control" />
+        <span asp-validation-for="Institucion" class="text-danger"></span>
+    </div>
+
+    <div class="col-12">
+        <label asp-for="Descripcion" class="form-label"></label>
+        <textarea asp-for="Descripcion" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Descripcion" class="text-danger"></span>
+    </div>
+
+    <div class="col-12">
+        <label asp-for="Etiquetas" class="form-label"></label>
+        <input asp-for="Etiquetas" class="form-control" placeholder="cardiología, control anual" />
+        <span asp-validation-for="Etiquetas" class="text-danger"></span>
+    </div>
+
+    <div class="col-12">
+        <label asp-for="Archivos" class="form-label"></label>
+        <input asp-for="Archivos" type="file" multiple class="form-control"
+               accept=".pdf,.jpg,.jpeg,.png" />
+        <div class="form-text">
+            PDF, JPG o PNG. Hasta 50 MB por archivo y 20 archivos por estudio.
+        </div>
+        <span asp-validation-for="Archivos" class="text-danger"></span>
+        @* Un mensaje por archivo rechazado, con el nombre que subió el usuario para que sepa cuál es. *@
+        @foreach (var (clave, estado) in ViewData.ModelState
+            .Where(par => par.Key.StartsWith("Archivos[", StringComparison.Ordinal)))
+        {
+            var indice = int.Parse(clave["Archivos[".Length..^1]);
+            var nombre = indice < Model.Archivos.Count
+                ? MiArchivoMedico.Web.Archivos.SanitizadorDeNombres.Sanitizar(
+                    Model.Archivos[indice].FileName)
+                : $"Archivo {indice + 1}";
+
+            foreach (var error in estado?.Errors ?? [])
+            {
+                <span class="text-danger d-block">@nombre: @error.ErrorMessage</span>
+            }
+        }
+    </div>
+</div>

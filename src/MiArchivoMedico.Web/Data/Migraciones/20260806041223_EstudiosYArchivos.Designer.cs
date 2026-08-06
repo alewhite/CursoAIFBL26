@@ -3,6 +3,7 @@ using System;
 using MiArchivoMedico.Web.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MiArchivoMedico.Web.Data.Migraciones
 {
     [DbContext(typeof(ArchivoMedicoDbContext))]
-    partial class ArchivoMedicoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260806041223_EstudiosYArchivos")]
+    partial class EstudiosYArchivos
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.11");

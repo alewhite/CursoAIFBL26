@@ -1,0 +1,33 @@
+@model IReadOnlyList<MiArchivoMedico.Web.Data.Estudio>
+@{
+    ViewData["Title"] = "Estudios";
+}
+
+<div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Estudios</h1>
+    <a asp-action="Crear" class="btn btn-primary">Nuevo estudio</a>
+</div>
+
+@if (Model.Count == 0)
+{
+    <p class="text-muted">Todavía no cargaste ningún estudio.</p>
+}
+else
+{
+    <ul class="list-unstyled">
+        @foreach (var estudio in Model)
+        {
+            <li class="border-bottom py-3">
+                <a asp-action="Detalle" asp-route-id="@estudio.Id" class="h6 d-block mb-1">@estudio.Titulo</a>
+                <div class="text-muted small">
+                    @estudio.Fecha.ToString("dd/MM/yyyy")
+                    @if (!string.IsNullOrWhiteSpace(estudio.Institucion))
+                    {
+                        <span>· @estudio.Institucion</span>
+                    }
+                    <span>· @estudio.Archivos.Count archivo(s)</span>
+                </div>
+            </li>
+        }
+    </ul>
+}

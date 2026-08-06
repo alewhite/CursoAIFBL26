@@ -34,6 +34,9 @@ Claves de configuración externa (todas por user-secrets o variables de entorno)
 |---|---|
 | `ConnectionStrings:ArchivoMedico` | Base SQLite. Sin ella la aplicación falla al arrancar. |
 | `CuentasIniciales:<n>:NombreDeUsuario` / `:Email` / `:Contrasena` | Alta administrativa de cuentas, máximo 5 (RNF-54, RNF-56). Se aplica en cada arranque y omite las que ya existen. |
+| `Almacenamiento:Ruta` | Carpeta de archivos cifrados, fuera de toda carpeta pública. |
+| `Almacenamiento:ClaveBase64` | Clave AES-256 (32 bytes en base64). **Sin ella la aplicación falla al arrancar** (RNF-02, RNF-62). |
+| `Almacenamiento:CupoTotalEnBytes` | Cupo compartido, 20 GB por omisión (RNF-52). |
 
 El alta y el restablecimiento de contraseñas se hacen por esta vía: la aplicación no expone ninguna ruta de
 registro ni de recuperación.
@@ -67,6 +70,11 @@ ficticios (RNF-10). Los archivos de prueba se generan; no se copian de un caso r
   al almacenamiento definitivo, y borrar los rechazados (RNF-15 a RNF-17, RNF-21).
 - **Cifrado en reposo**: la clave se resuelve desde configuración externa; si falta, la aplicación debe fallar al
   arrancar en vez de guardar archivos en claro (RNF-02, RNF-58).
+- **Fechas y SQLite**: SQLite no compara `DateTimeOffset` en un `ORDER BY`. Toda columna de ese tipo que
+  participe de un ordenamiento se persiste con el conversor a ticks UTC de `ArchivoMedicoDbContext`.
+- **ImageSharp está fijado en la línea 3.1.x** (`3.1.12`), que es Apache-2.0. La 4.x exige una licencia paga y
+  rompe el límite de costos (RNF-45): no actualizar a 4.x. Actualizar dentro de 3.1.x sí, y conviene, porque
+  es el componente que decodifica archivos no confiables.
 
 ## Qué NO hacer
 - **No escribir datos médicos en logs, métricas ni mensajes de error.** Nada de títulos, descripciones, profesionales,

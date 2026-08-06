@@ -1,0 +1,19 @@
+@model MiArchivoMedico.Web.Models.EstudioFormularioViewModel
+@{
+    ViewData["Title"] = "Nuevo estudio";
+}
+
+<h1 class="h3 mb-4">Nuevo estudio</h1>
+
+<form asp-action="Crear" method="post" enctype="multipart/form-data">
+    <partial name="_Formulario" model="Model" />
+
+    <div class="d-flex gap-2 mt-4">
+        <button type="submit" class="btn btn-primary">Guardar estudio</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

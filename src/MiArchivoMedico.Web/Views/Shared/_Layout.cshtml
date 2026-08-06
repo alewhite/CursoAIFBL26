@@ -15,12 +15,15 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-controller="Home" asp-action="Index">Mi Archivo Médico</a>
+                <a class="navbar-brand" asp-controller="Estudios" asp-action="Index">Mi Archivo Médico</a>
                 @if (InicioDeSesion.IsSignedIn(User))
                 {
-                    <form asp-controller="Cuenta" asp-action="Logout" method="post" class="d-inline">
-                        <button type="submit" class="btn btn-link nav-link">Cerrar sesión</button>
-                    </form>
+                    <div class="d-flex align-items-center gap-2">
+                        <a class="nav-link" asp-controller="Estudios" asp-action="Index">Estudios</a>
+                        <form asp-controller="Cuenta" asp-action="Logout" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-link nav-link">Cerrar sesión</button>
+                        </form>
+                    </div>
                 }
             </div>
         </nav>

@@ -1,0 +1,18 @@
+@model MiArchivoMedico.Web.Data.Estudio
+@{
+    ViewData["Title"] = "Eliminar estudio";
+}
+
+<h1 class="h3 mb-3">Eliminar estudio</h1>
+
+<div class="alert alert-warning" role="alert">
+    Vas a eliminar <strong>@Model.Titulo</strong> y sus @Model.Archivos.Count archivo(s).
+    La operación no se puede deshacer.
+</div>
+
+<form asp-action="Eliminar" asp-route-id="@Model.Id" method="post">
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+        <a asp-action="Detalle" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Cancelar</a>
+    </div>
+</form>

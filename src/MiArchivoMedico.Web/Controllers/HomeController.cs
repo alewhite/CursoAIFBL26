@@ -8,10 +8,7 @@ namespace MiArchivoMedico.Web.Controllers;
 public class HomeController : Controller
 {
     // La política global exige autenticación: Index queda protegido sin atributo (RF-01, AC-01).
-    public IActionResult Index()
-    {
-        return View();
-    }
+    public IActionResult Index() => RedirectToAction("Index", "Estudios");
 
     [AllowAnonymous]
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

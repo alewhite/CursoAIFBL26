@@ -1,0 +1,28 @@
+@model MiArchivoMedico.Web.Data.ArchivoDeEstudio
+@{
+    ViewData["Title"] = Model.NombreOriginal;
+}
+
+<div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+    <h1 class="h5 mb-0 text-break">@Model.NombreOriginal</h1>
+    <span class="d-flex gap-2">
+        <a asp-action="Descargar" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-secondary">
+            Descargar
+        </a>
+        <a asp-controller="Estudios" asp-action="Detalle" asp-route-id="@Model.EstudioId"
+           class="btn btn-sm btn-outline-secondary">Volver al estudio</a>
+    </span>
+</div>
+
+@* El contenido se incrusta aislado: el atributo sandbox sin tokens impide scripts y formularios, y la
+   respuesta llega además con una CSP que apaga todo contenido activo (RNF-20, AC-26). *@
+@if (Model.EsImagen)
+{
+    <img src="@Url.Action("Contenido", new { id = Model.Id })" alt="@Model.NombreOriginal"
+         class="img-fluid border rounded" />
+}
+else
+{
+    <iframe src="@Url.Action("Contenido", new { id = Model.Id })" title="@Model.NombreOriginal"
+            sandbox class="w-100 border rounded" style="height: 75vh;"></iframe>
+}

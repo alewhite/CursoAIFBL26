@@ -26,6 +26,18 @@ public sealed class AplicacionDePrueba : WebApplicationFactory<Program>, IAsyncL
 
     public FakeTimeProvider Reloj { get; } = new(new DateTimeOffset(2026, 1, 15, 9, 0, 0, TimeSpan.Zero));
 
+    /// <summary>Carpeta de archivos cifrados, para poder inspeccionar el disco desde los tests (AC-57, AC-65).</summary>
+    public string RutaDeAlmacenamiento => Path.Combine(_rutaBase, "archivos");
+
+    /// <summary>Clave AES-256 ficticia. Se puede vaciar antes del primer arranque para ejercitar AC-83.</summary>
+    public string ClaveDeCifradoBase64 { get; set; } = Convert.ToBase64String(Enumerable
+        .Range(0, 32)
+        .Select(i => (byte)(i * 7 + 3))
+        .ToArray());
+
+    /// <summary>Cupo total de almacenamiento; los tests de límite lo bajan (RNF-52).</summary>
+    public long CupoTotalEnBytes { get; set; } = 20L * 1024 * 1024 * 1024;
+
     /// <summary>Cuentas sembradas por omisión. Los tests de cupo agregan las que necesiten.</summary>
     public List<(string Usuario, string Email, string Contrasena)> CuentasIniciales { get; } =
     [
@@ -69,11 +81,18 @@ public sealed class AplicacionDePrueba : WebApplicationFactory<Program>, IAsyncL
     {
         builder.UseEnvironment("Production");
 
+        // Sin esto, una excepción del servidor llega al test como un 500 opaco y hay que adivinar.
+        builder.UseSetting("detailedErrors", "true");
+
         // UseSetting y no ConfigureAppConfiguration: con hosting mínimo, Program lee la cadena de conexión
         // durante CreateBuilder, antes de que corran los callbacks de configuración de la fábrica.
         builder.UseSetting(
             "ConnectionStrings:ArchivoMedico",
             $"Data Source={Path.Combine(_rutaBase, "archivo-medico.db")}");
+
+        builder.UseSetting("Almacenamiento:Ruta", RutaDeAlmacenamiento);
+        builder.UseSetting("Almacenamiento:ClaveBase64", ClaveDeCifradoBase64);
+        builder.UseSetting("Almacenamiento:CupoTotalEnBytes", CupoTotalEnBytes.ToString());
 
         for (var i = 0; i < CuentasIniciales.Count; i++)
         {

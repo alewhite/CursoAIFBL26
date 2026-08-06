@@ -6,6 +6,9 @@ namespace MiArchivoMedico.Tests.Infraestructura;
 /// <summary>Operaciones de sesión sobre el formulario real, incluido el token antifalsificación.</summary>
 public static partial class ClienteDeSesion
 {
+    /// <summary>Página que exige sesión. La raíz no sirve: redirige al listado y devuelve 302.</summary>
+    private const string RutaProtegida = "/Estudios";
+
     public static async Task<HttpResponseMessage> IniciarSesionAsync(
         this HttpClient cliente, string usuario, string contrasena)
     {
@@ -23,7 +26,7 @@ public static partial class ClienteDeSesion
 
     public static async Task<HttpResponseMessage> CerrarSesionAsync(this HttpClient cliente)
     {
-        var pagina = await cliente.GetAsync("/");
+        var pagina = await cliente.GetAsync(RutaProtegida);
         pagina.EnsureSuccessStatusCode();
         var token = ExtraerToken(await pagina.Content.ReadAsStringAsync());
 
@@ -36,7 +39,7 @@ public static partial class ClienteDeSesion
     /// <summary>Una sesión válida devuelve la página; una inválida redirige al inicio de sesión.</summary>
     public static async Task<bool> TieneSesionValidaAsync(this HttpClient cliente)
     {
-        var respuesta = await cliente.GetAsync("/");
+        var respuesta = await cliente.GetAsync(RutaProtegida);
         return respuesta.StatusCode == HttpStatusCode.OK;
     }
 

@@ -1,7 +1,9 @@
+using MiArchivoMedico.Web.Archivos;
 using MiArchivoMedico.Web.Data;
 using MiArchivoMedico.Web.Security;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +23,28 @@ builder.Services.AddScoped<EventosDeSesion>();
 
 builder.Services.AddDbContext<ArchivoMedicoDbContext>(opciones =>
     opciones.UseSqlite(cadenaDeConexion));
+
+builder.Services.Configure<OpcionesDeAlmacenamiento>(
+    builder.Configuration.GetSection(OpcionesDeAlmacenamiento.Seccion));
+
+// Si la clave de cifrado no se resuelve desde configuración externa, la aplicación no arranca: guardar
+// archivos médicos en claro no es una degradación aceptable (RNF-02, RNF-62, AC-83).
+// Sección ausente y clave vacía deben fallar igual, así que la instancia por omisión no se saltea.
+(builder.Configuration.GetSection(OpcionesDeAlmacenamiento.Seccion).Get<OpcionesDeAlmacenamiento>()
+    ?? new OpcionesDeAlmacenamiento()).ResolverClave();
+
+builder.Services.AddSingleton<IAlmacenamientoDeArchivos, AlmacenamientoCifradoEnDisco>();
+builder.Services.AddSingleton<ValidadorDeArchivos>();
+builder.Services.AddScoped<ServicioDeCargaDeArchivos>();
+
+// El límite de cuerpo cubre un envío completo: hasta 20 archivos de 50 MB no entran, pero sí el uso real
+// del formulario. Cada archivo se acota individualmente en ValidadorDeArchivos (RNF-14).
+builder.Services.Configure<FormOptions>(opciones =>
+{
+    opciones.MultipartBodyLengthLimit = 250L * 1024 * 1024;
+    opciones.MultipartHeadersLengthLimit = 32 * 1024;
+});
+builder.WebHost.ConfigureKestrel(opciones => opciones.Limits.MaxRequestBodySize = 250L * 1024 * 1024);
 
 builder.Services
     .AddIdentity<UsuarioApp, IdentityRole>(opciones =>
