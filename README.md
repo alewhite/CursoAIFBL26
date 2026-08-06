@@ -15,7 +15,7 @@ MVP en construcción. Lo que ya está implementado:
 | Andamiaje | Proyecto MVC, EF Core sobre SQLite en modo WAL, proyecto de tests | ✅ |
 | Feature 1 | Autenticación, sesiones, bloqueo por intentos fallidos, aislamiento por propietario | ✅ |
 | Feature 2 | Estudios y archivos: carga, validación, cifrado, visualización, descarga, borrado | ✅ |
-| Feature 3 | Listado, búsqueda por metadatos y filtros combinables | ⏳ |
+| Feature 3 | Listado, búsqueda por metadatos, filtros combinables y paginación | ✅ |
 | Pendiente | PWA (instalación, pantalla offline) y respaldos de infraestructura | ⏳ |
 
 ## Documentos del repositorio
@@ -91,7 +91,7 @@ src/MiArchivoMedico.Web/
   Controllers/          Cuenta (login), Estudios (CRUD), Archivos (ver, descargar)
   Data/                 DbContext, entidades, migraciones, inicialización y siembra
   Archivos/             validación, sanitización de nombres, almacenamiento cifrado
-  Dominio/              normalización de texto para búsqueda
+  Dominio/              normalización de texto, criterios y buscador de estudios
   Security/             sesión, hashing, usuario actual, alta de cuentas
   Models/ · Views/      formularios y vistas
 tests/MiArchivoMedico.Tests/
@@ -127,6 +127,10 @@ Cada una responde a un requerimiento del PRD, y cada una tiene test:
 - **Entrega de archivos (RNF-06, RNF-20).** No existe ninguna URL pública ni permanente: cada solicitud pasa
   por autenticación y por el filtro de propietario. El contenido se sirve con una CSP `sandbox` y se incrusta
   en un iframe con `sandbox`, de modo que un PDF con JavaScript embebido no lo ejecute.
+- **Búsqueda sobre columnas normalizadas (RNF-55).** SQLite no tiene intercalaciones insensibles a acentos,
+  así que cada campo buscable se persiste además normalizado (minúsculas, sin acentos, sin espacios
+  sobrantes) y el término ingresado se normaliza con la misma función. Buscar sobre las columnas originales
+  no cumpliría el requisito. No hay FTS5 ni índice de texto completo: sobre el volumen del MVP no hace falta.
 - **Nada de datos médicos en logs (RNF-09, RNF-43).** Ni títulos, descripciones, profesionales,
   instituciones, etiquetas ni nombres originales de archivo. Solo identificadores técnicos.
 

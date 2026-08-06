@@ -1,5 +1,6 @@
 using MiArchivoMedico.Web.Archivos;
 using MiArchivoMedico.Web.Data;
+using MiArchivoMedico.Web.Dominio;
 using MiArchivoMedico.Web.Security;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authorization;
@@ -36,6 +37,7 @@ builder.Services.Configure<OpcionesDeAlmacenamiento>(
 builder.Services.AddSingleton<IAlmacenamientoDeArchivos, AlmacenamientoCifradoEnDisco>();
 builder.Services.AddSingleton<ValidadorDeArchivos>();
 builder.Services.AddScoped<ServicioDeCargaDeArchivos>();
+builder.Services.AddScoped<BuscadorDeEstudios>();
 
 // El límite de cuerpo cubre un envío completo: hasta 20 archivos de 50 MB no entran, pero sí el uso real
 // del formulario. Cada archivo se acota individualmente en ValidadorDeArchivos (RNF-14).

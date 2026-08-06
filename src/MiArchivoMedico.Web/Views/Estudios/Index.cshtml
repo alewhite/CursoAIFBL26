@@ -1,6 +1,7 @@
-@model IReadOnlyList<MiArchivoMedico.Web.Data.Estudio>
+@model MiArchivoMedico.Web.Models.ListadoDeEstudiosViewModel
 @{
     ViewData["Title"] = "Estudios";
+    var resultado = Model.Resultado;
 }
 
 <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
@@ -8,14 +9,68 @@
     <a asp-action="Crear" class="btn btn-primary">Nuevo estudio</a>
 </div>
 
-@if (Model.Count == 0)
+@* Un único formulario GET: la búsqueda de texto y los filtros se combinan y viajan juntos (RF-21). *@
+<form asp-action="Index" method="get" class="row g-2 align-items-end mb-3">
+    <div class="col-12 col-lg-4">
+        <label asp-for="Texto" class="form-label"></label>
+        <input asp-for="Texto" class="form-control" placeholder="Título, profesional, institución…" />
+    </div>
+
+    <div class="col-6 col-lg-2">
+        <label asp-for="Desde" class="form-label"></label>
+        <input asp-for="Desde" type="date" class="form-control" />
+    </div>
+
+    <div class="col-6 col-lg-2">
+        <label asp-for="Hasta" class="form-label"></label>
+        <input asp-for="Hasta" type="date" class="form-control" />
+    </div>
+
+    <div class="col-12 col-lg-2">
+        <label asp-for="Institucion" class="form-label"></label>
+        <select asp-for="Institucion" class="form-select">
+            <option value="">Todas</option>
+            @foreach (var institucion in Model.Instituciones)
+            {
+                <option value="@institucion">@institucion</option>
+            }
+        </select>
+    </div>
+
+    <div class="col-12 col-lg-2 d-flex gap-2">
+        <button type="submit" class="btn btn-outline-primary flex-grow-1">Buscar</button>
+        @if (Model.HayFiltrosAplicados)
+        {
+            @* Una sola acción devuelve el listado completo (RF-22, AC-36). *@
+            <a asp-action="Index" class="btn btn-outline-secondary">Limpiar filtros</a>
+        }
+    </div>
+</form>
+
+@* Cantidad de estudios encontrados (RF-23, AC-37). *@
+<p class="text-muted" data-testid="contador-de-resultados">
+    @if (resultado.Total == 1)
+    {
+        <text>Se encontró 1 estudio.</text>
+    }
+    else
+    {
+        <text>Se encontraron @resultado.Total estudios.</text>
+    }
+</p>
+
+@if (resultado.Total == 0)
 {
-    <p class="text-muted">Todavía no cargaste ningún estudio.</p>
+    <p class="text-muted">
+        @(Model.HayFiltrosAplicados
+            ? "Ningún estudio coincide con la búsqueda."
+            : "Todavía no cargaste ningún estudio.")
+    </p>
 }
 else
 {
     <ul class="list-unstyled">
-        @foreach (var estudio in Model)
+        @foreach (var estudio in resultado.Elementos)
         {
             <li class="border-bottom py-3">
                 <a asp-action="Detalle" asp-route-id="@estudio.Id" class="h6 d-block mb-1">@estudio.Titulo</a>
@@ -27,7 +82,40 @@ else
                     }
                     <span>· @estudio.Archivos.Count archivo(s)</span>
                 </div>
+                @if (estudio.Etiquetas.Count > 0)
+                {
+                    <div class="mt-1">
+                        @foreach (var etiqueta in estudio.Etiquetas)
+                        {
+                            <span class="badge text-bg-secondary me-1">@etiqueta.Texto</span>
+                        }
+                    </div>
+                }
             </li>
         }
     </ul>
+
+    @* Paginación a partir del estudio 26 (RNF-27, AC-54). Los enlaces conservan los filtros vigentes. *@
+    @if (resultado.TotalDePaginas > 1)
+    {
+        <nav aria-label="Paginación" class="d-flex flex-wrap gap-2 align-items-center">
+            @if (resultado.HayPaginaAnterior)
+            {
+                <a class="btn btn-outline-secondary btn-sm"
+                   asp-all-route-data="Model.ComoRuta(resultado.Pagina - 1)"
+                   data-testid="pagina-anterior">Anterior</a>
+            }
+
+            <span class="text-muted small">
+                Página @resultado.Pagina de @resultado.TotalDePaginas
+            </span>
+
+            @if (resultado.HayPaginaSiguiente)
+            {
+                <a class="btn btn-outline-secondary btn-sm"
+                   asp-all-route-data="Model.ComoRuta(resultado.Pagina + 1)"
+                   data-testid="pagina-siguiente">Siguiente</a>
+            }
+        </nav>
+    }
 }

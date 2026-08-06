@@ -1,5 +1,6 @@
 using MiArchivoMedico.Web.Archivos;
 using MiArchivoMedico.Web.Data;
+using MiArchivoMedico.Web.Dominio;
 using MiArchivoMedico.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,35 +17,37 @@ namespace MiArchivoMedico.Web.Controllers;
 public class EstudiosController : Controller
 {
     private readonly ArchivoMedicoDbContext _contexto;
+    private readonly BuscadorDeEstudios _buscador;
     private readonly ServicioDeCargaDeArchivos _carga;
     private readonly IAlmacenamientoDeArchivos _almacenamiento;
     private readonly TimeProvider _reloj;
 
     public EstudiosController(
         ArchivoMedicoDbContext contexto,
+        BuscadorDeEstudios buscador,
         ServicioDeCargaDeArchivos carga,
         IAlmacenamientoDeArchivos almacenamiento,
         TimeProvider reloj)
     {
         _contexto = contexto;
+        _buscador = buscador;
         _carga = carga;
         _almacenamiento = almacenamiento;
         _reloj = reloj;
     }
 
-    /// <summary>Listado del más reciente al más antiguo (RF-15, AC-28). La búsqueda llega en la Feature 3.</summary>
+    /// <summary>
+    /// Listado del más reciente al más antiguo, con búsqueda y filtros combinables
+    /// (RF-15 a RF-17, RF-20 a RF-23).
+    /// </summary>
     [HttpGet]
-    public async Task<IActionResult> Index(CancellationToken cancelacion)
+    public async Task<IActionResult> Index(
+        ListadoDeEstudiosViewModel modelo, CancellationToken cancelacion)
     {
-        var estudios = await _contexto.Estudios
-            .AsNoTracking()
-            .Include(e => e.Etiquetas)
-            .Include(e => e.Archivos)
-            .OrderByDescending(e => e.Fecha)
-            .ThenByDescending(e => e.CreadoUtc)
-            .ToListAsync(cancelacion);
+        modelo.Resultado = await _buscador.BuscarAsync(modelo.ACriterios(), cancelacion);
+        modelo.Instituciones = await _buscador.InstitucionesAsync(cancelacion);
 
-        return View(estudios);
+        return View(modelo);
     }
 
     [HttpGet]
