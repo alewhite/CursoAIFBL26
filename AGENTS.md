@@ -55,6 +55,16 @@ Una tarea no está terminada hasta que:
 5. El cambio referencia el RF/RNF/AC del PRD que satisface. Si no hay ninguno, el cambio está fuera de alcance:
    preguntar antes de implementar, no ampliar el PRD por cuenta propia.
 
+## Commits
+Conventional Commits en español, en imperativo y sin acentos en el asunto. El skill `conventional-commit`
+tiene el formato completo.
+
+**Un commit por paso que funciona, no uno por feature.** Cada vez que el árbol vuelve a un estado
+consistente —compila, los tests pasan— eso es un commit, aunque la feature esté a medio camino: la
+migración y la entidad antes que el controlador, el controlador antes que las vistas, el camino feliz antes
+que las validaciones. Un commit de 39 archivos y 3.300 líneas es un único punto de retorno para un día
+entero de trabajo: si algo se rompe en el medio, no hay dónde volver ni qué revisar de a poco.
+
 ## Datos de prueba
 Nunca usar estudios, nombres, instituciones ni archivos reales en desarrollo, tests o fixtures: solo datos
 ficticios (RNF-10). Los archivos de prueba se generan; no se copian de un caso real.
