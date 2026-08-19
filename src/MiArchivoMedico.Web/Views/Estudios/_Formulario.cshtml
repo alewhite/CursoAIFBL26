@@ -3,6 +3,10 @@
 @* Una sola pantalla para metadatos y archivos: el alta no supera los tres pasos (RNF-31, AC-79). *@
 <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
 
+@* Lo completa carga.js cuando el envío no llega a destino (RF-28, AC-42). Nace oculto y sin texto: si
+   no hay JavaScript, no hay aviso que mostrar. *@
+<div class="alert alert-warning" role="alert" tabindex="-1" data-aviso-de-carga-mensaje hidden></div>
+
 <div class="row g-3">
     <div class="col-12 col-md-8">
         <label asp-for="Titulo" class="form-label"></label>

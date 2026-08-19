@@ -133,4 +133,31 @@ public class PwaTests : IAsyncLifetime
             .Distinct()
             .ToList();
     }
+
+    /// <summary>
+    /// El aviso en sí lo da el navegador: cuando la conexión se corta durante el envío, el servidor no
+    /// llega a responder nada. Lo que se puede verificar desde acá es que las dos pantallas de carga
+    /// lleven el aviso y el guion que lo muestra, que es lo que se rompe al editar una vista.
+    /// </summary>
+    [Fact(DisplayName = "AC-42: las pantallas de carga incluyen el aviso de conexión perdida")]
+    public async Task FormulariosDeCarga_IncluyenElAvisoDeConexionPerdida()
+    {
+        var cliente = _app.CrearCliente();
+        await cliente.IniciarSesionAsync(AplicacionDePrueba.Usuario, AplicacionDePrueba.Contrasena);
+        var id = await cliente.CrearYObtenerIdAsync("Estudio ficticio");
+
+        foreach (var ruta in new[] { "/Estudios/Crear", $"/Estudios/Editar/{id}" })
+        {
+            var html = await cliente.GetStringAsync(ruta);
+
+            Assert.Contains("data-aviso-de-carga", html);
+            Assert.Contains("data-aviso-de-carga-mensaje", html);
+            Assert.Contains("/js/carga.js", html);
+        }
+
+        var guion = await cliente.GetStringAsync("/js/carga.js");
+
+        // El texto es lo que exige AC-42: que el usuario sepa que el archivo no quedó cargado.
+        Assert.Contains("El archivo no fue cargado", guion);
+    }
 }
