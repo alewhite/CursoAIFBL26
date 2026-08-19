@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Titulo"] · Mi Archivo Médico</title>
     <link rel="stylesheet" href="~/css/sitio.css" asp-append-version="true" />
+    <link rel="manifest" href="~/manifest.webmanifest" />
+    <meta name="theme-color" content="#1f6f8b" />
+    <link rel="icon" href="~/iconos/icono-192.png" sizes="192x192" />
 </head>
 <body>
     <header class="principal">
@@ -21,6 +24,13 @@
     <main class="contenedor">
         @RenderBody()
     </main>
+    <script>
+        // Registro del service worker. La aplicación no promueve su instalación: publica el
+        // manifiesto y decide el navegador.
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js');
+        }
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

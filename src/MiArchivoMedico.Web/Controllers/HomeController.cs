@@ -1,31 +1,23 @@
-using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MiArchivoMedico.Web.Models;
 
 namespace MiArchivoMedico.Web.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly ILogger<HomeController> _logger;
+    [HttpGet]
+    public IActionResult Index() => RedirectToAction("Index", "Estudios");
 
-    public HomeController(ILogger<HomeController> logger)
-    {
-        _logger = logger;
-    }
+    /// <summary>
+    /// Única pantalla anónima de la aplicación además del ingreso. No usa el layout y no muestra ningún
+    /// dato médico, para que la copia que guarda el service worker sea idéntica para cualquiera
+    /// (RF-26, RNF-51, AC-40, AC-41).
+    /// </summary>
+    [AllowAnonymous]
+    [HttpGet("/sin-conexion")]
+    public IActionResult SinConexion() => View();
 
-    public IActionResult Index()
-    {
-        return View();
-    }
-
-    public IActionResult Privacy()
-    {
-        return View();
-    }
-
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
-    {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-    }
+    [AllowAnonymous]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+    public IActionResult Error() => View();
 }

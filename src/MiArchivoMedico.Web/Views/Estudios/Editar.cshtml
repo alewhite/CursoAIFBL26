@@ -1,0 +1,43 @@
+@model MiArchivoMedico.Web.Models.EstudioFormulario
+@{
+    ViewData["Titulo"] = "Editar estudio";
+}
+<h1>Editar estudio</h1>
+
+<form method="post" class="tarjeta">
+    <div class="campo">
+        <label asp-for="Titulo">Título</label>
+        <input asp-for="Titulo" />
+        <span class="error" data-error-de="Titulo" asp-validation-for="Titulo"></span>
+    </div>
+    <div class="campo">
+        <label asp-for="Fecha">Fecha</label>
+        <input asp-for="Fecha" type="date" />
+        <span class="error" data-error-de="Fecha" asp-validation-for="Fecha"></span>
+    </div>
+    <div class="campo">
+        <label asp-for="Profesional">Profesional</label>
+        <input asp-for="Profesional" />
+        <span class="error" data-error-de="Profesional" asp-validation-for="Profesional"></span>
+    </div>
+    <div class="campo">
+        <label asp-for="Institucion">Institución</label>
+        <input asp-for="Institucion" />
+        <span class="error" data-error-de="Institucion" asp-validation-for="Institucion"></span>
+    </div>
+    <div class="campo">
+        <label asp-for="Descripcion">Descripción</label>
+        <textarea asp-for="Descripcion" rows="4"></textarea>
+        <span class="error" data-error-de="Descripcion" asp-validation-for="Descripcion"></span>
+    </div>
+    <div class="campo">
+        <label asp-for="Etiquetas">Etiquetas</label>
+        <input asp-for="Etiquetas" placeholder="separadas por coma" />
+    </div>
+
+    @* Los archivos no se editan acá: esta pantalla solo toca metadatos. *@
+    <div class="acciones">
+        <button type="submit">Guardar cambios</button>
+        <a class="boton secundario" asp-action="Detalle" asp-route-id="@ViewContext.RouteData.Values["id"]">Cancelar</a>
+    </div>
+</form>

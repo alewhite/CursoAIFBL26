@@ -202,6 +202,65 @@ public class EstudiosController(
     }
 
     [HttpGet]
+    public async Task<IActionResult> Editar(Guid id)
+    {
+        var estudio = await contexto.Estudios
+            .Include(e => e.Etiquetas)
+            .FirstOrDefaultAsync(e => e.Id == id);
+
+        if (estudio is null) return NoEncontrado();
+
+        ViewData["Titulo"] = "Editar estudio";
+        return View(new EstudioFormulario
+        {
+            Titulo = estudio.Titulo,
+            Fecha = estudio.Fecha,
+            Profesional = estudio.Profesional,
+            Institucion = estudio.Institucion,
+            Descripcion = estudio.Descripcion,
+            Etiquetas = string.Join(", ", estudio.Etiquetas.Select(t => t.Texto)),
+        });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Editar(Guid id, EstudioFormulario formulario)
+    {
+        var estudio = await contexto.Estudios
+            .Include(e => e.Etiquetas)
+            .FirstOrDefaultAsync(e => e.Id == id);
+
+        if (estudio is null) return NoEncontrado();
+
+        if (formulario.Fecha is { } fecha && fecha > DateOnly.FromDateTime(reloj.GetUtcNow().UtcDateTime))
+            ModelState.AddModelError(nameof(EstudioFormulario.Fecha), "La fecha no puede ser posterior al día de hoy.");
+
+        if (!ModelState.IsValid)
+        {
+            ViewData["Titulo"] = "Editar estudio";
+            return View(formulario);
+        }
+
+        // Solo metadatos: los archivos y su huella no se tocan (RNF-18, AC-14). Las columnas
+        // normalizadas las recalcula la interceptación de SaveChanges, no este método.
+        estudio.Titulo = formulario.Titulo;
+        estudio.Fecha = formulario.Fecha!.Value;
+        estudio.Profesional = formulario.Profesional;
+        estudio.Institucion = formulario.Institucion;
+        estudio.Descripcion = formulario.Descripcion;
+
+        contexto.Etiquetas.RemoveRange(estudio.Etiquetas);
+        estudio.Etiquetas.Clear();
+        foreach (var texto in formulario.EtiquetasSeparadas())
+            estudio.Etiquetas.Add(new EtiquetaDeEstudio { Texto = texto });
+
+        await contexto.SaveChangesAsync();
+
+        TempData["Mensaje"] = "Los datos del estudio se actualizaron.";
+        return RedirectToAction(nameof(Detalle), new { id });
+    }
+
+    [HttpGet]
     public async Task<IActionResult> Eliminar(Guid id)
     {
         var estudio = await contexto.Estudios

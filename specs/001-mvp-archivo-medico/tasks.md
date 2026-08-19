@@ -242,10 +242,10 @@ declarado.
 **Prueba independiente**: editar cada metadato de un estudio existente y verificar que el cambio
 persiste y que la huella de sus archivos no cambió.
 
-- [ ] T104 [P] [US5] Escribir los tests de edición de metadatos y de huella intacta en `tests/MiArchivoMedico.Tests/EdicionDeEstudioTests.cs` (AC-14)
-- [ ] T105 [P] [US5] Escribir el test de edición de un estudio ajeno en `tests/MiArchivoMedico.Tests/PropiedadDeDatosTests.cs` (RNF-53)
-- [ ] T106 [US5] Implementar la edición de metadatos en `src/MiArchivoMedico.Web/Controllers/EstudiosController.cs`, apoyándose en la interceptación para recalcular las columnas normalizadas (RF-10)
-- [ ] T107 [P] [US5] Crear la vista de edición en `src/MiArchivoMedico.Web/Views/Estudios/Editar.cshtml`
+- [X] T104 [P] [US5] Escribir los tests de edición de metadatos y de huella intacta en `tests/MiArchivoMedico.Tests/EdicionDeEstudioTests.cs` (AC-14)
+- [X] T105 [P] [US5] Escribir el test de edición de un estudio ajeno en `tests/MiArchivoMedico.Tests/PropiedadDeDatosTests.cs` (RNF-53)
+- [X] T106 [US5] Implementar la edición de metadatos en `src/MiArchivoMedico.Web/Controllers/EstudiosController.cs`, apoyándose en la interceptación para recalcular las columnas normalizadas (RF-10)
+- [X] T107 [P] [US5] Crear la vista de edición en `src/MiArchivoMedico.Web/Views/Estudios/Editar.cshtml`
 
 **Punto de control**: la Historia 5 funciona sin haber tocado nada de las anteriores.
 
@@ -259,13 +259,13 @@ viejos.
 **Prueba independiente**: verificar la instalación, la pantalla sin conexión, el aviso de carga
 interrumpida y las acciones principales a 360 píxeles.
 
-- [ ] T108 [P] [US6] Escribir el test que pide cada entrada de la lista `ESTATICOS` sin sesión en `tests/MiArchivoMedico.Tests/PwaTests.cs` (RNF-51, AC-41)
-- [ ] T109 [P] [US6] Escribir el test de que la pantalla sin conexión es anónima y no contiene datos médicos en `tests/MiArchivoMedico.Tests/PwaTests.cs` (AC-40)
-- [ ] T110 [P] [US6] Crear `manifest.webmanifest` con ícono propio y presentación en ventana propia en `src/MiArchivoMedico.Web/wwwroot/manifest.webmanifest` (RF-24)
-- [ ] T111 [P] [US6] Crear los íconos de la aplicación en `src/MiArchivoMedico.Web/wwwroot/iconos/`
-- [ ] T112 [US6] Escribir el service worker en `src/MiArchivoMedico.Web/wwwroot/sw.js` con una única regla: guarda solo la lista `ESTATICOS` y **nunca** escribe una respuesta de red (RNF-51)
-- [ ] T113 [US6] Implementar `HomeController.SinConexion` con `[AllowAnonymous]` y su vista sin layout en `src/MiArchivoMedico.Web/Views/Home/SinConexion.cshtml` (RF-26)
-- [ ] T114 [US6] Agregar al `carga.js` el aviso de carga interrumpida por pérdida de conexión, del lado del navegador, en `src/MiArchivoMedico.Web/wwwroot/js/carga.js` (RF-28, AC-42)
+- [X] T108 [P] [US6] Escribir el test que pide cada entrada de la lista `ESTATICOS` sin sesión en `tests/MiArchivoMedico.Tests/PwaTests.cs` (RNF-51, AC-41)
+- [X] T109 [P] [US6] Escribir el test de que la pantalla sin conexión es anónima y no contiene datos médicos en `tests/MiArchivoMedico.Tests/PwaTests.cs` (AC-40)
+- [X] T110 [P] [US6] Crear `manifest.webmanifest` con ícono propio y presentación en ventana propia en `src/MiArchivoMedico.Web/wwwroot/manifest.webmanifest` (RF-24)
+- [X] T111 [P] [US6] Crear los íconos de la aplicación en `src/MiArchivoMedico.Web/wwwroot/iconos/`
+- [X] T112 [US6] Escribir el service worker en `src/MiArchivoMedico.Web/wwwroot/sw.js` con una única regla: guarda solo la lista `ESTATICOS` y **nunca** escribe una respuesta de red (RNF-51)
+- [X] T113 [US6] Implementar `HomeController.SinConexion` con `[AllowAnonymous]` y su vista sin layout en `src/MiArchivoMedico.Web/Views/Home/SinConexion.cshtml` (RF-26)
+- [X] T114 [US6] Agregar al `carga.js` el aviso de carga interrumpida por pérdida de conexión, del lado del navegador, en `src/MiArchivoMedico.Web/wwwroot/js/carga.js` (RF-28, AC-42)
 
 **Punto de control**: la aplicación se instala y se comporta bien sin conexión.
 
@@ -279,13 +279,13 @@ médico en un registro, y con respaldos que se puedan restaurar.
 **Prueba independiente**: un ciclo de vida completo de un estudio ficticio con cadenas únicas, más un
 ciclo de respaldo y una restauración en un entorno limpio.
 
-- [ ] T115 [P] [US7] Escribir el test que crea, visualiza y elimina un estudio con cadenas únicas y busca esas cadenas en todo lo emitido por el canal de registro en `tests/MiArchivoMedico.Tests/PrivacidadEnLogsTests.cs` (AC-43)
-- [ ] T116 [P] [US7] Escribir el test equivalente sobre el canal de métricas, incluidos nombres, etiquetas y valores, en `tests/MiArchivoMedico.Tests/PrivacidadEnLogsTests.cs` (AC-85)
-- [ ] T117 [US7] Revisar todo el registro de la aplicación para que use solo identificadores técnicos, en `src/MiArchivoMedico.Web/` (RNF-09, RNF-43)
-- [ ] T118 [P] [US7] Documentar el procedimiento de alta y de restablecimiento de contraseña por configuración externa en `docs/operacion.md` (RNF-54)
-- [ ] T119 [P] [US7] Documentar el procedimiento de respaldo diario con `VACUUM INTO`, su retención de 30 días, su destino en cuenta separada y la coordinación con el respaldo de archivos en `docs/operacion.md` (RNF-34, RNF-35, RNF-59)
-- [ ] T120 [P] [US7] Documentar el procedimiento de custodia de la clave de cifrado, separado del entorno y de los respaldos, en `docs/operacion.md` (RNF-58)
-- [ ] T121 [P] [US7] Documentar el procedimiento de prueba de recuperación trimestral y su registro de evidencia en `docs/operacion.md` (RNF-37)
+- [X] T115 [P] [US7] Escribir el test que crea, visualiza y elimina un estudio con cadenas únicas y busca esas cadenas en todo lo emitido por el canal de registro en `tests/MiArchivoMedico.Tests/PrivacidadEnLogsTests.cs` (AC-43)
+- [X] T116 [P] [US7] Escribir el test equivalente sobre el canal de métricas, incluidos nombres, etiquetas y valores, en `tests/MiArchivoMedico.Tests/PrivacidadEnLogsTests.cs` (AC-85)
+- [X] T117 [US7] Revisar todo el registro de la aplicación para que use solo identificadores técnicos, en `src/MiArchivoMedico.Web/` (RNF-09, RNF-43)
+- [X] T118 [P] [US7] Documentar el procedimiento de alta y de restablecimiento de contraseña por configuración externa en `docs/operacion.md` (RNF-54)
+- [X] T119 [P] [US7] Documentar el procedimiento de respaldo diario con `VACUUM INTO`, su retención de 30 días, su destino en cuenta separada y la coordinación con el respaldo de archivos en `docs/operacion.md` (RNF-34, RNF-35, RNF-59)
+- [X] T120 [P] [US7] Documentar el procedimiento de custodia de la clave de cifrado, separado del entorno y de los respaldos, en `docs/operacion.md` (RNF-58)
+- [X] T121 [P] [US7] Documentar el procedimiento de prueba de recuperación trimestral y su registro de evidencia en `docs/operacion.md` (RNF-37)
 
 **Punto de control**: el sistema es operable y auditable por una persona sola.
 

@@ -1,0 +1,24 @@
+@{
+    // Sin layout a propósito: la copia que guarda el service worker tiene que ser idéntica para
+    // cualquiera, con sesión o sin ella, y no debe contener ningún dato médico (RF-26, AC-40, AC-41).
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sin conexión · Mi Archivo Médico</title>
+    <link rel="stylesheet" href="~/css/sitio.css" />
+</head>
+<body>
+    <main class="contenedor" style="max-width: 30rem;">
+        <h1>Sin conexión</h1>
+        <div class="tarjeta">
+            <p>No hay conexión a internet, así que no podemos mostrarte tus estudios.</p>
+            <p>Tus datos están a salvo en el servidor: vas a poder verlos apenas vuelva la conexión.</p>
+            <p><button type="button" onclick="location.reload()">Reintentar</button></p>
+        </div>
+    </main>
+</body>
+</html>

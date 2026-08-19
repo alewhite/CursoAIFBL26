@@ -92,6 +92,28 @@ public static class ClienteDeEstudios
         return await cliente.PostAsync($"/Estudios/AgregarArchivos/{estudioId}", contenido);
     }
 
+    public static async Task<HttpResponseMessage> EditarEstudioAsync(
+        this HttpClient cliente, Guid id, string titulo, DateOnly fecha,
+        string? profesional = null, string? institucion = null, string? descripcion = null,
+        string? etiquetas = null)
+    {
+        var formulario = await cliente.GetAsync($"/Estudios/Editar/{id}");
+        var token = ClienteDeSesion.ExtraerTokenAntifalsificacion(await formulario.Content.ReadAsStringAsync());
+
+        var campos = new Dictionary<string, string>
+        {
+            ["Titulo"] = titulo,
+            ["Fecha"] = fecha.ToString("yyyy-MM-dd"),
+        };
+        if (profesional is not null) campos["Profesional"] = profesional;
+        if (institucion is not null) campos["Institucion"] = institucion;
+        if (descripcion is not null) campos["Descripcion"] = descripcion;
+        if (etiquetas is not null) campos["Etiquetas"] = etiquetas;
+        if (token is not null) campos["__RequestVerificationToken"] = token;
+
+        return await cliente.PostAsync($"/Estudios/Editar/{id}", new FormUrlEncodedContent(campos));
+    }
+
     public static async Task<HttpResponseMessage> EliminarEstudioAsync(this HttpClient cliente, Guid id)
     {
         var confirmacion = await cliente.GetAsync($"/Estudios/Eliminar/{id}");
