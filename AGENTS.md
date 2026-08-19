@@ -4,8 +4,8 @@ Este archivo describe **el proyecto**: propósito, stack, arquitectura, convenci
 invariantes. El proceso de trabajo (fases, gates, cuándo testear, cuándo commitear y cuándo avanzar)
 pertenece a DAW y no debe duplicarse acá.
 
-`PRD2.md` es la **fuente única de verdad del alcance, requerimientos y criterios de aceptación**.
-Ante una contradicción sobre alcance o comportamiento del producto, prevalece `PRD2.md`.
+`docs/daw/prd/PRD2.md` es la **fuente única de verdad del alcance, requerimientos y criterios de aceptación**.
+Ante una contradicción sobre alcance o comportamiento del producto, prevalece `docs/daw/prd/PRD2.md`.
 
 ---
 
@@ -27,7 +27,7 @@ Ante una contradicción sobre alcance o comportamiento del producto, prevalece `
 - Mantener los nombres técnicos propios de tecnologías, protocolos, clases y APIs cuando traducirlos
   genere ambigüedad.
 - No inventar sinónimos para conceptos del dominio: usar la terminología definida en este archivo y en
-  `PRD2.md`.
+  `docs/daw/prd/PRD2.md`.
 
 ---
 
@@ -40,7 +40,7 @@ Cada cuenta accede exclusivamente a sus propios estudios, archivos y metadatos. 
 la instalación, nunca los datos. La búsqueda se realiza únicamente sobre metadatos ingresados
 manualmente: el sistema no analiza ni extrae el contenido interno de los archivos.
 
-**PRD de referencia:** `PRD2.md`
+**PRD de referencia:** `docs/daw/prd/PRD2.md`
 
 ### Objetivos principales
 
@@ -58,7 +58,7 @@ manualmente: el sistema no analiza ni extrae el contenido interno de los archivo
 ## Stack
 
 Este es el stack de referencia del proyecto. No agregar ni reemplazar componentes sin que exista una
-necesidad concreta compatible con `PRD2.md`.
+necesidad concreta compatible con `docs/daw/prd/PRD2.md`.
 
 | Campo | Valor |
 |---|---|
@@ -254,7 +254,7 @@ El aislamiento por propietario es una invariante crítica del sistema (RNF-53).
 
 ## Qué NO hacer en este proyecto
 
-- No agregar funcionalidad fuera del alcance definido en `PRD2.md`.
+- No agregar funcionalidad fuera del alcance definido en `docs/daw/prd/PRD2.md`.
 - No implementar OCR ni extracción automática de texto.
 - No buscar dentro del contenido de PDFs o imágenes.
 - No agregar diagnósticos, recomendaciones, interpretaciones ni resúmenes médicos generados por IA.
@@ -334,7 +334,7 @@ Estas reglas describen propiedades permanentes del producto y deben mantenerse e
 7. **URLs limpias:** búsquedas y filtros no aparecen en la dirección solicitada.
 8. **Cupo estricto:** el almacenamiento definitivo nunca supera los 20 GB.
 9. **Sin datos médicos offline:** la PWA no cachea ni muestra información médica privada sin sesión.
-10. **Alcance controlado:** las funciones declaradas fuera de alcance en `PRD2.md` no forman parte del MVP.
+10. **Alcance controlado:** las funciones declaradas fuera de alcance en `docs/daw/prd/PRD2.md` no forman parte del MVP.
 
 ---
 
