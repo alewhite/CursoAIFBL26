@@ -86,7 +86,7 @@ antes de pasar a `/speckit-plan` y `/speckit-tasks`
       quién lo mide y con qué periodicidad? [Medibilidad, Spec §SC-014]
 - [x] CHK028 - ¿Está definido el momento y el responsable de dar por validados los criterios de aceptación
       al 100 %, dado que ese criterio de éxito depende de todos los demás? [Medibilidad, Spec §SC-015]
-- [ ] CHK029 - ¿Se distinguen los criterios de éxito que se evalúan una vez antes de entregar de los que
+- [x] CHK029 - ¿Se distinguen los criterios de éxito que se evalúan una vez antes de entregar de los que
       exigen observación continua en operación? [Claridad, Spec §SC-013, §SC-014]
 
 ## Datos, Tiempo y Aislamiento en la Verificación

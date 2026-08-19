@@ -82,6 +82,13 @@ los archivos. Un archivo que se cargue entre ambos queda en el respaldo de archi
 —se detecta y se descarta al restaurar—, mientras que el orden inverso produciría una fila apuntando a
 un archivo que el respaldo no tiene.
 
+**Un estudio eliminado sobrevive en los respaldos.** La eliminación desde la aplicación es física e
+inmediata —borra los metadatos y el contenido cifrado, y libera el cupo—, pero los respaldos ya tomados
+no se tocan: ese estudio sigue existiendo en ellos hasta que el último respaldo que lo contiene cae
+fuera de la ventana de 30 días. Es el precio de tener respaldos, y conviene decirlo antes de que alguien
+suponga que «eliminar» borra de todas partes. Si hiciera falta borrarlo también de los respaldos, el
+procedimiento es manual y consiste en descartar los respaldos afectados, no en editarlos.
+
 **Retención y destino:**
 
 - Un respaldo **por día**, conservado **30 días como mínimo**.
@@ -137,6 +144,22 @@ identificadores técnicos.
 Eso significa que para diagnosticar un problema **no se puede buscar por el título de un estudio**. Se
 busca por el identificador de la cuenta, que sí aparece, o se reproduce con datos ficticios. Es más
 incómodo, y es el precio correcto.
+
+### Retención y acceso a los registros técnicos
+
+Los registros no contienen datos médicos, pero sí identificadores de cuenta y de recurso, y horarios de
+actividad: quién entró y cuándo. Eso es información sobre las personas del grupo familiar, aunque no sea
+información de salud.
+
+| Aspecto | Decisión |
+|---|---|
+| **Retención** | 30 días, la misma ventana que los respaldos. Pasado ese plazo se descartan. |
+| **Quién accede** | Solo el administrador técnico, con las credenciales del servidor. No se exportan ni se envían a ningún servicio externo. |
+| **Dónde viven** | En el servidor, fuera de toda carpeta pública, junto al resto de los registros del sistema. |
+| **Nivel** | `Information` para la aplicación y `Warning` para el marco, según `appsettings.json`. Subirlo a `Debug` o `Trace` en producción no está previsto: esos niveles pueden incluir cuerpos de solicitud. |
+
+Si hiciera falta compartir un registro para diagnosticar algo con un tercero, se revisa antes a mano.
+No hay ninguna automatización que lo haga, y no debe haberla.
 
 **Si la aplicación no arranca**, el mensaje dice cuál de estas tres falta:
 

@@ -42,7 +42,7 @@ inequívocos, consistentes entre sí y verificables objetivamente, antes de pasa
       no solo la prohibición de mostrar datos médicos sin sesión? [Completitud, Spec §FR-057]
 - [x] CHK014 - ¿Está definida la sanitización del nombre de archivo en el momento de la descarga, y no
       solo al almacenarlo y mostrarlo? [Completitud, Spec §FR-034]
-- [ ] CHK015 - ¿Están documentados los requisitos de retención y de control de acceso de los propios logs
+- [x] CHK015 - ¿Están documentados los requisitos de retención y de control de acceso de los propios logs
       técnicos? [Hueco, Spec §FR-061, §FR-062]
 
 ## Claridad y Ausencia de Ambigüedad
@@ -65,7 +65,7 @@ inequívocos, consistentes entre sí y verificables objetivamente, antes de pasa
       deshabilitada libera un lugar? [Ambigüedad, Spec §FR-011]
 - [x] CHK023 - ¿Está especificado el modo de operación del cifrado y el tratamiento del vector de
       inicialización, o "AES-256" admite modos que no protegen el contenido? [Claridad, Spec §FR-035]
-- [ ] CHK024 - ¿Está definida en un único lugar la expresión "dato médico", en lugar de reenumerarse campo
+- [x] CHK024 - ¿Está definida en un único lugar la expresión "dato médico", en lugar de reenumerarse campo
       por campo en cada requisito que la usa? [Claridad, Spec §FR-061, §FR-062, §FR-063]
 - [x] CHK025 - ¿Está especificado si la cookie de autenticación es de sesión del navegador o persistente,
       dado que la aplicación instalada puede cerrarse y reabrirse? [Ambigüedad, Spec §FR-008]
@@ -75,7 +75,7 @@ inequívocos, consistentes entre sí y verificables objetivamente, antes de pasa
 - [x] CHK026 - ¿Son consistentes el requisito de URLs temporales con expiración de 5 minutos y el que
       exige que ninguna URL entregue un archivo sin sesión válida, o el primero describe un mecanismo que
       el segundo vuelve innecesario? [Conflicto, Spec §FR-045, §FR-046]
-- [ ] CHK027 - ¿Es consistente el borrado físico e inmediato de un estudio con la retención de 30 días de
+- [x] CHK027 - ¿Es consistente el borrado físico e inmediato de un estudio con la retención de 30 días de
       los respaldos, y está documentado que el contenido eliminado sobrevive en ellos?
       [Conflicto, Spec §FR-044, §FR-064]
 - [x] CHK028 - ¿Es consistente la prohibición de datos médicos en logs con el requisito de mostrar errores

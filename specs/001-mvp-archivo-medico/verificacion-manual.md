@@ -30,8 +30,26 @@ barra de direcciones** del navegador.
 
 ### AC-39 — Diez acciones sin desplazamiento horizontal, a 360 píxeles
 
-Con la ventana a 360 píxeles de ancho, ejecutar las diez acciones principales de RNF-30 y comprobar en
-cada una que **no aparece barra de desplazamiento horizontal en el cuerpo de la página**:
+**Condiciones de medición.** Sin fijarlas, dos personas miden distinto y el criterio deja de ser
+binario:
+
+| Condición | Valor |
+|---|---|
+| Ancho de la ventana | **360 píxeles CSS** exactos |
+| Alto de la ventana | **640 píxeles CSS**, el más bajo de uso corriente |
+| Orientación | **Vertical**. La horizontal no se mide: a 360 de ancho no aplica |
+| Tamaño de fuente base | El **por omisión del navegador**, 16 px, sin zoom del sistema ni del navegador |
+| Zoom de la página | **100 %** |
+| Barras de desplazamiento | Visibles, no superpuestas, para que ocupen ancho real |
+
+**Cómo se comprueba.** En cada acción, con la consola del navegador:
+
+```js
+document.documentElement.scrollWidth <= document.documentElement.clientWidth
+```
+
+**Pasa si** devuelve `true` en las diez. Con la ventana en esas condiciones, ejecutar las diez acciones
+principales de RNF-30:
 
 | # | Acción | Sin scroll horizontal |
 |---|---|---|
@@ -207,6 +225,27 @@ restantes.
 motivo ajeno —el teléfono se trabó, sonó el timbre— se descarta y se repite.
 
 ---
+
+## E · Qué se evalúa una vez y qué exige observación continua
+
+No todos los criterios se comprueban igual de seguido, y mezclarlos lleva a creer que el sistema está
+verificado cuando la mitad de las comprobaciones venció hace meses.
+
+**Una sola vez, antes de entregar.** Se ejecutan íntegros y no vuelven a mirarse salvo que cambie el
+código que tocan: los ocho del bloque A, los tres del bloque C y los dos del bloque D.
+
+**Observación continua durante la operación.** No se pueden dar por cumplidos con una corrida:
+
+| Criterio | Cada cuánto | Quién |
+|---|---|---|
+| AC-59 · un respaldo por día, 30 de retención | Revisión mensual del historial | Administrador técnico |
+| AC-60 · los respaldos no se alteran desde el entorno principal | Con cada cambio de credenciales | Administrador técnico |
+| AC-61, AC-67, AC-68 · restauración en entorno limpio | **Trimestral**, según RNF-37 | Administrador técnico |
+| AC-56 · HTTPS y TLS 1.2 o superior | Con cada renovación de certificado | Administrador técnico |
+| SC-014 · costo mensual dentro del límite | Con cada factura del hosting | Administrador técnico |
+
+La diferencia práctica: un criterio de la primera lista se marca una vez y queda; uno de la segunda,
+marcado hace seis meses, **no dice nada sobre hoy**.
 
 ## Planilla de resultados
 

@@ -82,7 +82,7 @@ inequívocos, consistentes entre sí y verificables objetivamente, antes de pasa
 
 ## Calidad y Medibilidad de los Criterios de Aceptación
 
-- [ ] CHK028 - ¿Están definidas las condiciones de medición de la ausencia de desplazamiento horizontal
+- [x] CHK028 - ¿Están definidas las condiciones de medición de la ausencia de desplazamiento horizontal
       —alto de la ventana, orientación, tamaño de fuente base—, de modo que el criterio dé el mismo
       resultado en dos evaluaciones? [Medibilidad, Spec §AC-39]
 - [x] CHK029 - ¿Puede evaluarse objetivamente el criterio de los tres pasos sin haber definido antes qué

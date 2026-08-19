@@ -522,6 +522,22 @@ AC-106) y ya citan sus identificadores. Las demás decisiones de esa sesión son
 existentes. **No queda ninguna deuda de trazabilidad**: todo requisito de este spec traza a un
 identificador permanente del PRD.
 
+### Definición: dato médico
+
+Se llama **dato médico** a cualquiera de estos, y esta es la única enumeración del documento: el
+**título**, la **fecha**, el **profesional**, la **institución**, la **descripción** y las **etiquetas**
+de un estudio; el **nombre original** de un archivo asociado; y el **contenido** de ese archivo. También
+lo es el **término de búsqueda** que un usuario escribe, porque es un fragmento de alguno de los
+anteriores.
+
+Los requisitos que prohíben exponer datos médicos —en registros, métricas, mensajes de error, caché del
+navegador o direcciones— se refieren exactamente a esta lista. Un campo nuevo que describa un estudio
+queda alcanzado sin necesidad de modificar cada requisito: alcanza con agregarlo acá.
+
+**No** son datos médicos los identificadores técnicos internos (el identificador de una cuenta, de un
+estudio o de un archivo), ni el tamaño en bytes, ni la huella SHA-256, ni las marcas de tiempo del
+sistema. Esos sí pueden registrarse.
+
 ### Requisitos Funcionales
 
 **Autenticación y sesión**
@@ -730,12 +746,11 @@ identificador permanente del PRD.
 - **FR-060**: El 100 % de las comunicaciones DEBE usar HTTPS con TLS 1.2 o superior, redirigiendo las
   solicitudes sin cifrar, y en producción DEBE emitirse la cabecera que obliga al navegador a usar
   HTTPS en las visitas posteriores, con vigencia de un año. *(RNF-01, AC-56)*
-- **FR-061**: Los títulos, profesionales, instituciones, descripciones, etiquetas, nombres originales de
-  archivo y resultados médicos NO DEBEN registrarse en logs técnicos. La prohibición alcanza a todo
-  registro producido durante la operación, incluidos los que genera la infraestructura por fuera de la
-  aplicación; el diseño DEBE impedir que esos datos lleguen a un registro, en lugar de depender de que
-  se los filtre después. *(RNF-09, AC-43)*
-- **FR-062**: Esos mismos datos NO DEBEN aparecer en métricas técnicas, incluidos nombres de métrica,
+- **FR-061**: Ningún **dato médico**, según la definición del comienzo de esta sección, DEBE registrarse
+  en logs técnicos. La prohibición alcanza a todo registro producido durante la operación, incluidos los
+  que genera la infraestructura por fuera de la aplicación; el diseño DEBE impedir que esos datos
+  lleguen a un registro, en lugar de depender de que se los filtre después. *(RNF-09, AC-43)*
+- **FR-062**: Ningún dato médico DEBE aparecer en métricas técnicas, incluidos nombres de métrica,
   etiquetas y valores. *(RNF-43, AC-85)*
 - **FR-063**: La aplicación NO DEBE incluir publicidad ni herramientas de seguimiento de comportamiento,
   NO DEBE compartir documentos ni metadatos médicos con terceros, y el contenido médico NO DEBE usarse
