@@ -110,6 +110,11 @@ ficticios (RNF-10). Los archivos de prueba se generan; no se copian de un caso r
 - **Nunca consultar estudios ni archivos sin filtrar por el propietario autenticado.** Toda query de EF Core sobre
   datos médicos filtra por el `OwnerId` del usuario de la sesión; un recurso de otra cuenta responde 403 o 404 aunque
   se conozca su identificador. Es el requisito crítico del sistema (RNF-53, RNF-08, AC-47 a AC-49).
+- **No poner datos médicos en la caché del service worker.** Solo entra la lista `ESTATICOS` de
+  `wwwroot/sw.js`, y ahí no hay ninguna ruta de la aplicación: las navegaciones y la entrega de archivos van
+  siempre a la red, y ninguna respuesta se guarda. Cachear páginas «para que ande offline» rompe RNF-51, que
+  exige que sin sesión no se vea información médica guardada antes. La pantalla sin conexión no muestra
+  datos y no usa el layout, para que la copia guardada sea idéntica para cualquiera (RF-26, AC-40, AC-41).
 - **No exponer archivos por URL pública ni permanente.** Todo acceso a un archivo pasa por autenticación y autorización;
   las URLs temporales expiran en 5 minutos como máximo. Secretos y cadenas de conexión, fuera del código fuente
   (RNF-06 a RNF-08, sección 11).

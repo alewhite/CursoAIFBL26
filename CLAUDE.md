@@ -62,6 +62,10 @@ de tocar algo, porque cambian la forma de escribir el código:
 - **Entrega de archivos**: `ArchivosController` sirve el contenido con CSP `sandbox` y `nosniff`, y la vista
   lo incrusta en un `iframe` con `sandbox`. Un identificador ajeno responde 404 por el filtro global, no por
   un chequeo explícito.
+- **La caché del navegador no toca la aplicación**: `wwwroot/sw.js` solo guarda lo que declara su lista
+  `ESTATICOS` —archivos estáticos y la pantalla `/sin-conexion`— y nunca escribe una respuesta de la red.
+  Las navegaciones y `/Archivos` son red o pantalla sin conexión, nada intermedio. `PwaTests` pide cada
+  entrada de esa lista sin sesión: si alguna exigiera autenticación, el test falla (RNF-51, AC-41).
 - **El tiempo se inyecta**: todo usa `TimeProvider` (registrado como singleton). No usar `DateTimeOffset.Now`
   ni `DateTime.UtcNow` directo, o el test correspondiente no puede ejercitar expiraciones ni ventanas de
   bloqueo.
