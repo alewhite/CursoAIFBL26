@@ -16,20 +16,60 @@ public class EstudiosController(
     ArchivoMedicoDbContext contexto,
     ServicioDeCargaDeArchivos carga,
     IAlmacenamientoDeArchivos almacenamiento,
+    BuscadorDeEstudios buscador,
+    EstadoDeBusqueda estado,
     TimeProvider reloj) : Controller
 {
     private const string ClaveDeMarcasUsadas = "marcas-de-envio-usadas";
 
     [HttpGet]
-    public async Task<IActionResult> Index()
+    public Task<IActionResult> Index() => MostrarListado(estado.Leer());
+
+    /// <summary>
+    /// El criterio llega en el cuerpo y se guarda en la sesión: así ningún dato médico aparece en la
+    /// dirección, ni siquiera al paginar (RNF-63, AC-96).
+    /// </summary>
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public Task<IActionResult> Buscar(CriterioDeBusqueda criterio)
+    {
+        criterio.Pagina = 1;
+        estado.Guardar(criterio);
+        return MostrarListado(criterio);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public Task<IActionResult> Pagina(int pagina)
+    {
+        var criterio = estado.Leer().EnPagina(pagina);
+        estado.Guardar(criterio);
+        return MostrarListado(criterio);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public Task<IActionResult> LimpiarFiltros()
+    {
+        // Una única acción borra el término y todos los filtros (RF-22, AC-36).
+        estado.Limpiar();
+        return MostrarListado(new CriterioDeBusqueda());
+    }
+
+    private async Task<IActionResult> MostrarListado(CriterioDeBusqueda criterio)
     {
         ViewData["Titulo"] = "Mis estudios";
-        var estudios = await contexto.Estudios
-            .OrderByDescending(e => e.Fecha)
-            .ThenByDescending(e => e.CreadoEn)
-            .ToListAsync();
 
-        return View(estudios);
+        var pagina = await buscador.BuscarAsync(criterio);
+        var modelo = new ListadoDeEstudios
+        {
+            Pagina = pagina,
+            Criterio = criterio.EnPagina(pagina.PaginaActual),
+            Instituciones = await buscador.InstitucionesAsync(),
+            CuentaSinEstudios = !await buscador.TieneAlgunEstudioAsync(),
+        };
+
+        return View(nameof(Index), modelo);
     }
 
     [HttpGet]

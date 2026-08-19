@@ -51,6 +51,8 @@ constructor.Services.AddSingleton<ValidadorDeArchivos>();
 constructor.Services.AddSingleton<IAlmacenamientoDeArchivos, AlmacenamientoCifradoEnDisco>();
 constructor.Services.AddScoped<ServicioDeCargaDeArchivos>();
 constructor.Services.AddScoped<GeneradorDeTokenDeArchivo>();
+constructor.Services.AddScoped<BuscadorDeEstudios>();
+constructor.Services.AddScoped<EstadoDeBusqueda>();
 
 constructor.Services.AddDbContext<ArchivoMedicoDbContext>(o => o.UseSqlite(cadenaDeConexion));
 

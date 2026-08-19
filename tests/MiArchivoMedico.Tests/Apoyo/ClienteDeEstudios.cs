@@ -111,8 +111,24 @@ public static class ClienteDeEstudios
         return cliente;
     }
 
-    public static async Task<HttpResponseMessage> BuscarAsync(
-        this HttpClient cliente, string? termino = null, string? institucion = null)
+    public static Task<HttpResponseMessage> BuscarAsync(
+        this HttpClient cliente, string? termino = null, string? institucion = null) =>
+        cliente.EnviarCriterioAsync("/Estudios/Buscar", termino, institucion);
+
+    public static Task<HttpResponseMessage> FiltrarAsync(
+        this HttpClient cliente, DateOnly? desde = null, DateOnly? hasta = null, string? institucion = null) =>
+        cliente.EnviarCriterioAsync("/Estudios/Buscar", null, institucion, desde, hasta);
+
+    public static Task<HttpResponseMessage> IrAPaginaAsync(this HttpClient cliente, int pagina) =>
+        cliente.EnviarCriterioAsync("/Estudios/Pagina", pagina: pagina);
+
+    public static Task<HttpResponseMessage> LimpiarFiltrosAsync(this HttpClient cliente) =>
+        cliente.EnviarCriterioAsync("/Estudios/LimpiarFiltros");
+
+    private static async Task<HttpResponseMessage> EnviarCriterioAsync(
+        this HttpClient cliente, string ruta,
+        string? termino = null, string? institucion = null,
+        DateOnly? desde = null, DateOnly? hasta = null, int? pagina = null)
     {
         var listado = await cliente.GetAsync("/Estudios");
         var token = ClienteDeSesion.ExtraerTokenAntifalsificacion(await listado.Content.ReadAsStringAsync());
@@ -120,8 +136,11 @@ public static class ClienteDeEstudios
         var campos = new Dictionary<string, string>();
         if (termino is not null) campos["Termino"] = termino;
         if (institucion is not null) campos["Institucion"] = institucion;
+        if (desde is not null) campos["Desde"] = desde.Value.ToString("yyyy-MM-dd");
+        if (hasta is not null) campos["Hasta"] = hasta.Value.ToString("yyyy-MM-dd");
+        if (pagina is not null) campos["Pagina"] = pagina.Value.ToString();
         if (token is not null) campos["__RequestVerificationToken"] = token;
 
-        return await cliente.PostAsync("/Estudios/Buscar", new FormUrlEncodedContent(campos));
+        return await cliente.PostAsync(ruta, new FormUrlEncodedContent(campos));
     }
 }

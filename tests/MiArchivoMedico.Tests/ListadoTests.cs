@@ -26,4 +26,53 @@ public class ListadoTests
         Assert.True(reciente < medio, "El más reciente debe aparecer antes que el del medio.");
         Assert.True(medio < antiguo, "El del medio debe aparecer antes que el más antiguo.");
     }
+
+    [Fact(DisplayName = "AC-54: con 26 estudios se muestran 25 y hay control para avanzar")]
+    public async Task VeintiseisEstudios_MuestraVeinticincoYPermiteAvanzar()
+    {
+        using var aplicacion = new AplicacionDePrueba();
+        var cliente = await aplicacion.ClienteAutenticadoAsync();
+
+        for (var i = 1; i <= 26; i++)
+            await cliente.CrearEstudioAsync($"Estudio {i:D2}", Hoy);
+
+        var html = await (await cliente.GetAsync("/Estudios")).Content.ReadAsStringAsync();
+
+        Assert.Equal(25, ContarFilas(html));
+        Assert.Contains("data-pagina-siguiente", html, StringComparison.Ordinal);
+    }
+
+    [Fact(DisplayName = "AC-101: en la segunda página hay control para retroceder y la página está indicada")]
+    public async Task SegundaPagina_PermiteRetrocederEIndicaLaPagina()
+    {
+        using var aplicacion = new AplicacionDePrueba();
+        var cliente = await aplicacion.ClienteAutenticadoAsync();
+
+        for (var i = 1; i <= 26; i++)
+            await cliente.CrearEstudioAsync($"Estudio {i:D2}", Hoy);
+
+        var html = await (await cliente.IrAPaginaAsync(2)).Content.ReadAsStringAsync();
+
+        Assert.Equal(1, ContarFilas(html));
+        Assert.Contains("data-pagina-anterior", html, StringComparison.Ordinal);
+        Assert.Contains("data-pagina-actual=\"2\"", html, StringComparison.Ordinal);
+    }
+
+    [Fact(DisplayName = "RNF-27: con 25 estudios o menos no se ofrece navegación entre páginas")]
+    public async Task UnaSolaPagina_NoOfreceNavegacion()
+    {
+        using var aplicacion = new AplicacionDePrueba();
+        var cliente = await aplicacion.ClienteAutenticadoAsync();
+
+        for (var i = 1; i <= 5; i++)
+            await cliente.CrearEstudioAsync($"Estudio {i:D2}", Hoy);
+
+        var html = await (await cliente.GetAsync("/Estudios")).Content.ReadAsStringAsync();
+
+        Assert.DoesNotContain("data-pagina-siguiente", html, StringComparison.Ordinal);
+        Assert.DoesNotContain("data-pagina-anterior", html, StringComparison.Ordinal);
+    }
+
+    private static int ContarFilas(string html) =>
+        System.Text.RegularExpressions.Regex.Matches(html, "data-estudio=").Count;
 }

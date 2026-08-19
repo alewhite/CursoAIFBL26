@@ -1,26 +1,88 @@
-@model IReadOnlyCollection<MiArchivoMedico.Web.Dominio.Estudio>
+@model MiArchivoMedico.Web.Models.ListadoDeEstudios
 @{
     ViewData["Titulo"] = "Mis estudios";
+    var criterio = Model.Criterio;
+    var pagina = Model.Pagina;
 }
 <h1>Mis estudios</h1>
 
-@if (Model.Count == 0)
+@if (TempData["Mensaje"] is string mensaje)
 {
-    <div class="tarjeta">
-        <p>Todavía no cargaste ningún estudio.</p>
+    <p class="aviso exito">@mensaje</p>
+}
+
+@* Búsqueda y filtros por POST: nada de esto viaja en la dirección, porque el término es un dato
+   médico y la infraestructura registra las direcciones solicitadas (RNF-63). *@
+<form method="post" asp-action="Buscar" class="tarjeta">
+    <div class="campo">
+        <label for="Termino">Buscar</label>
+        <input id="Termino" name="Termino" type="search" value="@criterio.Termino"
+               placeholder="título, profesional, institución, descripción o etiqueta" />
+    </div>
+
+    <div class="campo">
+        <label for="Institucion">Institución</label>
+        <select id="Institucion" name="Institucion">
+            <option value="">Todas</option>
+            @foreach (var institucion in Model.Instituciones)
+            {
+                <option value="@institucion" selected="@(institucion == criterio.Institucion)">@institucion</option>
+            }
+        </select>
+    </div>
+
+    <div class="campo">
+        <label for="Desde">Desde</label>
+        <input id="Desde" name="Desde" type="date" value="@(criterio.Desde?.ToString("yyyy-MM-dd"))" />
+    </div>
+
+    <div class="campo">
+        <label for="Hasta">Hasta</label>
+        <input id="Hasta" name="Hasta" type="date" value="@(criterio.Hasta?.ToString("yyyy-MM-dd"))" />
+    </div>
+
+    <div class="acciones">
+        <button type="submit">Buscar</button>
+        <a class="boton secundario" asp-action="Crear">Nuevo estudio</a>
+    </div>
+</form>
+
+@if (criterio.HayFiltrosAplicados)
+{
+    <form method="post" asp-action="LimpiarFiltros">
+        <button type="submit" class="secundario">Limpiar filtros</button>
+    </form>
+}
+
+@if (Model.CuentaSinEstudios)
+{
+    <div class="tarjeta" data-estado="sin-estudios">
+        <p>Todavía no cargaste ningún estudio. Cuando cargues el primero, va a aparecer acá.</p>
+        <p><a class="boton" asp-action="Crear">Cargar mi primer estudio</a></p>
+    </div>
+}
+else if (Model.BusquedaSinResultados)
+{
+    <div class="tarjeta" data-estado="sin-resultados">
+        <p><span data-contador>0 estudios encontrados</span>. Ninguno coincide con lo que buscaste.</p>
+        <form method="post" asp-action="LimpiarFiltros">
+            <button type="submit">Limpiar filtros y ver todos</button>
+        </form>
     </div>
 }
 else
 {
+    <p><span data-contador>@pagina.TotalDeResultados @(pagina.TotalDeResultados == 1 ? "estudio encontrado" : "estudios encontrados")</span></p>
+
     <div class="desplazable">
         <table>
             <thead>
                 <tr><th>Fecha</th><th>Título</th><th>Institución</th></tr>
             </thead>
             <tbody>
-            @foreach (var estudio in Model)
+            @foreach (var estudio in pagina.Estudios)
             {
-                <tr>
+                <tr data-estudio="@estudio.Id">
                     <td>@estudio.Fecha.ToString("dd/MM/yyyy")</td>
                     <td><a asp-action="Detalle" asp-route-id="@estudio.Id">@estudio.Titulo</a></td>
                     <td>@estudio.Institucion</td>
@@ -29,4 +91,25 @@ else
             </tbody>
         </table>
     </div>
+
+    @if (pagina.TotalDePaginas > 1)
+    {
+        <div class="acciones" data-pagina-actual="@pagina.PaginaActual">
+            @if (pagina.HayAnterior)
+            {
+                <form method="post" asp-action="Pagina">
+                    <input type="hidden" name="pagina" value="@(pagina.PaginaActual - 1)" />
+                    <button type="submit" class="secundario" data-pagina-anterior>Anterior</button>
+                </form>
+            }
+            <span>Página @pagina.PaginaActual de @pagina.TotalDePaginas</span>
+            @if (pagina.HaySiguiente)
+            {
+                <form method="post" asp-action="Pagina">
+                    <input type="hidden" name="pagina" value="@(pagina.PaginaActual + 1)" />
+                    <button type="submit" class="secundario" data-pagina-siguiente>Siguiente</button>
+                </form>
+            }
+        </div>
+    }
 }

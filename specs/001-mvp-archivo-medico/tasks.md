@@ -210,25 +210,25 @@ paginación y los estados vacíos.
 
 ### Tests de la Historia 4
 
-- [ ] T088 [P] [US4] Escribir los tests de búsqueda por los cinco campos en `tests/MiArchivoMedico.Tests/BusquedaTests.cs` (AC-29, AC-30, AC-71, AC-72, AC-73)
-- [ ] T089 [P] [US4] Escribir los tests de insensibilidad a mayúsculas, acentos y espacios sobrantes en `tests/MiArchivoMedico.Tests/BusquedaTests.cs` (AC-45, AC-46)
-- [ ] T090 [P] [US4] Escribir los tests de filtro por rango de fechas, por institución y combinados en `tests/MiArchivoMedico.Tests/FiltrosTests.cs` (AC-31, AC-34, AC-35)
-- [ ] T091 [P] [US4] Escribir el test de que la lista de instituciones del filtro no incluye las de otra cuenta en `tests/MiArchivoMedico.Tests/FiltrosTests.cs` (AC-92)
-- [ ] T092 [P] [US4] Escribir los tests de limpiar filtros y de contador de resultados en `tests/MiArchivoMedico.Tests/FiltrosTests.cs` (AC-36, AC-37)
-- [ ] T093 [P] [US4] Escribir los tests de paginación con avance, retroceso y página indicada en `tests/MiArchivoMedico.Tests/ListadoTests.cs` (AC-54, AC-101)
-- [ ] T094 [P] [US4] Escribir el test de persistencia del criterio al paginar y al volver del detalle en `tests/MiArchivoMedico.Tests/EstadoDeBusquedaTests.cs` (AC-95)
-- [ ] T095 [P] [US4] Escribir los tests de los dos estados de listado vacío en `tests/MiArchivoMedico.Tests/ListadoVacioTests.cs` (AC-93, AC-94)
-- [ ] T096 [P] [US4] Escribir el test de que el término buscado no aparece en la dirección de ninguna solicitud en `tests/MiArchivoMedico.Tests/EstadoDeBusquedaTests.cs` (AC-96, RNF-63)
+- [X] T088 [P] [US4] Escribir los tests de búsqueda por los cinco campos en `tests/MiArchivoMedico.Tests/BusquedaTests.cs` (AC-29, AC-30, AC-71, AC-72, AC-73)
+- [X] T089 [P] [US4] Escribir los tests de insensibilidad a mayúsculas, acentos y espacios sobrantes en `tests/MiArchivoMedico.Tests/BusquedaTests.cs` (AC-45, AC-46)
+- [X] T090 [P] [US4] Escribir los tests de filtro por rango de fechas, por institución y combinados en `tests/MiArchivoMedico.Tests/FiltrosTests.cs` (AC-31, AC-34, AC-35)
+- [X] T091 [P] [US4] Escribir el test de que la lista de instituciones del filtro no incluye las de otra cuenta en `tests/MiArchivoMedico.Tests/FiltrosTests.cs` (AC-92)
+- [X] T092 [P] [US4] Escribir los tests de limpiar filtros y de contador de resultados en `tests/MiArchivoMedico.Tests/FiltrosTests.cs` (AC-36, AC-37)
+- [X] T093 [P] [US4] Escribir los tests de paginación con avance, retroceso y página indicada en `tests/MiArchivoMedico.Tests/ListadoTests.cs` (AC-54, AC-101)
+- [X] T094 [P] [US4] Escribir el test de persistencia del criterio al paginar y al volver del detalle en `tests/MiArchivoMedico.Tests/EstadoDeBusquedaTests.cs` (AC-95)
+- [X] T095 [P] [US4] Escribir los tests de los dos estados de listado vacío en `tests/MiArchivoMedico.Tests/ListadoVacioTests.cs` (AC-93, AC-94)
+- [X] T096 [P] [US4] Escribir el test de que el término buscado no aparece en la dirección de ninguna solicitud en `tests/MiArchivoMedico.Tests/EstadoDeBusquedaTests.cs` (AC-96, RNF-63)
 
 ### Implementación de la Historia 4
 
-- [ ] T097 [P] [US4] Crear `CriterioDeBusqueda` en `src/MiArchivoMedico.Web/Servicios/CriterioDeBusqueda.cs`: término, rango de fechas con ambos extremos incluidos y opcionales, institución y página
-- [ ] T098 [US4] Implementar `BuscadorDeEstudios` en `src/MiArchivoMedico.Web/Servicios/BuscadorDeEstudios.cs`: única implementación de búsqueda, sobre las columnas normalizadas, normalizando el término con `NormalizadorDeTexto.Normalizar` (RF-16, RNF-55, RNF-48)
-- [ ] T099 [US4] Implementar la paginación de 25 por página con avance, retroceso y página actual en `src/MiArchivoMedico.Web/Servicios/BuscadorDeEstudios.cs` (RNF-27)
-- [ ] T100 [US4] Implementar `EstadoDeBusqueda` sobre el estado de sesión en `src/MiArchivoMedico.Web/Servicios/EstadoDeBusqueda.cs`, para conservar el criterio entre solicitudes (RF-40, RNF-63)
-- [ ] T101 [US4] Implementar las rutas `Buscar`, `Pagina` y `LimpiarFiltros` por POST en `src/MiArchivoMedico.Web/Controllers/EstudiosController.cs`, sin que ningún dato médico viaje en la dirección (contracts/rutas.md)
-- [ ] T102 [US4] Implementar la lista de instituciones del propio usuario para el filtro en `src/MiArchivoMedico.Web/Servicios/BuscadorDeEstudios.cs` (RF-38)
-- [ ] T103 [P] [US4] Ampliar la vista del listado con formulario de búsqueda, filtros, contador, paginación y los dos estados vacíos en `src/MiArchivoMedico.Web/Views/Estudios/Index.cshtml` (RF-23, RF-39)
+- [X] T097 [P] [US4] Crear `CriterioDeBusqueda` en `src/MiArchivoMedico.Web/Servicios/CriterioDeBusqueda.cs`: término, rango de fechas con ambos extremos incluidos y opcionales, institución y página
+- [X] T098 [US4] Implementar `BuscadorDeEstudios` en `src/MiArchivoMedico.Web/Servicios/BuscadorDeEstudios.cs`: única implementación de búsqueda, sobre las columnas normalizadas, normalizando el término con `NormalizadorDeTexto.Normalizar` (RF-16, RNF-55, RNF-48)
+- [X] T099 [US4] Implementar la paginación de 25 por página con avance, retroceso y página actual en `src/MiArchivoMedico.Web/Servicios/BuscadorDeEstudios.cs` (RNF-27)
+- [X] T100 [US4] Implementar `EstadoDeBusqueda` sobre el estado de sesión en `src/MiArchivoMedico.Web/Servicios/EstadoDeBusqueda.cs`, para conservar el criterio entre solicitudes (RF-40, RNF-63)
+- [X] T101 [US4] Implementar las rutas `Buscar`, `Pagina` y `LimpiarFiltros` por POST en `src/MiArchivoMedico.Web/Controllers/EstudiosController.cs`, sin que ningún dato médico viaje en la dirección (contracts/rutas.md)
+- [X] T102 [US4] Implementar la lista de instituciones del propio usuario para el filtro en `src/MiArchivoMedico.Web/Servicios/BuscadorDeEstudios.cs` (RF-38)
+- [X] T103 [P] [US4] Ampliar la vista del listado con formulario de búsqueda, filtros, contador, paginación y los dos estados vacíos en `src/MiArchivoMedico.Web/Views/Estudios/Index.cshtml` (RF-23, RF-39)
 
 **Punto de control**: las cuatro historias principales están completas. El producto cumple su objetivo
 declarado.
