@@ -16,7 +16,12 @@ MVP en construcción. Lo que ya está implementado:
 | Feature 1 | Autenticación, sesiones, bloqueo por intentos fallidos, aislamiento por propietario | ✅ |
 | Feature 2 | Estudios y archivos: carga, validación, cifrado, visualización, descarga, borrado | ✅ |
 | Feature 3 | Listado, búsqueda por metadatos, filtros combinables y paginación | ✅ |
-| Pendiente | PWA (instalación, pantalla offline) y respaldos de infraestructura | ⏳ |
+| Feature 4 | PWA: instalación, pantalla sin conexión y aviso de carga interrumpida | ✅ |
+| Pendiente | Respaldos automáticos de infraestructura | ⏳ |
+
+La PWA no guarda nada de la aplicación en el navegador: el service worker solo tiene en caché archivos
+estáticos y la pantalla sin conexión. Sin conexión no se ven estudios —tampoco los que ya se habían
+abierto—, que es exactamente lo que pide RNF-51.
 
 ## Documentos del repositorio
 
