@@ -61,6 +61,24 @@ public class PropiedadDeDatosTests(AplicacionDePrueba aplicacion) : IClassFixtur
         Assert.DoesNotContain("Radiografia de Bruno", html, StringComparison.Ordinal);
     }
 
+    [Fact(DisplayName = "AC-48: la descarga de un archivo de otro propietario responde 404")]
+    public async Task ArchivoAjeno_Responde404()
+    {
+        var deBruno = await aplicacion.ClienteAutenticadoAsync(AplicacionDePrueba.UsuarioDos);
+        await deBruno.CrearEstudioAsync("Estudio de Bruno con archivo",
+            DateOnly.FromDateTime(AplicacionDePrueba.MomentoInicial.UtcDateTime), archivos:
+            [("informe.pdf", ArchivosFicticios.PdfValido(), "application/pdf")]);
+
+        var archivoDeBruno = (await aplicacion.EstudiosDeAsync(AplicacionDePrueba.UsuarioDos))
+            .SelectMany(e => e.Archivos).First().Id;
+
+        var deAna = await aplicacion.ClienteAutenticadoAsync();
+
+        Assert.Equal(HttpStatusCode.NotFound, (await deAna.GetAsync($"/Archivos/Ver/{archivoDeBruno}")).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await deAna.GetAsync($"/Archivos/Contenido/{archivoDeBruno}")).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await deAna.GetAsync($"/Archivos/Descargar/{archivoDeBruno}")).StatusCode);
+    }
+
     /// <summary>
     /// Siembra directamente por el contexto, con el usuario actual fijado a la cuenta indicada. Es el
     /// único camino admitido para construir el estado de partida sin romper el aislamiento que se está

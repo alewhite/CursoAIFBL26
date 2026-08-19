@@ -177,23 +177,23 @@ incrustada, la identidad de la huella tras la descarga y el flujo de eliminació
 
 ### Tests de la Historia 3
 
-- [ ] T074 [P] [US3] Escribir el test de orden del listado en `tests/MiArchivoMedico.Tests/ListadoTests.cs` (AC-28)
-- [ ] T075 [P] [US3] Escribir los tests de visualización incrustada y de cabeceras que bloquean contenido activo en `tests/MiArchivoMedico.Tests/EntregaDeArchivosTests.cs` (AC-15, y la parte automatizable de AC-26)
-- [ ] T076 [P] [US3] Escribir los tests de descarga con huella idéntica antes y después en `tests/MiArchivoMedico.Tests/EntregaDeArchivosTests.cs` (AC-16, AC-77)
-- [ ] T077 [P] [US3] Escribir el test de que el listado y el detalle no incluyen ningún elemento que descargue contenido por su cuenta en `tests/MiArchivoMedico.Tests/EntregaDeArchivosTests.cs` (parte automatizable de AC-78)
-- [ ] T078 [P] [US3] Escribir los tests de token de archivo vencido y de token vigente sin sesión, con tiempo simulado, en `tests/MiArchivoMedico.Tests/TokenDeArchivoTests.cs` (AC-08, AC-84)
-- [ ] T079 [P] [US3] Escribir el test de acceso a un archivo de otro propietario en `tests/MiArchivoMedico.Tests/PropiedadDeDatosTests.cs` (AC-48)
-- [ ] T080 [P] [US3] Escribir los tests de eliminación con confirmación, cancelación y liberación del cupo en `tests/MiArchivoMedico.Tests/EliminacionTests.cs` (AC-17, AC-18, AC-19, AC-102)
+- [X] T074 [P] [US3] Escribir el test de orden del listado en `tests/MiArchivoMedico.Tests/ListadoTests.cs` (AC-28)
+- [X] T075 [P] [US3] Escribir los tests de visualización incrustada y de cabeceras que bloquean contenido activo en `tests/MiArchivoMedico.Tests/EntregaDeArchivosTests.cs` (AC-15, y la parte automatizable de AC-26)
+- [X] T076 [P] [US3] Escribir los tests de descarga con huella idéntica antes y después en `tests/MiArchivoMedico.Tests/EntregaDeArchivosTests.cs` (AC-16, AC-77)
+- [X] T077 [P] [US3] Escribir el test de que el listado y el detalle no incluyen ningún elemento que descargue contenido por su cuenta en `tests/MiArchivoMedico.Tests/EntregaDeArchivosTests.cs` (parte automatizable de AC-78)
+- [X] T078 [P] [US3] Escribir los tests de token de archivo vencido y de token vigente sin sesión, con tiempo simulado, en `tests/MiArchivoMedico.Tests/TokenDeArchivoTests.cs` (AC-08, AC-84)
+- [X] T079 [P] [US3] Escribir el test de acceso a un archivo de otro propietario en `tests/MiArchivoMedico.Tests/PropiedadDeDatosTests.cs` (AC-48)
+- [X] T080 [P] [US3] Escribir los tests de eliminación con confirmación, cancelación y liberación del cupo en `tests/MiArchivoMedico.Tests/EliminacionTests.cs` (AC-17, AC-18, AC-19, AC-102)
 
 ### Implementación de la Historia 3
 
-- [ ] T081 [P] [US3] Implementar `GeneradorDeTokenDeArchivo` en `src/MiArchivoMedico.Web/Servicios/GeneradorDeTokenDeArchivo.cs` con la protección de datos de ASP.NET Core y vencimiento de 5 minutos (RNF-07, research.md §4)
-- [ ] T082 [US3] Ampliar el listado con el orden del más reciente al más antiguo en `src/MiArchivoMedico.Web/Controllers/EstudiosController.cs` (RF-15)
-- [ ] T083 [US3] Ampliar el detalle del estudio con la lista de sus archivos en `src/MiArchivoMedico.Web/Controllers/EstudiosController.cs`, sin transferir el contenido de los archivos (RF-11, RNF-28)
-- [ ] T084 [US3] Implementar `ArchivosController` en `src/MiArchivoMedico.Web/Controllers/ArchivosController.cs`: visualización y descarga exigiendo token vigente **y** sesión del propietario, con las cabeceras que impiden interpretar el tipo y ejecutar contenido activo (RNF-06, RNF-08, RNF-20)
-- [ ] T085 [P] [US3] Crear las vistas de detalle y de visualización en `src/MiArchivoMedico.Web/Views/Estudios/Detalle.cshtml` y `src/MiArchivoMedico.Web/Views/Archivos/Ver.cshtml`, incrustando el archivo en un marco restringido
-- [ ] T086 [US3] Implementar la confirmación y la eliminación física del estudio, sus etiquetas, sus filas de archivo y su contenido en disco en `src/MiArchivoMedico.Web/Controllers/EstudiosController.cs` (RF-13, RF-14, RNF-33)
-- [ ] T087 [P] [US3] Crear la vista de confirmación en `src/MiArchivoMedico.Web/Views/Estudios/Eliminar.cshtml`, que declara que la operación es irreversible y cuántos archivos alcanza
+- [X] T081 [P] [US3] Implementar `GeneradorDeTokenDeArchivo` en `src/MiArchivoMedico.Web/Servicios/GeneradorDeTokenDeArchivo.cs` con la protección de datos de ASP.NET Core y vencimiento de 5 minutos (RNF-07, research.md §4)
+- [X] T082 [US3] Ampliar el listado con el orden del más reciente al más antiguo en `src/MiArchivoMedico.Web/Controllers/EstudiosController.cs` (RF-15)
+- [X] T083 [US3] Ampliar el detalle del estudio con la lista de sus archivos en `src/MiArchivoMedico.Web/Controllers/EstudiosController.cs`, sin transferir el contenido de los archivos (RF-11, RNF-28)
+- [X] T084 [US3] Implementar `ArchivosController` en `src/MiArchivoMedico.Web/Controllers/ArchivosController.cs`: visualización y descarga exigiendo token vigente **y** sesión del propietario, con las cabeceras que impiden interpretar el tipo y ejecutar contenido activo (RNF-06, RNF-08, RNF-20)
+- [X] T085 [P] [US3] Crear las vistas de detalle y de visualización en `src/MiArchivoMedico.Web/Views/Estudios/Detalle.cshtml` y `src/MiArchivoMedico.Web/Views/Archivos/Ver.cshtml`, incrustando el archivo en un marco restringido
+- [X] T086 [US3] Implementar la confirmación y la eliminación física del estudio, sus etiquetas, sus filas de archivo y su contenido en disco en `src/MiArchivoMedico.Web/Controllers/EstudiosController.cs` (RF-13, RF-14, RNF-33)
+- [X] T087 [P] [US3] Crear la vista de confirmación en `src/MiArchivoMedico.Web/Views/Estudios/Eliminar.cshtml`, que declara que la operación es irreversible y cuántos archivos alcanza
 
 **Punto de control**: el ciclo de vida completo de un estudio funciona de punta a punta.
 

@@ -92,6 +92,17 @@ public static class ClienteDeEstudios
         return await cliente.PostAsync($"/Estudios/AgregarArchivos/{estudioId}", contenido);
     }
 
+    public static async Task<HttpResponseMessage> EliminarEstudioAsync(this HttpClient cliente, Guid id)
+    {
+        var confirmacion = await cliente.GetAsync($"/Estudios/Eliminar/{id}");
+        var token = ClienteDeSesion.ExtraerTokenAntifalsificacion(await confirmacion.Content.ReadAsStringAsync());
+
+        var campos = new Dictionary<string, string>();
+        if (token is not null) campos["__RequestVerificationToken"] = token;
+
+        return await cliente.PostAsync($"/Estudios/Eliminar/{id}", new FormUrlEncodedContent(campos));
+    }
+
     public static async Task<HttpClient> ClienteAutenticadoAsync(
         this AplicacionDePrueba aplicacion, string? usuario = null)
     {

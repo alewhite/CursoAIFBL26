@@ -50,6 +50,7 @@ constructor.Services.AddScoped<ControlDeIntentosDeInicioDeSesion>();
 constructor.Services.AddSingleton<ValidadorDeArchivos>();
 constructor.Services.AddSingleton<IAlmacenamientoDeArchivos, AlmacenamientoCifradoEnDisco>();
 constructor.Services.AddScoped<ServicioDeCargaDeArchivos>();
+constructor.Services.AddScoped<GeneradorDeTokenDeArchivo>();
 
 constructor.Services.AddDbContext<ArchivoMedicoDbContext>(o => o.UseSqlite(cadenaDeConexion));
 

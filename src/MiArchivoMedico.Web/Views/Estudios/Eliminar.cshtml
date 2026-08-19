@@ -1,0 +1,22 @@
+@model MiArchivoMedico.Web.Dominio.Estudio
+@{
+    ViewData["Titulo"] = "Eliminar estudio";
+}
+<h1>Eliminar «@Model.Titulo»</h1>
+
+<div class="tarjeta">
+    <p class="aviso error">
+        Esta operación es <strong>irreversible</strong>: se borran el estudio y
+        @Model.Archivos.Count @(Model.Archivos.Count == 1 ? "archivo" : "archivos"),
+        y no hay forma de recuperarlos desde la aplicación.
+    </p>
+
+    <p><strong>Fecha:</strong> @Model.Fecha.ToString("dd/MM/yyyy")</p>
+
+    <form method="post" asp-action="Eliminar" asp-route-id="@Model.Id">
+        <div class="acciones">
+            <button type="submit">Sí, eliminar</button>
+            <a class="boton secundario" asp-action="Detalle" asp-route-id="@Model.Id">Cancelar</a>
+        </div>
+    </form>
+</div>

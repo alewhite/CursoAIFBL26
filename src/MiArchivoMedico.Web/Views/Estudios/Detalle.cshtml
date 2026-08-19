@@ -36,10 +36,16 @@
     else
     {
         @* Se listan sin transferir su contenido: nada se descarga hasta que el usuario lo pida (RNF-28). *@
+        @* Se listan sin transferir su contenido: el enlace lleva a la vista, que recién ahí emite el
+           token y pide el archivo (RNF-28, AC-78). *@
         <ul>
             @foreach (var archivo in Model.Archivos.OrderBy(a => a.CargadoEn))
             {
-                <li>@archivo.NombreOriginal</li>
+                <li>
+                    <a asp-controller="Archivos" asp-action="Ver" asp-route-id="@archivo.Id">
+                        @archivo.NombreOriginal
+                    </a>
+                </li>
             }
         </ul>
     }
@@ -53,4 +59,7 @@
     </form>
 </div>
 
-<p><a class="boton secundario" asp-action="Index">Volver al listado</a></p>
+<div class="acciones">
+    <a class="boton secundario" asp-action="Index">Volver al listado</a>
+    <a class="boton secundario" asp-action="Eliminar" asp-route-id="@Model.Id">Eliminar estudio</a>
+</div>

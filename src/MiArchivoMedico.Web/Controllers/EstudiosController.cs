@@ -15,6 +15,7 @@ namespace MiArchivoMedico.Web.Controllers;
 public class EstudiosController(
     ArchivoMedicoDbContext contexto,
     ServicioDeCargaDeArchivos carga,
+    IAlmacenamientoDeArchivos almacenamiento,
     TimeProvider reloj) : Controller
 {
     private const string ClaveDeMarcasUsadas = "marcas-de-envio-usadas";
@@ -158,6 +159,44 @@ public class EstudiosController(
         var actualizadas = usadas.TakeLast(20).Append(marca);
         HttpContext.Session.SetString(ClaveDeMarcasUsadas, string.Join(';', actualizadas));
         return true;
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Eliminar(Guid id)
+    {
+        var estudio = await contexto.Estudios
+            .Include(e => e.Archivos)
+            .FirstOrDefaultAsync(e => e.Id == id);
+
+        if (estudio is null) return NoEncontrado();
+
+        ViewData["Titulo"] = "Eliminar estudio";
+        return View(estudio);
+    }
+
+    [HttpPost]
+    [ActionName(nameof(Eliminar))]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ConfirmarEliminacion(Guid id)
+    {
+        var estudio = await contexto.Estudios
+            .Include(e => e.Archivos)
+            .Include(e => e.Etiquetas)
+            .FirstOrDefaultAsync(e => e.Id == id);
+
+        if (estudio is null) return NoEncontrado();
+
+        // La eliminación es física y definitiva: se borran los metadatos y el contenido cifrado, y el
+        // espacio vuelve al cupo compartido de inmediato (FR-044, AC-102). El contenido se borra
+        // primero: si algo falla, el estudio sigue visible en lugar de quedar apuntando a la nada.
+        foreach (var archivo in estudio.Archivos)
+            await almacenamiento.EliminarAsync(archivo.Id);
+
+        contexto.Estudios.Remove(estudio);
+        await contexto.SaveChangesAsync();
+
+        TempData["Mensaje"] = "El estudio se eliminó.";
+        return RedirectToAction(nameof(Index));
     }
 
     /// <summary>

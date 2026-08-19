@@ -1,0 +1,22 @@
+@model MiArchivoMedico.Web.Dominio.ArchivoDeEstudio
+@{
+    ViewData["Titulo"] = "Ver archivo";
+    var token = (string)ViewData["Token"]!;
+}
+<h1>@Model.NombreOriginal</h1>
+
+@* El archivo se muestra dentro de la aplicación, en un marco restringido que no ejecuta nada de lo
+   que el archivo pudiera traer (RNF-20, AC-15). *@
+<div class="tarjeta">
+    <iframe src="@Url.Action("Contenido", new { id = Model.Id, t = token })"
+            sandbox
+            title="Vista del archivo"
+            style="width: 100%; height: 70vh; border: 0;"></iframe>
+</div>
+
+<div class="acciones">
+    <a class="boton" href="@Url.Action("Descargar", new { id = Model.Id, t = token })">Descargar</a>
+    <a class="boton secundario" asp-controller="Estudios" asp-action="Detalle" asp-route-id="@Model.EstudioId">
+        Volver al estudio
+    </a>
+</div>
