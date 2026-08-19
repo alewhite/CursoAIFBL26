@@ -9,6 +9,14 @@ Ante una contradicción sobre alcance o comportamiento del producto, prevalece `
 
 ---
 
+## Git conventions
+
+- Base branch: `v5-daw`
+- All DAW feature, fix, and discovery branches must be created from `v5-daw`.
+- Do not work directly on `v5-daw` or `main`.
+
+---
+
 ## Idioma
 
 **Idioma de trabajo: español.**
