@@ -296,18 +296,18 @@ ciclo de respaldo y una restauración en un entorno limpio.
 **Propósito**: lo que no pertenece a una sola historia, incluidas las verificaciones que la suite no
 puede cubrir.
 
-- [ ] T122 Crear `specs/001-mvp-archivo-medico/verificacion-manual.md` con el procedimiento escrito de las 17 comprobaciones que no son alcanzables por un test de integración (research.md §6)
-- [ ] T123 [P] Escribir en `specs/001-mvp-archivo-medico/verificacion-manual.md` el procedimiento de las 8 comprobaciones con navegador real: AC-26, AC-38, AC-39, AC-40, AC-41, AC-42, AC-78, AC-79
-- [ ] T124 [P] Escribir en `specs/001-mvp-archivo-medico/verificacion-manual.md` el procedimiento de las 6 comprobaciones sobre la instalación desplegada: AC-56, AC-59, AC-60, AC-61, AC-67, AC-68
-- [ ] T125 [P] Escribir en `specs/001-mvp-archivo-medico/verificacion-manual.md` el procedimiento de medición de los tiempos de tarea: quién los ejecuta, sobre qué colección, cuántas repeticiones y qué se considera cumplido (SC-001: crear un estudio con tres archivos en menos de 60 segundos; SC-002: encontrar un estudio conocido en menos de 10 segundos)
-- [ ] T126 [P] Inspeccionar las dependencias y la configuración y registrar en `docs/operacion.md` la constancia de que la aplicación no incluye publicidad ni seguimiento de comportamiento, no envía documentos ni metadatos a terceros, y no usa contenido médico para entrenar modelos (RNF-40, RNF-41, RNF-42, RNF-44)
-- [ ] T127 [P] Documentar en `docs/operacion.md` que todo servicio externo pago debe poder deshabilitarse por configuración sin desplegar código, y dejar constancia de que el MVP no integra ninguno (RNF-50)
-- [ ] T128 Crear el sembrador reproducible de 2.000 estudios ficticios en `tests/MiArchivoMedico.Tests/Apoyo/SembradorDeVolumen.cs` (RNF-24)
-- [ ] T129 Crear las mediciones de rendimiento fuera de la suite habitual en `tests/MiArchivoMedico.Tests/Rendimiento/MedicionesTests.cs`, marcadas para ejecución a pedido (AC-51, AC-52, AC-53)
-- [ ] T130 [P] Actualizar `AGENTS.md` y `CLAUDE.md` con la arquitectura real una vez construida, corrigiendo cualquier diferencia con lo que el árbol hace
+- [X] T122 Crear `specs/001-mvp-archivo-medico/verificacion-manual.md` con el procedimiento escrito de las 17 comprobaciones que no son alcanzables por un test de integración (research.md §6)
+- [X] T123 [P] Escribir en `specs/001-mvp-archivo-medico/verificacion-manual.md` el procedimiento de las 8 comprobaciones con navegador real: AC-26, AC-38, AC-39, AC-40, AC-41, AC-42, AC-78, AC-79
+- [X] T124 [P] Escribir en `specs/001-mvp-archivo-medico/verificacion-manual.md` el procedimiento de las 6 comprobaciones sobre la instalación desplegada: AC-56, AC-59, AC-60, AC-61, AC-67, AC-68
+- [X] T125 [P] Escribir en `specs/001-mvp-archivo-medico/verificacion-manual.md` el procedimiento de medición de los tiempos de tarea: quién los ejecuta, sobre qué colección, cuántas repeticiones y qué se considera cumplido (SC-001: crear un estudio con tres archivos en menos de 60 segundos; SC-002: encontrar un estudio conocido en menos de 10 segundos)
+- [X] T126 [P] Inspeccionar las dependencias y la configuración y registrar en `docs/operacion.md` la constancia de que la aplicación no incluye publicidad ni seguimiento de comportamiento, no envía documentos ni metadatos a terceros, y no usa contenido médico para entrenar modelos (RNF-40, RNF-41, RNF-42, RNF-44)
+- [X] T127 [P] Documentar en `docs/operacion.md` que todo servicio externo pago debe poder deshabilitarse por configuración sin desplegar código, y dejar constancia de que el MVP no integra ninguno (RNF-50)
+- [X] T128 Crear el sembrador reproducible de 2.000 estudios ficticios en `tests/MiArchivoMedico.Tests/Apoyo/SembradorDeVolumen.cs` (RNF-24)
+- [X] T129 Crear las mediciones de rendimiento fuera de la suite habitual en `tests/MiArchivoMedico.Tests/Rendimiento/MedicionesTests.cs`, marcadas para ejecución a pedido (AC-51, AC-52, AC-53)
+- [X] T130 [P] Actualizar `AGENTS.md` y `CLAUDE.md` con la arquitectura real una vez construida, corrigiendo cualquier diferencia con lo que el árbol hace
 - [ ] T131 Ejecutar la validación de punta a punta de [quickstart.md](./quickstart.md) sobre una instalación limpia
 - [ ] T132 Recorrer `checklists/security.md`, `checklists/ux.md` y `checklists/testabilidad.md` y cerrar o justificar cada ítem abierto
-- [ ] T133 Recorrer la definición de terminado de `specs/001-mvp-archivo-medico/quickstart.md` sobre el árbol completo: `dotnet build` sin warnings nuevos, `dotnet test` en verde, aislamiento verificado en todo acceso nuevo y ningún dato médico en registros
+- [X] T133 Recorrer la definición de terminado de `specs/001-mvp-archivo-medico/quickstart.md` sobre el árbol completo: `dotnet build` sin warnings nuevos, `dotnet test` en verde, aislamiento verificado en todo acceso nuevo y ningún dato médico en registros
 
 ---
 

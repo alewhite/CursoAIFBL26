@@ -25,7 +25,8 @@ La búsqueda es exclusivamente sobre metadatos cargados a mano: el sistema nunca
 ```bash
 dotnet restore                  # instalar dependencias
 dotnet run                      # levantar en desarrollo (URL en Properties/launchSettings.json)
-dotnet test                     # correr tests
+dotnet test                     # correr tests (incluye las mediciones de rendimiento)
+dotnet test --filter "Category!=Rendimiento"   # la suite habitual, en segundos
 dotnet build                    # verificación de compilación antes de dar algo por terminado
 ```
 Las migraciones se aplican solas al arrancar (`InicializadorDeBaseDeDatos.InicializarAsync`), que además
@@ -49,6 +50,10 @@ El alta y el restablecimiento de contraseñas se hacen por esta vía: la aplicac
 registro ni de recuperación.
 
 Nueva migración: `dotnet ef migrations add <Nombre>`.
+
+Los procedimientos de operación —alta de cuentas, custodia de la clave, respaldo, prueba de
+recuperación— están en `docs/operacion.md`. Las comprobaciones que no puede hacer la suite están en
+`specs/001-mvp-archivo-medico/verificacion-manual.md`.
 
 ## Definición de terminado
 Una tarea no está terminada hasta que:

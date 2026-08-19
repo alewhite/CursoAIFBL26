@@ -17,9 +17,11 @@ aceptación, y citar los identificadores al proponer o implementar un cambio.
 Los de uso diario están en AGENTS.md. Detalles propios de este árbol:
 
 ```bash
-dotnet run --project src/MiArchivoMedico.Web          # https://localhost:7028
+dotnet run --project src/MiArchivoMedico.Web          # el puerto lo fija Properties/launchSettings.json
 dotnet test --filter "FullyQualifiedName~AislamientoPorPropietarioTests"   # un archivo
 dotnet test --filter "DisplayName~RNF-53"                                  # por requerimiento
+dotnet test --filter "Category!=Rendimiento"                               # la suite habitual
+dotnet test --filter "Category=Rendimiento"                                # las mediciones, a pedido
 dotnet ef migrations add <Nombre> --project src/MiArchivoMedico.Web --output-dir Data/Migraciones
 ```
 
@@ -31,8 +33,12 @@ final de `Program.cs`), que además reafirma `PRAGMA journal_mode=WAL` y siembra
 
 Un solo proyecto web (`src/MiArchivoMedico.Web`, MVC clásico con vistas Razor) y un proyecto de tests de
 integración (`tests/MiArchivoMedico.Tests`). No hay capa de servicios de aplicación ni repositorios: los
-controladores hablan con `ArchivoMedicoDbContext` y con tres colaboradores de dominio
-(`BuscadorDeEstudios`, `ServicioDeCargaDeArchivos`, `IAlmacenamientoDeArchivos`).
+controladores hablan con `ArchivoMedicoDbContext` y con los colaboradores de `Servicios/`
+(`BuscadorDeEstudios`, `EstadoDeBusqueda`, `ServicioDeCargaDeArchivos`, `ValidadorDeArchivos`,
+`IAlmacenamientoDeArchivos`, `GeneradorDeTokenDeArchivo`, `ControlDeIntentosDeInicioDeSesion`).
+`Servicios/` **no** es una capa de servicios de aplicación: son colaboradores de dominio sueltos, y la
+única con interfaz es `IAlmacenamientoDeArchivos`, porque el PRD exige poder reemplazar el proveedor de
+almacenamiento sin tocar el dominio.
 
 La PWA no agrega capas: es `wwwroot/manifest.webmanifest`, `wwwroot/sw.js`, `wwwroot/js/carga.js` y la
 vista anónima `/sin-conexion` (`HomeController.SinConexion`). Sin librerías de por medio.
@@ -76,6 +82,24 @@ de tocar algo, porque cambian la forma de escribir el código:
 - **El tiempo se inyecta**: todo usa `TimeProvider` (registrado como singleton). No usar `DateTimeOffset.Now`
   ni `DateTime.UtcNow` directo, o el test correspondiente no puede ejercitar expiraciones ni ventanas de
   bloqueo.
+- **Nada médico viaja en la dirección** (RNF-63). El término de búsqueda y los filtros van en el cuerpo
+  y se guardan en el estado de sesión (`EstadoDeBusqueda`), porque la infraestructura registra las
+  direcciones solicitadas. Por eso `Buscar`, `Pagina` y `LimpiarFiltros` son POST y el listado no acepta
+  parámetros de consulta. Corolario: **no** agregar un `asp-route-termino` ni nada parecido.
+- **El token de archivo no es una credencial**: la ruta de contenido exige token vigente **y** sesión
+  del propietario, acumulativamente. Un token vigente sin sesión no entrega nada y una sesión con token
+  vencido tampoco. El token se firma con la protección de datos y no se persiste.
+- **Dos reglas de sesión viven en `OnValidatePrincipal`**, no en el manejador de la cookie: el tope
+  absoluto de 24 horas, que se apoya en un claim con el momento del ingreso, y la sesión única por
+  cuenta, que compara la marca de seguridad del usuario **sin volver a firmar**. Usar el
+  `SecurityStampValidator` de Identity rompería lo primero, porque refirma el principal y reinicia el
+  reloj de la cookie.
+- **`IntentoDeInicioDeSesion` no implementa `IPropiedadDeUsuario`** a propósito: se consulta sin sesión,
+  que es justo cuando se evalúa un intento. Someterla al filtro global la volvería invisible en el
+  único momento en que hace falta.
+- **El codificador de HTML está ampliado al suplemento Latin-1** en `Program.cs`. Sin eso, Razor
+  convierte cada texto acentuado en entidades numéricas y el marcado en español se vuelve ilegible. No
+  relaja el escapado de `<`, `>`, `&` ni de las comillas.
 
 ## Convenciones de los tests
 
@@ -89,7 +113,14 @@ inyectado en el manejador de cookies) y dos cuentas ficticias sembradas por conf
   antifalsificación) y `ClienteDeEstudios` son las extensiones de `HttpClient` que ya resuelven el
   formulario y el antiforgery. Reusarlas en vez de armar el POST a mano.
 - Los archivos de prueba se **generan** con `ArchivosFicticios` (PDF mínimo válido, PDF con JavaScript,
-  imágenes con ImageSharp). Nunca se copia un archivo de un caso real (RNF-10).
+  PDF truncado, imágenes con ImageSharp, binario que simula un ejecutable). Nunca se copia un archivo de
+  un caso real (RNF-10).
+- **El cliente de pruebas habla `https://localhost`**: la cookie se emite con `Secure` y un contenedor
+  de cookies no la devolvería sobre `http`. No hay TLS real; lo resuelve el servidor de pruebas.
+- Las mediciones de rendimiento llevan `[Trait("Category", "Rendimiento")]` y **no** corren en la suite
+  habitual: sembrar 2.000 estudios la volvería lenta. Imprimen el p95 medido con `ITestOutputHelper`.
+- El proyecto web compila con `TreatWarningsAsErrors`: un warning nuevo rompe el build, que es lo que
+  pide la definición de terminado.
 - Cada `[Fact]` lleva `DisplayName` con el identificador del PRD que verifica
   (`[Fact(DisplayName = "RNF-53: ...")]`), y el método se nombra en español con la forma
   `Condicion_ResultadoEsperado`. Un archivo por área.
