@@ -1,7 +1,9 @@
 # AGENTS.md — Mi Archivo Médico
 
-`PRD.md` es la fuente única del alcance y de los requerimientos (RF/RNF/AC). Este archivo define **cómo** se
-construye; el PRD define **qué**. Ante una contradicción, prevalece el PRD: corregir este archivo, no el PRD.
+`PRD2.md` (revisión 2, endurecida) es la fuente única del alcance y de los requerimientos (RF/RNF/AC).
+Este archivo define **cómo** se construye; el PRD define **qué**. Ante una contradicción, prevalece el PRD:
+corregir este archivo, no el PRD.
+`PRD.md` es la revisión 1 y se conserva solo como referencia histórica: no citarlo ni implementar contra él.
 
 ## Propósito
 Aplicación web progresiva (PWA) de uso familiar (hasta 5 cuentas) para cargar, organizar y encontrar estudios médicos.
@@ -91,7 +93,7 @@ ficticios (RNF-10). Los archivos de prueba se generan; no se copian de un caso r
   línea, nunca copiando el archivo en caliente (RNF-34, RNF-35).
 - **No agregar funciones fuera del alcance del MVP**: OCR, exportar/importar/restaurar desde la UI, enlaces públicos
   para compartir, envío por mail o WhatsApp, roles y permisos configurables, versionado, notificaciones
-  (ver "Fuera de Alcance" en el PRD, que es la fuente única).
+  (ver "Fuera de Alcance" en `PRD2.md`, que es la fuente única).
 - **No agregar nada que cruce datos entre cuentas**: ni compartir/delegar/transferir estudios, ni vistas consolidadas
   del grupo familiar, ni registro abierto de usuarios. El alta de cuentas es administrativa, fuera de la app,
   con un máximo de 5 (RNF-54, RNF-56, RNF-57).
