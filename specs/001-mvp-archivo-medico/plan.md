@@ -150,23 +150,46 @@ src/MiArchivoMedico.Web/
     ├── css/
     └── iconos/
 
+docs/
+└── operacion.md                        # Procedimientos del administrador técnico: alta de cuentas,
+                                        # respaldos, custodia de la clave, prueba de recuperación
+
 tests/MiArchivoMedico.Tests/
 ├── AplicacionDePrueba.cs               # WebApplicationFactory, SQLite descartable, FakeTimeProvider
 ├── Apoyo/
 │   ├── ClienteDeSesion.cs              # Login y logout resolviendo el antiforgery
 │   ├── ClienteDeEstudios.cs            # Alta, edición y búsqueda por HTTP
-│   └── ArchivosFicticios.cs            # Genera PDF, PDF con JavaScript, JPG y PNG
+│   ├── ArchivosFicticios.cs            # Genera PDF, PDF con JavaScript, PDF truncado, JPG, PNG
+│   └── SembradorDeVolumen.cs           # 2.000 estudios reproducibles para las mediciones
 ├── AislamientoPorPropietarioTests.cs   # RNF-53: falla si una entidad médica queda sin filtro
-├── AutenticacionTests.cs
+├── ArranqueTests.cs                    # AC-83: sin clave de cifrado, el host no arranca
+├── AutenticacionTests.cs               # Historia 1
+├── SesionTests.cs
 ├── BloqueoDeIntentosTests.cs
-├── EstudiosTests.cs
+├── PropiedadDeDatosTests.cs
+├── RutasExpuestasTests.cs
+├── CuentasInicialesTests.cs
+├── SeguridadDeCredencialesTests.cs
+├── CreacionDeEstudiosTests.cs          # Historia 2
+├── MetadatosDeEstudioTests.cs
 ├── ValidacionDeArchivosTests.cs
+├── CustodiaDeArchivosTests.cs
+├── LimitesDeCargaTests.cs
+├── CargaParcialTests.cs
+├── FormularioDeEstudioTests.cs
+├── ListadoTests.cs                     # Historia 3
 ├── EntregaDeArchivosTests.cs
-├── BusquedaYFiltrosTests.cs
-├── ListadoYPaginacionTests.cs
-├── PwaTests.cs
-├── PrivacidadEnLogsTests.cs
-└── ArranqueTests.cs                    # AC-83: sin clave de cifrado, el host no arranca
+├── TokenDeArchivoTests.cs
+├── EliminacionTests.cs
+├── BusquedaTests.cs                    # Historia 4
+├── FiltrosTests.cs
+├── EstadoDeBusquedaTests.cs
+├── ListadoVacioTests.cs
+├── EdicionDeEstudioTests.cs            # Historia 5
+├── PwaTests.cs                         # Historia 6
+├── PrivacidadEnLogsTests.cs            # Historia 7
+└── Rendimiento/
+    └── MedicionesTests.cs              # AC-51, AC-52, AC-53: fuera de la suite habitual
 ```
 
 **Decisión de estructura**: un único proyecto ejecutable más un proyecto de tests. La carpeta

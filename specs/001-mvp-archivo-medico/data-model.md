@@ -20,6 +20,25 @@ guarda y **qué invariantes** lo protegen, no cómo se declara en el mapeo.
 
 ## Entidades
 
+### Equivalencia de nombres con la especificación
+
+`spec.md` nombra las entidades en lenguaje de negocio y este documento usa el nombre con el que se
+persisten. Son las mismas:
+
+| Entidad en `spec.md` | Entidad en el modelo |
+|---|---|
+| Cuenta | `Usuario` |
+| Estudio | `Estudio` |
+| Archivo asociado | `ArchivoDeEstudio` |
+| Etiqueta | `EtiquetaDeEstudio` |
+| Registro de intentos de inicio de sesión | `IntentoDeInicioDeSesion` |
+
+Dos entidades del spec **no** tienen tabla, y es deliberado: **Sesión** la administra el manejador de
+autenticación de la plataforma y su duración se configura, no se persiste; y **Cupo de almacenamiento**
+es un valor calculado como la suma de `TamanoEnBytes` de todos los archivos, contrastado contra un
+límite de configuración. Materializar cualquiera de las dos crearía un dato que puede quedar
+desincronizado de la realidad.
+
 ### Usuario
 
 Identidad de un integrante del grupo familiar. Es la entidad de Identity, sin datos médicos.
