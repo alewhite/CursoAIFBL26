@@ -34,6 +34,9 @@ integración (`tests/MiArchivoMedico.Tests`). No hay capa de servicios de aplica
 controladores hablan con `ArchivoMedicoDbContext` y con tres colaboradores de dominio
 (`BuscadorDeEstudios`, `ServicioDeCargaDeArchivos`, `IAlmacenamientoDeArchivos`).
 
+La PWA no agrega capas: es `wwwroot/manifest.webmanifest`, `wwwroot/sw.js`, `wwwroot/js/carga.js` y la
+vista anónima `/sin-conexion` (`HomeController.SinConexion`). Sin librerías de por medio.
+
 Las invariantes críticas están puestas en lugares donde no se pueden olvidar. Vale la pena conocerlas antes
 de tocar algo, porque cambian la forma de escribir el código:
 
@@ -66,6 +69,10 @@ de tocar algo, porque cambian la forma de escribir el código:
   `ESTATICOS` —archivos estáticos y la pantalla `/sin-conexion`— y nunca escribe una respuesta de la red.
   Las navegaciones y `/Archivos` son red o pantalla sin conexión, nada intermedio. `PwaTests` pide cada
   entrada de esa lista sin sesión: si alguna exigiera autenticación, el test falla (RNF-51, AC-41).
+- **El aviso de carga interrumpida es del navegador, no del servidor** (`wwwroot/js/carga.js`, RF-28): con
+  la conexión caída el servidor no llega a responder nada, y con el cuerpo multiparte truncado el 400 lo
+  produce la capa HTTP por debajo de la aplicación —sin cuerpo y sin pasar por ningún middleware, así que
+  no hay dónde engancharse—. Implementarlo del lado del servidor no funciona; ya se probó.
 - **El tiempo se inyecta**: todo usa `TimeProvider` (registrado como singleton). No usar `DateTimeOffset.Now`
   ni `DateTime.UtcNow` directo, o el test correspondiente no puede ejercitar expiraciones ni ventanas de
   bloqueo.

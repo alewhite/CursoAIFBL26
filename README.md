@@ -99,6 +99,7 @@ src/MiArchivoMedico.Web/
   Dominio/              normalización de texto, criterios y buscador de estudios
   Security/             sesión, hashing, usuario actual, alta de cuentas
   Models/ · Views/      formularios y vistas
+  wwwroot/              manifiesto, service worker, iconos y el guion de carga de la PWA
 tests/MiArchivoMedico.Tests/
   Infraestructura/      aplicación en memoria con SQLite descartable y reloj controlable
   *Tests.cs             un archivo por área, con los AC del PRD en el nombre de cada test
@@ -136,6 +137,11 @@ Cada una responde a un requerimiento del PRD, y cada una tiene test:
   así que cada campo buscable se persiste además normalizado (minúsculas, sin acentos, sin espacios
   sobrantes) y el término ingresado se normaliza con la misma función. Buscar sobre las columnas originales
   no cumpliría el requisito. No hay FTS5 ni índice de texto completo: sobre el volumen del MVP no hace falta.
+- **La PWA no guarda nada de la aplicación (RNF-51).** El service worker solo cachea la lista `ESTATICOS`
+  de `wwwroot/sw.js` —archivos estáticos y la pantalla sin conexión— y jamás escribe una respuesta de la
+  red: las navegaciones y la entrega de archivos son red o pantalla sin conexión, nada intermedio. Por eso
+  abrir la aplicación sin conexión y sin sesión no muestra estudios vistos antes. El test pide cada entrada
+  de esa lista sin sesión, así que agregar una ruta privada lo hace fallar.
 - **Nada de datos médicos en logs (RNF-09, RNF-43).** Ni títulos, descripciones, profesionales,
   instituciones, etiquetas ni nombres originales de archivo. Solo identificadores técnicos.
 
