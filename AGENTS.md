@@ -1,6 +1,6 @@
 # AGENTS.md — Mi Archivo Médico
 
-`PRD2.md` (revisión 3) es la fuente única del alcance y de los requerimientos (RF/RNF/AC).
+`PRD2.md` (revisión 4) es la fuente única del alcance y de los requerimientos (RF/RNF/AC).
 Este archivo define **cómo** se construye; el PRD define **qué**. Ante una contradicción, prevalece el PRD:
 corregir este archivo, no el PRD.
 `PRD.md` es la revisión 1 y se conserva solo como referencia histórica: no citarlo ni implementar contra él.

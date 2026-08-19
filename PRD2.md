@@ -1,6 +1,6 @@
 # PRD-001: Mi Archivo Médico — Aplicación web progresiva de uso familiar para almacenar, organizar, consultar y encontrar estudios médicos de forma segura
 
-> **Estado**: vigente · **Alcance**: MVP · **Última actualización**: 2026-08-19 · **Revisión**: 3 (comportamientos derivados de la especificación)
+> **Estado**: vigente · **Alcance**: MVP · **Última actualización**: 2026-08-19 · **Revisión**: 4 (endurecimiento de sesión y de validación de entrada)
 >
 > Este documento es la fuente única de verdad del alcance. Convenciones de lectura:
 > **RF-nn** requerimiento funcional, **RNF-nn** requerimiento no funcional, **AC-nn** criterio de aceptación
@@ -32,6 +32,16 @@
 > nuevos se expresan siempre como identificadores nuevos, incluso cuando refuerzan a uno anterior —RNF-64
 > refuerza el cupo de RNF-52 y RNF-65 refuerza el bloqueo de RNF-60— para no alterar lo que un identificador
 > ya exigía. La revisión 3 no retira ningún identificador.
+>
+> **Cambios respecto de la revisión 3**: al cerrar los ítems de checklist que afectaban al código
+> aparecieron tres comportamientos observables que ningún identificador cubría: la sesión única por
+> cuenta con cookie no persistente, el largo mínimo de la contraseña que asigna el procedimiento
+> administrativo y el largo máximo de los campos de texto del estudio. Se incorporan como RNF-68 a
+> RNF-70, con AC-103 a AC-106, enumerados en
+> [Trazabilidad de la revisión 4](#trazabilidad-de-identificadores-nuevos-en-la-revisión-4). Se suman
+> además la exclusión de la rotación de la clave de cifrado y el riesgo aceptado de los metadatos sin
+> cifrar en reposo. Ningún identificador existente cambió de número ni de significado, y la revisión 4
+> no retira ninguno.
 
 ## Contexto y Problema
 
@@ -170,6 +180,8 @@ La verificación cuantitativa de estos objetivos se enumera en [Indicadores de �
 - **RNF-60**: El sistema debe rechazar todo intento de inicio de sesión de una cuenta que haya acumulado 5 intentos fallidos dentro de una ventana de 15 minutos, y mantener ese rechazo durante 15 minutos contados desde el quinto intento fallido. Un inicio de sesión exitoso debe reiniciar el contador de intentos fallidos a cero. El mensaje devuelto durante el bloqueo debe ser indistinguible del definido en RNF-13.
 - **RNF-62**: La clave de cifrado definida en RNF-02 no debe residir en el código fuente ni en archivos de configuración versionados. Si la clave no puede resolverse desde la configuración externa, la aplicación debe fallar al iniciar en lugar de almacenar archivos sin cifrar. *(proviene de RNF-02)*
 - **RNF-65**: El contador de intentos fallidos definido en RNF-60 debe llevarse contra el nombre de usuario ingresado, corresponda o no a una cuenta existente, y el tiempo de respuesta de un rechazo debe ser comparable en ambos casos. La indistinguibilidad exigida por RNF-13 alcanza así a todo el comportamiento observable y no solo al texto del mensaje. *(refuerza RNF-60 y RNF-13 sin alterar lo que exigen)*
+- **RNF-68**: La cookie de autenticación debe ser de sesión del navegador y no debe sobrevivir a su cierre. Cada cuenta debe tener como máximo una sesión activa a la vez: un inicio de sesión exitoso debe invalidar la sesión que esa cuenta tuviera en cualquier otro dispositivo. *(refuerza RNF-11 y RNF-12 sin alterar lo que exigen)*
+- **RNF-69**: La contraseña asignada por el procedimiento administrativo definido en RNF-54 debe tener 12 caracteres como mínimo. No se exigen reglas de composición. El alta que no cumpla ese mínimo debe rechazarse.
 
 ### Validación de archivos
 
@@ -206,6 +218,7 @@ La verificación cuantitativa de estos objetivos se enumera en [Indicadores de �
 - **RNF-55**: La búsqueda y los filtros sobre metadatos de texto libre deben ser insensibles a mayúsculas, minúsculas y acentos, y deben ignorar los espacios al inicio y al final del término ingresado. Como SQLite no ofrece una intercalación insensible a acentos, la normalización (minúsculas, sin acentos, sin espacios sobrantes) debe resolverse en la aplicación: cada campo de texto buscable se persiste además en una columna normalizada e indexada, y el término ingresado se normaliza con la misma función antes de consultar.
 - **RNF-66**: Mientras una carga de archivos está en curso, la aplicación debe indicar que la operación está en progreso e impedir que el formulario vuelva a enviarse, de modo que la espera admitida por RNF-26 no se confunda con una aplicación detenida ni derive en la creación duplicada del estudio. No se exige informar el avance por archivo ni un porcentaje.
 - **RNF-67**: Cuando el envío de un formulario se rechaza por validación, la aplicación debe devolverlo con los metadatos ingresados intactos y debe advertir explícitamente que los archivos deben volver a adjuntarse. Ningún archivo queda retenido esperando un segundo envío.
+- **RNF-70**: Los campos de texto del estudio deben tener un largo máximo: 200 caracteres para el título, el profesional y la institución; 2.000 para la descripción; y 50 para cada etiqueta. El sistema debe rechazar el valor que lo supere e informarlo junto al campo que lo produjo.
 
 ### Respaldo y recuperación de infraestructura
 
@@ -256,6 +269,9 @@ La verificación cuantitativa de estos objetivos se enumera en [Indicadores de �
 - **AC-86 (RNF-60)**: Dada una cuenta bloqueada por 5 intentos fallidos, cuando se intenta iniciar sesión con la contraseña correcta una vez transcurridos 15 minutos desde el quinto fallo, entonces el acceso se concede.
 - **AC-87 (RNF-60)**: Dada una cuenta con 4 intentos fallidos consecutivos seguidos de un inicio de sesión exitoso, cuando a continuación se registran 4 nuevos intentos fallidos, entonces la cuenta no queda bloqueada, porque el inicio de sesión exitoso reinició el contador.
 - **AC-98 (RNF-65, RNF-13)**: Dado un nombre de usuario que no corresponde a ninguna cuenta, cuando se realizan 5 intentos fallidos dentro de una ventana de 15 minutos y luego un sexto intento, entonces el rechazo devuelto y su demora son indistinguibles de los que produce una cuenta existente en la misma situación.
+- **AC-103 (RNF-68)**: Dada una cuenta con sesión iniciada en un dispositivo, cuando la misma cuenta inicia sesión en un segundo dispositivo, entonces la primera sesión deja de ser válida y su siguiente solicitud exige autenticarse de nuevo.
+- **AC-104 (RNF-68)**: Dada una sesión iniciada, cuando se inspecciona la cookie de autenticación, entonces no declara fecha de vencimiento ni duración propia, de modo que el navegador la descarta al cerrarse.
+- **AC-105 (RNF-69)**: Dada una configuración de alta con una contraseña de 11 caracteres, cuando se inicia la aplicación, entonces esa cuenta no se crea y el arranque informa el incumplimiento del mínimo.
 
 ### Creación y edición de estudios
 
@@ -275,6 +291,7 @@ La verificación cuantitativa de estos objetivos se enumera en [Indicadores de �
 - **AC-91 (RF-37)**: Dada una fecha posterior al día en curso, cuando el usuario intenta crear un estudio con ella, entonces el sistema no lo crea y muestra un error; dada la fecha del día en curso, el estudio se crea.
 - **AC-99 (RNF-66)**: Dada una carga de archivos en curso, cuando el usuario intenta enviar el formulario otra vez, entonces el sistema lo impide, sigue indicando que la operación está en progreso y no se crea un segundo estudio.
 - **AC-100 (RNF-67)**: Dado un formulario de creación rechazado por validación, cuando se lo devuelve al usuario, entonces los metadatos que había ingresado siguen en sus campos y un aviso indica que los archivos deben adjuntarse otra vez.
+- **AC-106 (RNF-70)**: Dado un título de 201 caracteres, cuando el usuario intenta crear el estudio, entonces el sistema no lo crea y muestra el error junto al campo título; con 200 caracteres, el estudio se crea.
 
 ### Visualización, descarga y eliminación
 
@@ -409,6 +426,7 @@ La verificación cuantitativa de estos objetivos se enumera en [Indicadores de �
 - Edición del contenido interno de los archivos.
 - Compromisos de accesibilidad: navegación por teclado, foco visible, contraste, compatibilidad con lectores de pantalla y conformidad con cualquier norma de accesibilidad. La única exigencia del MVP sobre la interfaz es la de RNF-29 y RNF-30, que trata el ancho de pantalla y el desplazamiento horizontal. *(incorporado en la revisión 3: la exclusión estaba implícita y ahora es explícita)*
 - Direcciones que reproduzcan una búsqueda o un listado filtrado, como consecuencia de RNF-63.
+- Rotación o reemplazo de la clave de cifrado desde la aplicación: cambiarla obliga a recifrar todos los archivos existentes. Ante sospecha de compromiso se ejecuta un procedimiento manual administrativo. *(incorporado en la revisión 4)*
 
 ## Riesgos y Dependencias
 
@@ -429,6 +447,8 @@ Mitigación:
 - Validación de autorización antes de entregar cada archivo.
 
 **Riesgo aceptado**: RNF-60 bloquea por cuenta, de modo que quien conozca el nombre de usuario de un integrante puede dejarlo sin acceso durante 15 minutos de forma deliberada. Se acepta para el MVP: la instalación es familiar, con 5 cuentas conocidas entre sí, y el bloqueo por origen de la solicitud agregaría complejidad sin reducir el riesgo real en ese contexto.
+
+**Riesgo aceptado**: RNF-02 exige cifrar los archivos, no la base de datos. Quien obtenga el archivo de base puede leer los metadatos de los estudios —títulos, profesionales, instituciones, descripciones y etiquetas— aunque no pueda abrir ningún documento. Se acepta para el MVP: la base vive fuera de toda carpeta pública y su protección se apoya en los permisos del sistema operativo, y cifrarla exigiría una extensión de SQLite o cifrado de volumen, fuera del límite de costos de RNF-45. *(incorporado en la revisión 4)*
 
 #### Archivos maliciosos o inválidos
 
@@ -638,3 +658,17 @@ requerimiento existente quedaba incompleto o ambiguo.
 | AC-100 | RNF-67 | Verificación de la conservación de los metadatos ingresados. |
 | AC-101 | RNF-27 | RNF-27 exigía paginar y AC-54 solo verificaba el control de avance. |
 | AC-102 | RF-14, RNF-52 | La liberación del cupo al eliminar un estudio no tenía verificación. |
+
+### Trazabilidad de identificadores nuevos en la revisión 4
+
+Todos provienen del cierre de los ítems de `specs/001-mvp-archivo-medico/checklists/` que afectaban al
+código, sobre comportamiento que la revisión 3 no cubría con ningún identificador.
+
+| Nuevo | Origen | Motivo |
+|---|---|---|
+| RNF-68 | RNF-11, RNF-12 | Ninguno definía si la cookie sobrevive al cierre del navegador ni cuántas sesiones simultáneas admite una cuenta. |
+| RNF-69 | RNF-03, RNF-54 | RNF-03 fija cómo se almacena la contraseña y RNF-54 quién la asigna, pero ninguno exigía un largo mínimo. |
+| RNF-70 | RF-34, RNF-32 | RF-34 rechaza el título vacío; nada acotaba el largo máximo de los campos de texto. |
+| AC-103, AC-104 | RNF-68 | Verificación de la sesión única y de la cookie no persistente. |
+| AC-105 | RNF-69 | Verificación del rechazo del alta con contraseña corta. |
+| AC-106 | RNF-70 | Verificación del rechazo por largo máximo. |

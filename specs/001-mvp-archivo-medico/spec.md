@@ -46,6 +46,36 @@ identificadores RF/RNF/AC, según el Principio II de la constitución del proyec
 
 - Q: ¿De dónde deben salir los identificadores con que se nombran los tests de los seis requisitos derivados de las clarificaciones? → A: De `PRD2.md`: se lo amplía como revisión 3 con los RF/RNF y AC que correspondan a esos comportamientos, y el spec pasa a citarlos. No se crea un espacio de identificadores propio del spec ni se admite excepción a la convención de nombres de los tests. *(Aplicado: `PRD2.md` revisión 3, RF-36 a RF-40, RNF-63 a RNF-67, AC-90 a AC-102.)*
 
+### Sesión 2026-08-19 (quinta pasada, cierre de los ítems de checklist que afectan al código)
+
+- Q: ¿Qué cuenta como "pantalla o paso" en el máximo de tres para crear un estudio? → A: Cada pantalla distinta que el usuario ve entre que elige crear y el estudio queda guardado. Un diálogo de confirmación suma; volver a ver el formulario tras un error de validación no suma, porque es la misma pantalla otra vez.
+- Q: ¿Qué longitudes máximas tienen los campos de texto del estudio? → A: Título, profesional e institución hasta 200 caracteres; descripción hasta 2000; cada etiqueta hasta 50.
+- Q: ¿La sesión sobrevive al cierre del navegador, y puede la misma cuenta tener varias sesiones a la vez? → A: No sobrevive —la cookie es de sesión del navegador— y solo puede haber **una sesión activa por cuenta**: iniciar sesión en un dispositivo invalida la sesión de los demás.
+- Q: ¿Qué protección tienen los metadatos médicos guardados en la base? → A: Ninguna adicional: RNF-02 exige cifrar los archivos, no la base. El archivo de base vive fuera de toda carpeta pública y su protección depende de los permisos del sistema operativo. Queda declarado como riesgo aceptado.
+
+Además se resolvieron con criterio estándar diecisiete ítems de checklist que afectaban al código, sin
+que ninguno amplíe una capacidad del PRD:
+
+| Ítem | Resolución |
+|---|---|
+| security CHK004 | El identificador de sesión se renueva al autenticarse, para cerrar la fijación de sesión |
+| security CHK005 | La contraseña que asigna el procedimiento administrativo tiene 12 caracteres como mínimo, sin reglas de composición |
+| security CHK006 | Si una credencial almacenada quedó con parámetros por debajo del mínimo, se recalcula en el siguiente ingreso exitoso |
+| security CHK007 | El área de tránsito es `<Almacenamiento:Ruta>/transito/`, se borra al terminar cada carga y se purga al arrancar |
+| security CHK009 | La rotación de la clave de cifrado queda fuera del alcance del MVP: reemplazarla exige recifrar todo, con procedimiento manual documentado |
+| security CHK010 | Se emite HSTS con `max-age` de un año, solo en producción |
+| security CHK022 | "Cuenta activa" significa cuenta existente; el MVP no contempla deshabilitación, así que ninguna libera lugar |
+| ux CHK007 | Tras crear, editar y eliminar se muestra un mensaje de confirmación en la pantalla de destino |
+| ux CHK008 | Si la sesión vence a mitad de una operación, se redirige al ingreso y lo escrito se pierde; el aviso lo dice |
+| ux CHK009 | La aplicación no promueve su instalación: publica el manifiesto y decide el navegador |
+| ux CHK010 | La pantalla sin conexión ofrece un botón de reintentar que recarga |
+| ux CHK013 | Los archivos se presentan por fecha de carga ascendente y las etiquetas en orden alfabético |
+| ux CHK014 | Si el visor no puede mostrar un archivo, se informa y se ofrece descargarlo |
+| ux CHK021 | Las fechas se presentan como `dd/mm/aaaa`, uniforme en listado, detalle y filtros |
+| ux CHK022 | El contador va arriba del listado, con el total de resultados y el rango visible en la página |
+| ux CHK037 | El listado no lleva indicador de espera: los 2 segundos que admite SC-004 se toleran sin señal |
+| ux CHK038 | No hay tratamiento especial para estudios con muchos archivos o etiquetas; los límites de RNF-61 alcanzan |
+
 ## Escenarios de Usuario y Pruebas *(obligatorio)*
 
 Las historias están ordenadas por prioridad. Cada una es una porción independientemente construible,
@@ -481,9 +511,16 @@ completo de un estudio ficticio.
 Cada requisito traza al identificador de `PRD2.md` que lo origina. Los identificadores del PRD son la
 referencia autoritativa: si esta sección y el PRD difirieran, prevalece el PRD.
 
-Los requisitos nacidos de las sesiones de clarificación fueron incorporados a `PRD2.md` en su **revisión 3**
-(RF-36 a RF-40, RNF-63 a RNF-67, AC-90 a AC-102) y esta sección los cita como a cualquier otro. No queda
-ninguna deuda de trazabilidad: todo requisito de este spec traza a un identificador permanente del PRD.
+Los requisitos nacidos de las primeras cuatro sesiones de clarificación fueron incorporados a `PRD2.md`
+en su **revisión 3** (RF-36 a RF-40, RNF-63 a RNF-67, AC-90 a AC-102) y esta sección los cita como a
+cualquier otro.
+
+Los tres requisitos nuevos de la quinta sesión —**FR-004b** (sesión única por cuenta y cookie no
+persistente), **FR-009b** (largo mínimo de la contraseña administrativa) y **FR-016b** (largo máximo de
+los campos de texto)— fueron incorporados a `PRD2.md` en su **revisión 4** (RNF-68 a RNF-70, AC-103 a
+AC-106) y ya citan sus identificadores. Las demás decisiones de esa sesión son precisiones de requisitos
+existentes. **No queda ninguna deuda de trazabilidad**: todo requisito de este spec traza a un
+identificador permanente del PRD.
 
 ### Requisitos Funcionales
 
@@ -498,6 +535,9 @@ ninguna deuda de trazabilidad: todo requisito de este spec traza a un identifica
   no permita deducir si la cuenta existe. *(RNF-13, RNF-65, AC-04, AC-98)*
 - **FR-004**: El sistema DEBE permitir cerrar la sesión manualmente e invalidarla en ese acto. *(RF-03,
   RNF-12, AC-05)*
+- **FR-004b**: La cookie de autenticación DEBE ser de sesión del navegador, sin sobrevivir a su cierre.
+  Cada cuenta DEBE tener como máximo una sesión activa a la vez: iniciar sesión en un dispositivo
+  DEBE invalidar la sesión que la cuenta tuviera en cualquier otro. *(RNF-68, AC-103, AC-104)*
 - **FR-005**: El sistema DEBE expirar la sesión tras 30 minutos de inactividad y exigir una nueva
   autenticación. La ventana es deslizante: toda solicitud autenticada reinicia la cuenta de 30 minutos.
   *(RF-04, RNF-04, AC-06)*
@@ -515,6 +555,9 @@ ninguna deuda de trazabilidad: todo requisito de este spec traza a un identifica
   *(RNF-11, AC-58)*
 - **FR-009**: Las contraseñas DEBEN almacenarse con Argon2id (memoria ≥ 19 MiB, 2 iteraciones,
   paralelismo 1), bcrypt (costo ≥ 12) o PBKDF2-HMAC-SHA256 con ≥ 100.000 iteraciones. *(RNF-03, AC-76)*
+- **FR-009b**: La contraseña que asigna el procedimiento administrativo DEBE tener 12 caracteres como
+  mínimo. No se exigen reglas de composición. El alta que no lo cumpla DEBE rechazarse al arrancar.
+  *(RNF-69, AC-105)*
 - **FR-010**: La aplicación NO DEBE exponer ninguna ruta de registro de cuentas; el alta se realiza por
   un procedimiento administrativo externo. *(RNF-54, AC-50)*
 - **FR-011**: El sistema DEBE admitir un máximo de 5 cuentas activas y rechazar el alta de una adicional
@@ -539,6 +582,9 @@ ninguna deuda de trazabilidad: todo requisito de este spec traza a un identifica
 
 - **FR-015**: Los usuarios DEBEN poder crear un estudio médico. *(RF-33, AC-09)*
 - **FR-016**: El sistema DEBE rechazar la creación de un estudio con título vacío. *(RF-34, AC-10)*
+- **FR-016b**: Los campos de texto del estudio DEBEN tener un largo máximo: 200 caracteres para título,
+  profesional e institución, 2000 para la descripción y 50 para cada etiqueta. El sistema DEBE
+  rechazar el valor que lo supere e informarlo junto al campo. *(RNF-70, AC-106)*
 - **FR-017**: El sistema DEBE rechazar la creación de un estudio con fecha ausente o inválida. La fecha
   del estudio es una fecha de calendario sin hora, y es inválida si no existe en el calendario, si no
   respeta el formato esperado o si es posterior al día en curso. *(RF-35, RF-37, AC-11, AC-91)*
@@ -554,8 +600,10 @@ ninguna deuda de trazabilidad: todo requisito de este spec traza a un identifica
   archivos. *(RF-10, RNF-18, AC-14)*
 - **FR-023**: El sistema DEBE permitir asociar uno o más archivos a un mismo estudio, con un máximo de 20
   por estudio, rechazando la carga que lo supere e informando el límite. *(RF-07, RNF-61, AC-12, AC-70)*
-- **FR-024**: La creación de un estudio DEBE completarse en un máximo de tres pantallas o pasos.
-  *(RNF-31, AC-79)*
+- **FR-024**: La creación de un estudio DEBE completarse en un máximo de tres pantallas o pasos. Un
+  paso es cada pantalla distinta que el usuario ve entre que elige crear y el estudio queda guardado:
+  un diálogo de confirmación suma, y volver a ver el mismo formulario tras un error de validación no
+  suma. *(RNF-31, AC-79)*
 - **FR-025**: Los errores de validación DEBEN mostrarse junto al campo o al archivo que los produjo.
   *(RNF-32, AC-80)*
 - **FR-025c**: Cuando el envío de un formulario se rechaza por validación, el sistema DEBE devolver el
@@ -680,7 +728,8 @@ ninguna deuda de trazabilidad: todo requisito de este spec traza a un identifica
 **Transporte, privacidad y operación**
 
 - **FR-060**: El 100 % de las comunicaciones DEBE usar HTTPS con TLS 1.2 o superior, redirigiendo las
-  solicitudes sin cifrar. *(RNF-01, AC-56)*
+  solicitudes sin cifrar, y en producción DEBE emitirse la cabecera que obliga al navegador a usar
+  HTTPS en las visitas posteriores, con vigencia de un año. *(RNF-01, AC-56)*
 - **FR-061**: Los títulos, profesionales, instituciones, descripciones, etiquetas, nombres originales de
   archivo y resultados médicos NO DEBEN registrarse en logs técnicos. La prohibición alcanza a todo
   registro producido durante la operación, incluidos los que genera la infraestructura por fuera de la
@@ -796,6 +845,13 @@ ninguna deuda de trazabilidad: todo requisito de este spec traza a un identifica
 - **Sin enlaces marcables a listados filtrados**: como consecuencia de FR-048b, no existe una dirección
   que reproduzca una búsqueda o un filtro. El PRD no lo exige en ningún requerimiento y se acepta como
   costo de mantener los datos médicos fuera de los registros.
+- **Metadatos en reposo sin cifrar**: RNF-02 exige cifrar los archivos, no la base. El archivo de base
+  y sus auxiliares viven fuera de toda carpeta pública y su protección depende de los permisos del
+  sistema operativo. Quien obtenga el archivo puede leer los metadatos, aunque no los documentos. Es un
+  riesgo aceptado del MVP; cifrarlo exigiría modificar antes `PRD2.md`.
+- **Rotación de la clave de cifrado fuera de alcance**: reemplazar la clave obliga a recifrar todos los
+  archivos existentes. El MVP no ofrece ese mecanismo; ante sospecha de compromiso se ejecuta un
+  procedimiento manual documentado en `docs/operacion.md`.
 - **Idioma único**: la interfaz, los mensajes y los rótulos están en español, en línea con el resto del
   proyecto. No se contempla más de un idioma ni un mecanismo de traducción; el PRD no lo pide.
 - **Los usuarios usan navegadores compatibles con PWA** y disponen de conexión para toda operación con
@@ -838,10 +894,10 @@ durante la implementación. Ninguna de ellas se implementa sin modificar antes e
 - **I. Seguridad y privacidad por construcción**: FR-001, FR-012 a FR-014, FR-035, FR-036, FR-045,
   FR-057, FR-061 y FR-062 fijan aislamiento total, autenticación por omisión, cifrado, falla segura ante
   configuración faltante y ausencia de datos médicos en logs, métricas y caché.
-- **II. Trazabilidad al PRD**: los 79 requisitos funcionales y los criterios de éxito citan sus RF/RNF/AC
-  de origen, sin excepciones. Los comportamientos surgidos de las sesiones de clarificación se
-  incorporaron a `PRD2.md` en su revisión 3 en lugar de quedar solo en este documento, de modo que el PRD
-  sigue siendo la fuente única del alcance.
+- **II. Trazabilidad al PRD**: los 82 requisitos funcionales y los criterios de éxito citan sus RF/RNF/AC
+  de origen, sin excepciones. Los comportamientos surgidos de las cinco sesiones de clarificación se
+  incorporaron a `PRD2.md` en sus revisiones 3 y 4 en lugar de quedar solo en este documento, de modo
+  que el PRD sigue siendo la fuente única del alcance.
 - **III. Invariantes centralizadas**: la especificación describe comportamiento observable y no prescribe
   dónde vive cada regla; el plan deberá resolver aislamiento, normalización, búsqueda, pipeline de
   archivos y tiempo en un único punto autoritativo.
