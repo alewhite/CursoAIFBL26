@@ -1,0 +1,14 @@
+@model MiArchivoMedico.Web.Dominio.Estudio
+@{
+    ViewData["Titulo"] = "Detalle del estudio";
+}
+<h1>@Model.Titulo</h1>
+
+<div class="tarjeta">
+    <p><strong>Fecha:</strong> @Model.Fecha.ToString("dd/MM/yyyy")</p>
+    @if (!string.IsNullOrWhiteSpace(Model.Profesional)) { <p><strong>Profesional:</strong> @Model.Profesional</p> }
+    @if (!string.IsNullOrWhiteSpace(Model.Institucion)) { <p><strong>Institución:</strong> @Model.Institucion</p> }
+    @if (!string.IsNullOrWhiteSpace(Model.Descripcion)) { <p>@Model.Descripcion</p> }
+</div>
+
+<p><a class="boton secundario" asp-action="Index">Volver al listado</a></p>

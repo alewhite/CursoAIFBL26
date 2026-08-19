@@ -94,31 +94,31 @@ reglas de expiración y bloqueo se cumplen.
 
 ### Tests de la Historia 1
 
-- [ ] T028 [P] [US1] Escribir los tests de ingreso y cierre de sesión en `tests/MiArchivoMedico.Tests/AutenticacionTests.cs` (AC-01, AC-02, AC-03, AC-04, AC-05)
-- [ ] T029 [P] [US1] Escribir los tests de expiración por inactividad y de tope absoluto, con tiempo simulado, en `tests/MiArchivoMedico.Tests/SesionTests.cs` (AC-06, AC-07)
-- [ ] T030 [P] [US1] Escribir los tests de bloqueo por intentos fallidos en `tests/MiArchivoMedico.Tests/BloqueoDeIntentosTests.cs` (AC-69, AC-86, AC-87)
-- [ ] T031 [P] [US1] Escribir el test de indistinguibilidad ante un nombre de usuario inexistente en `tests/MiArchivoMedico.Tests/BloqueoDeIntentosTests.cs` (AC-98, RNF-65)
-- [ ] T032 [P] [US1] Escribir los tests de aislamiento entre propietarios sobre detalle y listado en `tests/MiArchivoMedico.Tests/PropiedadDeDatosTests.cs` (AC-47, AC-49)
-- [ ] T033 [P] [US1] Escribir el test que enumera las rutas registradas y comprueba que ninguna acepta alta de cuenta, cambio de propietario ni exportación, importación o restauración en `tests/MiArchivoMedico.Tests/RutasExpuestasTests.cs` (AC-50, AC-63, RNF-39)
-- [ ] T034 [P] [US1] Escribir el test del tope de 5 cuentas activas en `tests/MiArchivoMedico.Tests/CuentasInicialesTests.cs` (AC-62)
-- [ ] T035 [P] [US1] Escribir los tests de atributos de la cookie y de formato del hash almacenado en `tests/MiArchivoMedico.Tests/SeguridadDeCredencialesTests.cs` (AC-58, AC-76)
-- [ ] T036 [P] [US1] Escribir el test de arranque sin clave de cifrado en `tests/MiArchivoMedico.Tests/ArranqueTests.cs`, construyendo el host directamente y no con la fábrica (AC-83)
-- [ ] T037 [P] [US1] Escribir los tests de sesión única por cuenta y de cookie sin vencimiento propio en `tests/MiArchivoMedico.Tests/SesionTests.cs` (AC-103, AC-104)
-- [ ] T038 [P] [US1] Escribir el test de rechazo del alta con contraseña de 11 caracteres en `tests/MiArchivoMedico.Tests/CuentasInicialesTests.cs` (AC-105)
+- [X] T028 [P] [US1] Escribir los tests de ingreso y cierre de sesión en `tests/MiArchivoMedico.Tests/AutenticacionTests.cs` (AC-01, AC-02, AC-03, AC-04, AC-05)
+- [X] T029 [P] [US1] Escribir los tests de expiración por inactividad y de tope absoluto, con tiempo simulado, en `tests/MiArchivoMedico.Tests/SesionTests.cs` (AC-06, AC-07)
+- [X] T030 [P] [US1] Escribir los tests de bloqueo por intentos fallidos en `tests/MiArchivoMedico.Tests/BloqueoDeIntentosTests.cs` (AC-69, AC-86, AC-87)
+- [X] T031 [P] [US1] Escribir el test de indistinguibilidad ante un nombre de usuario inexistente en `tests/MiArchivoMedico.Tests/BloqueoDeIntentosTests.cs` (AC-98, RNF-65)
+- [X] T032 [P] [US1] Escribir los tests de aislamiento entre propietarios sobre detalle y listado en `tests/MiArchivoMedico.Tests/PropiedadDeDatosTests.cs` (AC-47, AC-49)
+- [X] T033 [P] [US1] Escribir el test que enumera las rutas registradas y comprueba que ninguna acepta alta de cuenta, cambio de propietario ni exportación, importación o restauración en `tests/MiArchivoMedico.Tests/RutasExpuestasTests.cs` (AC-50, AC-63, RNF-39)
+- [X] T034 [P] [US1] Escribir el test del tope de 5 cuentas activas en `tests/MiArchivoMedico.Tests/CuentasInicialesTests.cs` (AC-62)
+- [X] T035 [P] [US1] Escribir los tests de atributos de la cookie y de formato del hash almacenado en `tests/MiArchivoMedico.Tests/SeguridadDeCredencialesTests.cs` (AC-58, AC-76)
+- [X] T036 [P] [US1] Escribir el test de arranque sin clave de cifrado en `tests/MiArchivoMedico.Tests/ArranqueTests.cs`, construyendo el host directamente y no con la fábrica (AC-83)
+- [X] T037 [P] [US1] Escribir los tests de sesión única por cuenta y de cookie sin vencimiento propio en `tests/MiArchivoMedico.Tests/SesionTests.cs` (AC-103, AC-104)
+- [X] T038 [P] [US1] Escribir el test de rechazo del alta con contraseña de 11 caracteres en `tests/MiArchivoMedico.Tests/CuentasInicialesTests.cs` (AC-105)
 
 ### Implementación de la Historia 1
 
-- [ ] T039 [P] [US1] Crear la entidad `IntentoDeInicioDeSesion` en `src/MiArchivoMedico.Web/Dominio/IntentoDeInicioDeSesion.cs`, **sin** implementar `IPropiedadDeUsuario`, porque debe consultarse sin sesión (data-model.md)
-- [ ] T040 [US1] Agregar `IntentoDeInicioDeSesion` al contexto y generar la migración correspondiente en `src/MiArchivoMedico.Web/Data/Migraciones/`
-- [ ] T041 [US1] Implementar `ControlDeIntentosDeInicioDeSesion` en `src/MiArchivoMedico.Web/Servicios/ControlDeIntentosDeInicioDeSesion.cs`: cuenta contra el nombre ingresado normalizado, bloquea a los 5 fallos en 15 minutos, mantiene 15 minutos, reinicia ante ingreso exitoso y depura las entradas vencidas (RNF-60, RNF-65)
-- [ ] T042 [US1] Implementar `CuentaController` en `src/MiArchivoMedico.Web/Controllers/CuentaController.cs`: ingreso con `[AllowAnonymous]`, verificación contra un hash señuelo cuando el usuario no existe, mensaje único, renovación del identificador de sesión al autenticarse, recálculo de la credencial si quedó con parámetros por debajo del mínimo, y cierre de sesión que invalida (RF-02, RF-03, RNF-12, RNF-13)
-- [ ] T043 [P] [US1] Crear la vista de ingreso en `src/MiArchivoMedico.Web/Views/Cuenta/InicioDeSesion.cshtml`, sin layout completo y sin ningún dato médico
-- [ ] T044 [US1] Implementar la invalidación de la sesión anterior de una cuenta al iniciar sesión en otro dispositivo, mediante una marca de sesión en `src/MiArchivoMedico.Web/Dominio/Usuario.cs` que el manejador de la cookie valida en cada solicitud (RNF-68, AC-103)
-- [ ] T045 [US1] Configurar la cookie de autenticación en `src/MiArchivoMedico.Web/Program.cs`: `Secure`, `HttpOnly`, `SameSite=Strict`, cookie de sesión del navegador sin vencimiento propio, expiración deslizante de 30 minutos y tope absoluto de 24 horas que prevalece (RNF-04, RNF-05, RNF-11, RNF-68, AC-104)
-- [ ] T046 [US1] Implementar la respuesta 404 uniforme para recurso ajeno, inexistente o mal formado en `src/MiArchivoMedico.Web/Controllers/EstudiosController.cs` (RNF-53, contracts/rutas.md regla 2)
-- [ ] T047 [US1] Implementar en `src/MiArchivoMedico.Web/Controllers/EstudiosController.cs` las acciones mínimas de listado y detalle que la Historia 1 necesita para demostrar el aislamiento: devuelven solo los estudios del propietario autenticado y 404 ante uno ajeno, sin orden, paginación ni búsqueda, que llegan en las Historias 3 y 4 (RNF-53, AC-47, AC-49)
-- [ ] T048 [P] [US1] Crear las vistas mínimas de listado y detalle en `src/MiArchivoMedico.Web/Views/Estudios/Index.cshtml` y `src/MiArchivoMedico.Web/Views/Estudios/Detalle.cshtml`, que las Historias 3 y 4 amplían
-- [ ] T049 [US1] Configurar la redirección a HTTPS y la cabecera HSTS con vigencia de un año, solo en producción, en `src/MiArchivoMedico.Web/Program.cs` (RNF-01)
+- [X] T039 [P] [US1] Crear la entidad `IntentoDeInicioDeSesion` en `src/MiArchivoMedico.Web/Dominio/IntentoDeInicioDeSesion.cs`, **sin** implementar `IPropiedadDeUsuario`, porque debe consultarse sin sesión (data-model.md)
+- [X] T040 [US1] Agregar `IntentoDeInicioDeSesion` al contexto y generar la migración correspondiente en `src/MiArchivoMedico.Web/Data/Migraciones/`
+- [X] T041 [US1] Implementar `ControlDeIntentosDeInicioDeSesion` en `src/MiArchivoMedico.Web/Servicios/ControlDeIntentosDeInicioDeSesion.cs`: cuenta contra el nombre ingresado normalizado, bloquea a los 5 fallos en 15 minutos, mantiene 15 minutos, reinicia ante ingreso exitoso y depura las entradas vencidas (RNF-60, RNF-65)
+- [X] T042 [US1] Implementar `CuentaController` en `src/MiArchivoMedico.Web/Controllers/CuentaController.cs`: ingreso con `[AllowAnonymous]`, verificación contra un hash señuelo cuando el usuario no existe, mensaje único, renovación del identificador de sesión al autenticarse, recálculo de la credencial si quedó con parámetros por debajo del mínimo, y cierre de sesión que invalida (RF-02, RF-03, RNF-12, RNF-13)
+- [X] T043 [P] [US1] Crear la vista de ingreso en `src/MiArchivoMedico.Web/Views/Cuenta/InicioDeSesion.cshtml`, sin layout completo y sin ningún dato médico
+- [X] T044 [US1] Implementar la invalidación de la sesión anterior de una cuenta al iniciar sesión en otro dispositivo, mediante una marca de sesión en `src/MiArchivoMedico.Web/Dominio/Usuario.cs` que el manejador de la cookie valida en cada solicitud (RNF-68, AC-103)
+- [X] T045 [US1] Configurar la cookie de autenticación en `src/MiArchivoMedico.Web/Program.cs`: `Secure`, `HttpOnly`, `SameSite=Strict`, cookie de sesión del navegador sin vencimiento propio, expiración deslizante de 30 minutos y tope absoluto de 24 horas que prevalece (RNF-04, RNF-05, RNF-11, RNF-68, AC-104)
+- [X] T046 [US1] Implementar la respuesta 404 uniforme para recurso ajeno, inexistente o mal formado en `src/MiArchivoMedico.Web/Controllers/EstudiosController.cs` (RNF-53, contracts/rutas.md regla 2)
+- [X] T047 [US1] Implementar en `src/MiArchivoMedico.Web/Controllers/EstudiosController.cs` las acciones mínimas de listado y detalle que la Historia 1 necesita para demostrar el aislamiento: devuelven solo los estudios del propietario autenticado y 404 ante uno ajeno, sin orden, paginación ni búsqueda, que llegan en las Historias 3 y 4 (RNF-53, AC-47, AC-49)
+- [X] T048 [P] [US1] Crear las vistas mínimas de listado y detalle en `src/MiArchivoMedico.Web/Views/Estudios/Index.cshtml` y `src/MiArchivoMedico.Web/Views/Estudios/Detalle.cshtml`, que las Historias 3 y 4 amplían
+- [X] T049 [US1] Configurar la redirección a HTTPS y la cabecera HSTS con vigencia de un año, solo en producción, en `src/MiArchivoMedico.Web/Program.cs` (RNF-01)
 
 **Punto de control**: la Historia 1 funciona y se demuestra sola. Es el MVP mínimo defendible: un
 sistema que todavía no guarda estudios, pero que ya garantiza que nadie ve lo ajeno.

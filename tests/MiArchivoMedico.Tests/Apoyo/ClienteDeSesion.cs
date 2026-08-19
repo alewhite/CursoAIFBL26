@@ -10,11 +10,23 @@ namespace MiArchivoMedico.Tests.Apoyo;
 /// </summary>
 public static partial class ClienteDeSesion
 {
+    /// <summary>
+    /// El cliente habla https porque la cookie de autenticación se emite con Secure (RNF-11) y un
+    /// contenedor de cookies no la devolvería sobre http. No hay TLS real: lo resuelve el servidor
+    /// de pruebas.
+    /// </summary>
     public static HttpClient CrearClienteSinRedirecciones(this AplicacionDePrueba aplicacion) =>
         aplicacion.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
         {
             AllowAutoRedirect = false,
-            HandleCookies = true
+            HandleCookies = true,
+            BaseAddress = new Uri("https://localhost"),
+        });
+
+    public static HttpClient CrearCliente(this AplicacionDePrueba aplicacion) =>
+        aplicacion.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
+        {
+            BaseAddress = new Uri("https://localhost"),
         });
 
     public static async Task<HttpResponseMessage> IniciarSesionAsync(

@@ -1,4 +1,7 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using MiArchivoMedico.Web.Controllers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MiArchivoMedico.Web.Data;
@@ -10,8 +13,9 @@ var constructor = WebApplication.CreateBuilder(args);
 // --- Configuración externa obligatoria -------------------------------------------------
 // Sin cualquiera de estas tres la aplicación NO arranca, en lugar de degradar una garantía
 // de seguridad (RNF-62, AC-83).
-var cadenaDeConexion = constructor.Configuration.GetConnectionString("ArchivoMedico")
-    ?? throw new InvalidOperationException(
+var cadenaDeConexion = constructor.Configuration.GetConnectionString("ArchivoMedico");
+if (string.IsNullOrWhiteSpace(cadenaDeConexion))
+    throw new InvalidOperationException(
         "Falta ConnectionStrings:ArchivoMedico. Se carga por user-secrets o variables de entorno.");
 
 var almacenamiento = constructor.Configuration.GetSection("Almacenamiento").Get<OpcionesDeAlmacenamiento>()
@@ -39,6 +43,7 @@ constructor.Services.AddSingleton(almacenamiento);
 constructor.Services.AddSingleton(TimeProvider.System);
 constructor.Services.AddHttpContextAccessor();
 constructor.Services.AddScoped<IUsuarioActual, UsuarioActual>();
+constructor.Services.AddScoped<ControlDeIntentosDeInicioDeSesion>();
 
 constructor.Services.AddDbContext<ArchivoMedicoDbContext>(o => o.UseSqlite(cadenaDeConexion));
 
@@ -74,6 +79,38 @@ constructor.Services.ConfigureApplicationCookie(o =>
     o.LoginPath = "/Cuenta/InicioDeSesion";
     o.LogoutPath = "/Cuenta/CerrarSesion";
     o.AccessDeniedPath = "/Cuenta/InicioDeSesion";
+
+    // Dos reglas que el manejador de la cookie no trae por sí solo.
+    o.Events.OnValidatePrincipal = async contexto =>
+    {
+        var reloj = contexto.HttpContext.RequestServices.GetRequiredService<TimeProvider>();
+
+        // 1. Tope absoluto de 24 horas: prevalece sobre la ventana deslizante, así que una sesión con
+        //    actividad sostenida termina igual (RNF-05, AC-07).
+        var marca = contexto.Principal?.FindFirst(CuentaController.ClaimDeInicioDeSesion)?.Value;
+        if (long.TryParse(marca, out var ticks)
+            && reloj.GetUtcNow() - new DateTimeOffset(ticks, TimeSpan.Zero) >= TimeSpan.FromHours(24))
+        {
+            contexto.RejectPrincipal();
+            await contexto.HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
+            return;
+        }
+
+        // 2. Una sola sesión activa por cuenta: si la marca de seguridad del usuario cambió, esta
+        //    cookie es de un ingreso anterior y deja de valer (RNF-68, AC-103). Se compara sin volver
+        //    a firmar, para no reiniciar el tope absoluto ni perder el claim del punto 1.
+        var identificador = contexto.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var marcaDeLaCookie = contexto.Principal?.FindFirst("AspNet.Identity.SecurityStamp")?.Value;
+        if (identificador is null || marcaDeLaCookie is null) return;
+
+        var administrador = contexto.HttpContext.RequestServices.GetRequiredService<UserManager<Usuario>>();
+        var usuario = await administrador.FindByIdAsync(identificador);
+        if (usuario is null || usuario.SecurityStamp != marcaDeLaCookie)
+        {
+            contexto.RejectPrincipal();
+            await contexto.HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
+        }
+    };
 });
 
 // Autorización por omisión: una pantalla nueva nace protegida y abrirla exige [AllowAnonymous]

@@ -1,0 +1,38 @@
+@model MiArchivoMedico.Web.Models.InicioDeSesionFormulario
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Iniciar sesión · Mi Archivo Médico</title>
+    <link rel="stylesheet" href="~/css/sitio.css" asp-append-version="true" />
+</head>
+<body>
+    <main class="contenedor" style="max-width: 24rem;">
+        <h1>Mi Archivo Médico</h1>
+
+        @* Un único mensaje para cuenta inexistente, contraseña incorrecta y cuenta bloqueada. *@
+        @if (!ViewData.ModelState.IsValid && ViewData.ModelState[string.Empty]?.Errors.Count > 0)
+        {
+            <p class="aviso error">@ViewData.ModelState[string.Empty]!.Errors[0].ErrorMessage</p>
+        }
+
+        <form method="post" class="tarjeta">
+            <div class="campo">
+                <label asp-for="NombreDeUsuario"></label>
+                <input asp-for="NombreDeUsuario" autocomplete="username" autofocus />
+                <span class="error" asp-validation-for="NombreDeUsuario"></span>
+            </div>
+            <div class="campo">
+                <label asp-for="Contrasena"></label>
+                <input asp-for="Contrasena" type="password" autocomplete="current-password" />
+                <span class="error" asp-validation-for="Contrasena"></span>
+            </div>
+            <button type="submit">Entrar</button>
+        </form>
+    </main>
+</body>
+</html>

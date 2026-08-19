@@ -28,6 +28,9 @@ public class ArchivoMedicoDbContext(
     public DbSet<ArchivoDeEstudio> Archivos => Set<ArchivoDeEstudio>();
     public DbSet<EtiquetaDeEstudio> Etiquetas => Set<EtiquetaDeEstudio>();
 
+    /// <summary>Sin filtro global: se consulta sin sesión, que es cuando se evalúa un intento.</summary>
+    public DbSet<IntentoDeInicioDeSesion> Intentos => Set<IntentoDeInicioDeSesion>();
+
     protected override void OnModelCreating(ModelBuilder constructor)
     {
         base.OnModelCreating(constructor);
@@ -67,6 +70,12 @@ public class ArchivoMedicoDbContext(
             e.Property(x => x.Texto).HasMaxLength(EtiquetaDeEstudio.LargoMaximoTexto).IsRequired();
             e.Property(x => x.TextoNormalizado).HasMaxLength(EtiquetaDeEstudio.LargoMaximoTexto).IsRequired();
             e.HasIndex(x => x.TextoNormalizado);
+        });
+
+        constructor.Entity<IntentoDeInicioDeSesion>(e =>
+        {
+            e.Property(x => x.NombreDeUsuarioNormalizado).HasMaxLength(256).IsRequired();
+            e.HasIndex(x => x.NombreDeUsuarioNormalizado).IsUnique();
         });
 
         AplicarConversorDeFechas(constructor);
