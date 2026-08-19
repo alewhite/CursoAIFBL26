@@ -17,6 +17,8 @@ La búsqueda es exclusivamente sobre metadatos cargados a mano: el sistema nunca
 - SQLite: un único archivo en disco del servidor, en modo WAL, ubicado fuera de toda carpeta pública
 - ASP.NET Core Identity (autenticación, hashing de contraseñas)
 - NuGet como gestor de paquetes
+- PWA: manifiesto y service worker propios en `wwwroot`, escritos a mano. Sin Workbox ni ningún generador:
+  la caché tiene una sola regla y hay que poder leerla completa (RNF-51)
 - Archivos subidos: carpeta en disco del propio servidor (IIS / inetpub), servida solo a través de un controlador con autorización
 
 ## Cómo correr
