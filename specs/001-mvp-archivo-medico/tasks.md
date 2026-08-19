@@ -58,25 +58,25 @@ Todo lo de esta fase se escribe una vez y ninguna historia lo repite.
 
 **⚠️ CRÍTICO**: ninguna historia de usuario puede empezar hasta que esta fase esté completa.
 
-- [ ] T009 [P] Crear la interfaz marcadora `IPropiedadDeUsuario` con `OwnerId` en `src/MiArchivoMedico.Web/Dominio/IPropiedadDeUsuario.cs`
-- [ ] T010 [P] Crear `IUsuarioActual` y su implementación en `src/MiArchivoMedico.Web/Servicios/UsuarioActual.cs`, devolviendo `Id` nulo cuando no hay sesión (RNF-53)
-- [ ] T011 [P] Crear `NormalizadorDeTexto.Normalizar` en `src/MiArchivoMedico.Web/Servicios/NormalizadorDeTexto.cs`: minúsculas, sin acentos, sin espacios sobrantes (RNF-55)
-- [ ] T012 [P] Crear la entidad `Usuario` derivada de `IdentityUser` en `src/MiArchivoMedico.Web/Dominio/Usuario.cs`
-- [ ] T013 [P] Crear la entidad `Estudio` con sus columnas originales y normalizadas, y con los largos máximos de RNF-70 —200 para título, profesional e institución; 2.000 para la descripción— en `src/MiArchivoMedico.Web/Dominio/Estudio.cs`, implementando `IPropiedadDeUsuario` (data-model.md, RNF-70)
-- [ ] T014 [P] Crear la entidad `ArchivoDeEstudio` en `src/MiArchivoMedico.Web/Dominio/ArchivoDeEstudio.cs`, implementando `IPropiedadDeUsuario`
-- [ ] T015 [P] Crear la entidad `EtiquetaDeEstudio` con su columna normalizada y el largo máximo de 50 de RNF-70 en `src/MiArchivoMedico.Web/Dominio/EtiquetaDeEstudio.cs`, implementando `IPropiedadDeUsuario`
-- [ ] T016 Crear `ArchivoMedicoDbContext` en `src/MiArchivoMedico.Web/Data/ArchivoMedicoDbContext.cs` con el filtro global por reflexión sobre `IPropiedadDeUsuario`, el conversor de `DateTimeOffset` a ticks UTC y los índices de las columnas normalizadas (RNF-53, RNF-55)
-- [ ] T017 Implementar la interceptación de `SaveChanges`/`SaveChangesAsync` (`PrepararEntidades`) en `src/MiArchivoMedico.Web/Data/ArchivoMedicoDbContext.cs`: estampa `OwnerId` en las entidades nuevas y recalcula todas las columnas normalizadas
-- [ ] T018 Reemplazar el hasher de Identity por `HasherPbkdf2Sha256` (PBKDF2-HMAC-SHA256, formato Identity V3) en `src/MiArchivoMedico.Web/Servicios/HasherPbkdf2Sha256.cs`, que falla al construirse si `IterationCount` es menor a 100.000 (RNF-03)
-- [ ] T019 Configurar en `src/MiArchivoMedico.Web/Program.cs` la validación de configuración obligatoria al arrancar: cadena de conexión, ruta de almacenamiento y clave AES-256; sin clave, el arranque falla (RNF-62, AC-83)
-- [ ] T020 Configurar en `src/MiArchivoMedico.Web/Program.cs` el `FallbackPolicy` que exige sesión en todo el sitio, el registro de `TimeProvider` como singleton y el estado de sesión del servidor (research.md §3)
-- [ ] T021 Crear `InicializadorDeBaseDeDatos.InicializarAsync` en `src/MiArchivoMedico.Web/Data/InicializadorDeBaseDeDatos.cs`: aplica migraciones, reafirma `PRAGMA journal_mode=WAL` y siembra `CuentasIniciales` omitiendo las existentes, con tope de 5 cuentas y rechazo de toda contraseña de menos de 12 caracteres (RNF-56, RNF-69)
-- [ ] T022 Generar la migración inicial en `src/MiArchivoMedico.Web/Data/Migraciones/` con `dotnet ef migrations add Inicial`
-- [ ] T023 [P] Crear el layout base y el CSS adaptable desde 360 píxeles en `src/MiArchivoMedico.Web/Views/Shared/_Layout.cshtml` y `src/MiArchivoMedico.Web/wwwroot/css/sitio.css` (RNF-29, RNF-30)
-- [ ] T024 [P] Crear la fábrica de pruebas `AplicacionDePrueba` en `tests/MiArchivoMedico.Tests/AplicacionDePrueba.cs`: `WebApplicationFactory<Program>`, base SQLite descartable, almacenamiento temporal, `FakeTimeProvider` fijado en 2026-01-15 e inyectado también en el manejador de la cookie, y dos cuentas ficticias sembradas por `UseSetting`
-- [ ] T025 [P] Crear los ayudantes de HTTP en `tests/MiArchivoMedico.Tests/Apoyo/ClienteDeSesion.cs` y `tests/MiArchivoMedico.Tests/Apoyo/ClienteDeEstudios.cs`, que resuelven el formulario y el token antifalsificación
-- [ ] T026 [P] Crear `ArchivosFicticios` en `tests/MiArchivoMedico.Tests/Apoyo/ArchivosFicticios.cs`, que **genera** PDF mínimo válido, PDF con JavaScript embebido, PDF truncado sin `%%EOF`, JPG y PNG con ImageSharp, y un binario que simula un ejecutable (RNF-10)
-- [ ] T027 Escribir `AislamientoPorPropietarioTests` en `tests/MiArchivoMedico.Tests/AislamientoPorPropietarioTests.cs`, que recorre el modelo y falla si alguna entidad `IPropiedadDeUsuario` quedó sin filtro global (RNF-53)
+- [X] T009 [P] Crear la interfaz marcadora `IPropiedadDeUsuario` con `OwnerId` en `src/MiArchivoMedico.Web/Dominio/IPropiedadDeUsuario.cs`
+- [X] T010 [P] Crear `IUsuarioActual` y su implementación en `src/MiArchivoMedico.Web/Servicios/UsuarioActual.cs`, devolviendo `Id` nulo cuando no hay sesión (RNF-53)
+- [X] T011 [P] Crear `NormalizadorDeTexto.Normalizar` en `src/MiArchivoMedico.Web/Servicios/NormalizadorDeTexto.cs`: minúsculas, sin acentos, sin espacios sobrantes (RNF-55)
+- [X] T012 [P] Crear la entidad `Usuario` derivada de `IdentityUser` en `src/MiArchivoMedico.Web/Dominio/Usuario.cs`
+- [X] T013 [P] Crear la entidad `Estudio` con sus columnas originales y normalizadas, y con los largos máximos de RNF-70 —200 para título, profesional e institución; 2.000 para la descripción— en `src/MiArchivoMedico.Web/Dominio/Estudio.cs`, implementando `IPropiedadDeUsuario` (data-model.md, RNF-70)
+- [X] T014 [P] Crear la entidad `ArchivoDeEstudio` en `src/MiArchivoMedico.Web/Dominio/ArchivoDeEstudio.cs`, implementando `IPropiedadDeUsuario`
+- [X] T015 [P] Crear la entidad `EtiquetaDeEstudio` con su columna normalizada y el largo máximo de 50 de RNF-70 en `src/MiArchivoMedico.Web/Dominio/EtiquetaDeEstudio.cs`, implementando `IPropiedadDeUsuario`
+- [X] T016 Crear `ArchivoMedicoDbContext` en `src/MiArchivoMedico.Web/Data/ArchivoMedicoDbContext.cs` con el filtro global por reflexión sobre `IPropiedadDeUsuario`, el conversor de `DateTimeOffset` a ticks UTC y los índices de las columnas normalizadas (RNF-53, RNF-55)
+- [X] T017 Implementar la interceptación de `SaveChanges`/`SaveChangesAsync` (`PrepararEntidades`) en `src/MiArchivoMedico.Web/Data/ArchivoMedicoDbContext.cs`: estampa `OwnerId` en las entidades nuevas y recalcula todas las columnas normalizadas
+- [X] T018 Reemplazar el hasher de Identity por `HasherPbkdf2Sha256` (PBKDF2-HMAC-SHA256, formato Identity V3) en `src/MiArchivoMedico.Web/Servicios/HasherPbkdf2Sha256.cs`, que falla al construirse si `IterationCount` es menor a 100.000 (RNF-03)
+- [X] T019 Configurar en `src/MiArchivoMedico.Web/Program.cs` la validación de configuración obligatoria al arrancar: cadena de conexión, ruta de almacenamiento y clave AES-256; sin clave, el arranque falla (RNF-62, AC-83)
+- [X] T020 Configurar en `src/MiArchivoMedico.Web/Program.cs` el `FallbackPolicy` que exige sesión en todo el sitio, el registro de `TimeProvider` como singleton y el estado de sesión del servidor (research.md §3)
+- [X] T021 Crear `InicializadorDeBaseDeDatos.InicializarAsync` en `src/MiArchivoMedico.Web/Data/InicializadorDeBaseDeDatos.cs`: aplica migraciones, reafirma `PRAGMA journal_mode=WAL` y siembra `CuentasIniciales` omitiendo las existentes, con tope de 5 cuentas y rechazo de toda contraseña de menos de 12 caracteres (RNF-56, RNF-69)
+- [X] T022 Generar la migración inicial en `src/MiArchivoMedico.Web/Data/Migraciones/` con `dotnet ef migrations add Inicial`
+- [X] T023 [P] Crear el layout base y el CSS adaptable desde 360 píxeles en `src/MiArchivoMedico.Web/Views/Shared/_Layout.cshtml` y `src/MiArchivoMedico.Web/wwwroot/css/sitio.css` (RNF-29, RNF-30)
+- [X] T024 [P] Crear la fábrica de pruebas `AplicacionDePrueba` en `tests/MiArchivoMedico.Tests/AplicacionDePrueba.cs`: `WebApplicationFactory<Program>`, base SQLite descartable, almacenamiento temporal, `FakeTimeProvider` fijado en 2026-01-15 e inyectado también en el manejador de la cookie, y dos cuentas ficticias sembradas por `UseSetting`
+- [X] T025 [P] Crear los ayudantes de HTTP en `tests/MiArchivoMedico.Tests/Apoyo/ClienteDeSesion.cs` y `tests/MiArchivoMedico.Tests/Apoyo/ClienteDeEstudios.cs`, que resuelven el formulario y el token antifalsificación
+- [X] T026 [P] Crear `ArchivosFicticios` en `tests/MiArchivoMedico.Tests/Apoyo/ArchivosFicticios.cs`, que **genera** PDF mínimo válido, PDF con JavaScript embebido, PDF truncado sin `%%EOF`, JPG y PNG con ImageSharp, y un binario que simula un ejecutable (RNF-10)
+- [X] T027 Escribir `AislamientoPorPropietarioTests` en `tests/MiArchivoMedico.Tests/AislamientoPorPropietarioTests.cs`, que recorre el modelo y falla si alguna entidad `IPropiedadDeUsuario` quedó sin filtro global (RNF-53)
 
 **Punto de control**: la aplicación arranca, la base se crea sola, y el test que guarda el aislamiento
 está en verde. Recién ahora pueden empezar las historias.

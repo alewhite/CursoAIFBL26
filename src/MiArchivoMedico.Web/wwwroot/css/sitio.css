@@ -1,0 +1,104 @@
+/* Adaptable desde 360 píxeles de ancho, sin desplazamiento horizontal en las acciones
+   principales (RNF-29, RNF-30). Sin framework: una hoja que se puede leer entera. */
+:root {
+  --tinta: #1c2733;
+  --tinta-suave: #5a6b7b;
+  --fondo: #f7f9fb;
+  --superficie: #ffffff;
+  --borde: #d7dee6;
+  --acento: #1f6f8b;
+  --error: #a3231f;
+  --exito: #1d6b3f;
+  --radio: 8px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--fondo);
+  color: var(--tinta);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.contenedor { max-width: 60rem; margin: 0 auto; padding: 1rem; }
+
+header.principal {
+  background: var(--superficie);
+  border-bottom: 1px solid var(--borde);
+}
+header.principal .contenedor {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+  align-items: baseline;
+  justify-content: space-between;
+}
+header.principal a { color: var(--tinta); text-decoration: none; }
+header.principal .marca { font-weight: 700; }
+
+main { padding-bottom: 3rem; }
+
+h1 { font-size: 1.5rem; margin: 1rem 0; }
+h2 { font-size: 1.2rem; }
+
+.tarjeta {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+label { display: block; font-weight: 600; margin-bottom: .25rem; }
+
+input, select, textarea, button {
+  font: inherit;
+  max-width: 100%;
+}
+
+input[type="text"], input[type="password"], input[type="date"],
+input[type="email"], input[type="search"], select, textarea {
+  width: 100%;
+  padding: .5rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background: var(--superficie);
+  color: var(--tinta);
+}
+
+.campo { margin-bottom: 1rem; }
+.campo .error { color: var(--error); font-size: .875rem; display: block; margin-top: .25rem; }
+
+button, .boton {
+  display: inline-block;
+  padding: .55rem 1rem;
+  border: 1px solid var(--acento);
+  border-radius: var(--radio);
+  background: var(--acento);
+  color: #fff;
+  cursor: pointer;
+  text-decoration: none;
+}
+button.secundario, .boton.secundario { background: var(--superficie); color: var(--acento); }
+
+.aviso { padding: .75rem 1rem; border-radius: var(--radio); margin-bottom: 1rem; }
+.aviso.error { background: #fdecec; color: var(--error); }
+.aviso.exito { background: #e8f5ee; color: var(--exito); }
+.aviso.neutro { background: #eef3f7; color: var(--tinta-suave); }
+
+.acciones { display: flex; flex-wrap: wrap; gap: .5rem; }
+
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: .5rem; border-bottom: 1px solid var(--borde); }
+
+/* Cualquier bloque ancho se desplaza dentro de su propio contenedor, nunca el cuerpo. */
+.desplazable { overflow-x: auto; }
+
+@media (max-width: 40rem) {
+  .contenedor { padding: .75rem; }
+  h1 { font-size: 1.3rem; }
+}
