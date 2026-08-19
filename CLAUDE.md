@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Fuente de verdad del alcance
 
-`PRD2.md` (revisión 2, endurecida) es la fuente única del alcance y de los requerimientos (RF/RNF/AC).
+`PRD2.md` (revisión 3) es la fuente única del alcance y de los requerimientos (RF/RNF/AC).
 No se importa acá por su tamaño: leerlo cuando la tarea toque alcance, requerimientos o criterios de
 aceptación, y citar los identificadores al proponer o implementar un cambio.
 `PRD.md` es la revisión 1 y se conserva solo como referencia histórica: no citarlo ni implementar contra él

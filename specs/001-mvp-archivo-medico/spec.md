@@ -26,6 +26,26 @@ identificadores RF/RNF/AC, según el Principio II de la constitución del proyec
 - Q: ¿Qué reglas debe cumplir la fecha de un estudio para considerarse válida? → A: Fecha de calendario sin hora; se rechaza la inexistente o mal formada y la posterior al día de hoy. El filtro por rango incluye ambos extremos.
 - Q: ¿Cómo debe elegir el usuario la institución al filtrar el listado de estudios? → A: Con una lista desplegable de las instituciones distintas presentes en sus propios estudios, ordenadas alfabéticamente y con coincidencia exacta sobre el valor elegido.
 
+### Sesión 2026-08-19 (segunda pasada, sobre los hallazgos de `checklists/security.md`)
+
+- Q: ¿Cómo se accede al contenido de un archivo médico? → A: Por una ruta que lleva un token con vida máxima de 5 minutos y que además exige sesión válida del propietario: el token vencido se rechaza y la ausencia de sesión se rechaza siempre, incluso dentro de la ventana de validez.
+- Q: ¿Cómo deben viajar el término de búsqueda y los filtros para que no queden escritos en los registros del servidor? → A: En el cuerpo de la solicitud, nunca en la dirección: búsqueda, filtros y paginación se envían de modo que ningún dato médico aparezca en la URL, aun a costa de no poder marcar ni compartir un listado filtrado.
+- Q: ¿Qué debe responder el sistema cuando un usuario autenticado pide un recurso de otra cuenta? → A: Siempre 404, sin cuerpo que lo distinga, igual que ante un identificador inexistente o mal formado. Los AC del PRD que admiten "403 o 404" quedan satisfechos por la variante 404.
+- Q: ¿Cómo se cuentan los 30 minutos de inactividad que expiran la sesión? → A: De forma deslizante: cada solicitud autenticada reinicia la cuenta. El tope absoluto de 24 horas prevalece siempre y corta la sesión aunque el usuario esté activo.
+- Q: ¿Cómo debe comportarse el bloqueo por intentos fallidos cuando el nombre de usuario tecleado no corresponde a ninguna cuenta? → A: El contador se lleva contra el nombre tecleado, exista o no la cuenta, y el rechazo demanda un tiempo comparable en ambos casos, de modo que una cuenta inexistente y una contraseña equivocada sean indistinguibles desde afuera.
+
+### Sesión 2026-08-19 (tercera pasada, sobre los hallazgos de `checklists/ux.md`)
+
+- Q: ¿Cómo debe comportarse el listado al pasar de página y al volver desde el detalle de un estudio? → A: Con controles para avanzar y retroceder y la página actual visible; la búsqueda y los filtros aplicados se conservan al cambiar de página y al volver del detalle, sin volver a escribirlos.
+- Q: ¿Qué lugar ocupa la accesibilidad en este MVP? → A: Fuera de alcance, declarado: el MVP no asume ningún compromiso de accesibilidad y no se definen requisitos ni criterios de aceptación al respecto. Incorporarlos exigiría modificar antes `PRD2.md`.
+- Q: ¿Qué debe mostrar el listado cuando no hay estudios que mostrar? → A: Dos estados diferenciados: una cuenta sin ningún estudio ve un mensaje de bienvenida con la acción para crear el primero, y una búsqueda sin resultados ve un mensaje propio, el contador en cero y la acción para limpiar los filtros.
+- Q: ¿Qué debe ver el usuario mientras una carga de archivos está en curso? → A: Un indicador de que la operación está en progreso y el bloqueo del reenvío del formulario, para que no se cree el estudio dos veces. Sin porcentaje ni detalle por archivo.
+- Q: ¿Qué debe conservar el formulario cuando el envío falla por un error de validación? → A: Los metadatos tecleados se conservan tal como se escribieron; los archivos deben adjuntarse de nuevo, porque el navegador no permite repoblar un campo de archivo, y el mensaje de error lo advierte explícitamente.
+
+### Sesión 2026-08-19 (cuarta pasada, sobre CHK018 y CHK019 de `checklists/testabilidad.md`)
+
+- Q: ¿De dónde deben salir los identificadores con que se nombran los tests de los seis requisitos derivados de las clarificaciones? → A: De `PRD2.md`: se lo amplía como revisión 3 con los RF/RNF y AC que correspondan a esos comportamientos, y el spec pasa a citarlos. No se crea un espacio de identificadores propio del spec ni se admite excepción a la convención de nombres de los tests. *(Aplicado: `PRD2.md` revisión 3, RF-36 a RF-40, RNF-63 a RNF-67, AC-90 a AC-102.)*
+
 ## Escenarios de Usuario y Pruebas *(obligatorio)*
 
 Las historias están ordenadas por prioridad. Cada una es una porción independientemente construible,
@@ -75,25 +95,28 @@ Entrega valor por sí sola: es el control de acceso completo del sistema.
    minutos, **entonces** el acceso se concede. *(AC-86)*
 10. **Dada** una cuenta con 4 fallos, un ingreso exitoso y luego 4 fallos más, **cuando** se evalúa su
     estado, **entonces** no está bloqueada, porque el ingreso exitoso reinició el contador. *(AC-87)*
-11. **Dado** un estudio de otro propietario, **cuando** un usuario autenticado solicita su detalle
-    sustituyendo el identificador en la URL, **entonces** el sistema responde 403 o 404 y no entrega
-    metadatos. *(AC-47)*
-12. **Dado** un archivo de otro propietario, **cuando** un usuario autenticado solicita su descarga
-    sustituyendo el identificador, **entonces** el sistema responde 403 o 404 y no entrega el archivo.
+11. **Dado** un nombre de usuario que no corresponde a ninguna cuenta, **cuando** se realizan 5 intentos
+    fallidos y luego un sexto, **entonces** el rechazo y su demora son indistinguibles de los que
+    produce una cuenta existente en la misma situación. *(FR-003, FR-007)*
+12. **Dado** un estudio de otro propietario, **cuando** un usuario autenticado solicita su detalle
+    sustituyendo el identificador en la URL, **entonces** el sistema responde 404 y no entrega
+    metadatos, con una respuesta indistinguible de la de un identificador inexistente. *(AC-47)*
+13. **Dado** un archivo de otro propietario, **cuando** un usuario autenticado solicita su descarga
+    sustituyendo el identificador, **entonces** el sistema responde 404 y no entrega el archivo.
     *(AC-48)*
-13. **Dados** estudios de dos propietarios, **cuando** un usuario abre el listado y busca sin filtros,
+14. **Dados** estudios de dos propietarios, **cuando** un usuario abre el listado y busca sin filtros,
     **entonces** solo aparecen los propios y el contador no incluye los ajenos. *(AC-49)*
-14. **Dada** la aplicación desplegada, **cuando** se enumeran sus rutas, **entonces** ninguna acepta una
+15. **Dada** la aplicación desplegada, **cuando** se enumeran sus rutas, **entonces** ninguna acepta una
     creación de cuenta y una solicitud a una ruta de registro responde 404. *(AC-50)*
-15. **Dadas** 5 cuentas activas, **cuando** se intenta dar de alta una sexta, **entonces** el alta se
+16. **Dadas** 5 cuentas activas, **cuando** se intenta dar de alta una sexta, **entonces** el alta se
     rechaza informando que se alcanzó el límite. *(AC-62)*
-16. **Dada** la aplicación desplegada, **cuando** se enumeran sus rutas y las acciones del detalle de un
+17. **Dada** la aplicación desplegada, **cuando** se enumeran sus rutas y las acciones del detalle de un
     estudio, **entonces** ninguna permite asignar, copiar o autorizar un estudio a otro propietario, y
-    un intento construido a mano responde 403, 404 o 405. *(AC-63)*
-17. **Dada** una cuenta creada, **cuando** se inspecciona el valor almacenado de su contraseña,
+    un intento construido a mano responde 404 o 405. *(AC-63)*
+18. **Dada** una cuenta creada, **cuando** se inspecciona el valor almacenado de su contraseña,
     **entonces** no coincide con la contraseña en claro y su algoritmo y parámetros corresponden a una
     de las tres combinaciones admitidas. *(AC-76)*
-18. **Dada** una sesión iniciada, **cuando** se inspecciona la cookie de autenticación, **entonces**
+19. **Dada** una sesión iniciada, **cuando** se inspecciona la cookie de autenticación, **entonces**
     presenta Secure, HttpOnly y SameSite=Strict. *(AC-58)*
 
 ---
@@ -177,10 +200,16 @@ edición ni PWA.
 28. **Dado** un formulario de creación con el título vacío y un archivo de 0 bytes, **cuando** se envía,
     **entonces** el error del título se muestra junto al campo título y el del archivo junto a ese
     archivo, no en un aviso general desvinculado del origen. *(AC-80)*
-29. **Dado** un estudio nuevo con título y fecha válidos y tres archivos de los cuales el segundo es
+29. **Dado** ese mismo formulario rechazado, **cuando** se lo devuelve al usuario, **entonces** los
+    metadatos que había escrito siguen en sus campos y un aviso indica que los archivos deben
+    adjuntarse otra vez. *(FR-025c)*
+30. **Dado** un estudio nuevo con título y fecha válidos y tres archivos de los cuales el segundo es
     inválido, **cuando** se envía la carga, **entonces** el estudio queda creado con los dos archivos
     válidos, se informa el motivo de rechazo junto al segundo archivo y este no existe en el
     almacenamiento definitivo. *(FR-030b)*
+31. **Dada** una carga de archivos en curso, **cuando** el usuario intenta enviar el formulario otra vez,
+    **entonces** el sistema lo impide y sigue mostrando que la operación está en progreso, sin crear un
+    segundo estudio. *(FR-025b)*
 
 ---
 
@@ -222,8 +251,11 @@ embebida, la identidad de la huella tras la descarga y el flujo de eliminación 
 10. **Dada** la URL con la que un usuario autorizado accedió a un archivo, **cuando** se la solicita sin
     sesión válida, de inmediato y pasados 5 minutos, **entonces** en ningún caso se entrega el archivo.
     *(AC-84)*
-11. **Dada** una URL temporal generada hace más de 5 minutos, **cuando** se intenta usar, **entonces** el
-    acceso al archivo se rechaza. *(AC-08)*
+11. **Dada** una ruta de acceso a un archivo cuyo token se generó hace más de 5 minutos, **cuando** el
+    propietario con sesión válida la solicita, **entonces** el acceso se rechaza por token vencido.
+    *(AC-08, FR-046)*
+12. **Dada** esa misma ruta con el token todavía vigente, **cuando** se la solicita sin sesión válida,
+    **entonces** el acceso se rechaza igualmente. *(AC-84, FR-046)*
 
 ---
 
@@ -274,6 +306,12 @@ paginación.
     interfaz informa que se encontraron cinco estudios. *(AC-37)*
 14. **Dada** una colección de 26 estudios, **cuando** se abre el listado, **entonces** se muestran como
     máximo 25 y existe un control para avanzar a la página siguiente. *(AC-54)*
+15. **Dada** una búsqueda con resultados repartidos en dos páginas, **cuando** el usuario avanza de
+    página, abre un estudio y vuelve al listado, **entonces** la búsqueda y los filtros siguen
+    aplicados y no debe volver a ingresarlos. *(FR-054b)*
+16. **Dada** una búsqueda que no coincide con ningún estudio propio, **cuando** se muestra el listado,
+    **entonces** informa cero resultados, lo indica con un mensaje propio y ofrece limpiar los filtros.
+    *(FR-053b)*
 
 ---
 
@@ -293,7 +331,7 @@ persiste y que la huella de sus archivos no cambió.
 1. **Dado** un estudio existente, **cuando** se modifica su institución, **entonces** el metadato se
    actualiza y la huella del archivo original no cambia. *(AC-14)*
 2. **Dado** un estudio de otro propietario, **cuando** un usuario autenticado intenta editarlo,
-   **entonces** el sistema responde 403 o 404 y no modifica nada. *(AC-47, RNF-53)*
+   **entonces** el sistema responde 404 y no modifica nada. *(AC-47, RNF-53)*
 
 ---
 
@@ -372,7 +410,12 @@ completo de un estudio ficticio.
 - **Fecha en el borde**: un estudio fechado hoy se acepta y uno fechado mañana se rechaza; el filtro por
   rango devuelve los estudios fechados exactamente en el día inicial y en el día final (FR-017, FR-049).
 - **Sesión al filo**: una solicitud que llega exactamente al minuto 30 de inactividad, o a la hora 24 de
-  vida de la sesión, debe resolverse como expirada y exigir autenticación (RNF-04, RNF-05).
+  vida de la sesión, debe resolverse como expirada y exigir autenticación (FR-005, FR-006).
+- **Sesión activa que alcanza el tope absoluto**: un usuario que estuvo usando la aplicación sin pausas
+  durante 24 horas debe ser desautenticado igual, y el corte no debe dejar a medias una carga ni un
+  estudio parcialmente creado (FR-006).
+- **Contador sin cuenta detrás**: intentos repetidos contra nombres de usuario inventados no deben hacer
+  crecer indefinidamente el registro de intentos; las entradas vencidas se depuran (FR-007).
 - **Bloqueo y competencia**: intentos fallidos de dos orígenes distintos contra la misma cuenta suman al
   mismo contador; el bloqueo es por cuenta y se acepta que un tercero que conozca un nombre de usuario
   pueda dejar a esa cuenta sin acceso 15 minutos (riesgo aceptado en el PRD).
@@ -382,6 +425,12 @@ completo de un estudio ficticio.
 - **Archivo que se corrompe a mitad de la subida**: la conexión se corta con el cuerpo incompleto; el
   usuario debe recibir un aviso de que el archivo no se cargó, y nada debe quedar en el almacenamiento
   definitivo (RF-28, RNF-21).
+- **Error de validación con archivos adjuntos**: rechazado el envío, los metadatos vuelven completos y
+  los archivos no; el usuario debe enterarse de eso antes de guardar, no después de terminar con un
+  estudio sin archivos (FR-025c).
+- **Doble envío**: un usuario impaciente que aprieta dos veces el botón de guardar durante una carga de
+  15 segundos no debe terminar con dos estudios iguales ni con el cupo consumido por duplicado
+  (FR-025b, FR-037).
 - **Carga mixta**: en una carga de varios archivos donde solo algunos son inválidos, los válidos quedan
   asociados al estudio, los inválidos se informan uno por uno y ninguno de estos últimos llega al
   almacenamiento definitivo (FR-030, FR-030b).
@@ -394,14 +443,26 @@ completo de un estudio ficticio.
   del declarado (RNF-15, RNF-16).
 - **Filtro de institución sin opciones**: un usuario cuyos estudios no tienen institución cargada ve la
   lista de filtro vacía o deshabilitada, no un filtro que no devuelve nada sin explicación (FR-050).
+- **Listado filtrado y navegación del navegador**: como la búsqueda no viaja en la dirección, volver
+  atrás, recargar o abrir el listado en una pestaña nueva debe dejar un estado coherente y explicable,
+  no un listado filtrado que el usuario no pueda reproducir (FR-048b, FR-054b).
+- **Listado de una sola página**: con 25 estudios o menos los controles de paginación no tienen destino y
+  no deben ofrecer una navegación que no lleve a ninguna parte (FR-054).
+- **Filtro que deja sin resultados la página actual**: si el usuario está en la página 3 y aplica un
+  filtro que reduce el resultado a una sola página, el listado debe resolverse en una página existente
+  y no en una vacía (FR-054, FR-054b).
 - **Búsqueda sin resultados y término solo con espacios**: el contador debe informar cero resultados y
   el término normalizado vacío debe comportarse como ausencia de búsqueda, no como error (RF-23,
   RNF-55).
+- **Cuenta recién creada**: la primera vez que un integrante entra, el listado está vacío por no haber
+  cargado nada todavía, no por un filtro; el mensaje debe reflejar esa situación y llevar a crear el
+  primer estudio (FR-053b).
 - **Estudio sin archivos**: un estudio con título y fecha válidos pero sin ningún archivo adjunto es un
   estado alcanzable; el listado, el detalle y la eliminación deben funcionar sobre él (RF-07 admite
   "uno o más" archivos asociados, pero no los exige en la creación).
-- **Identificador ajeno, inexistente o mal formado**: los tres casos deben ser indistinguibles desde
-  afuera —403 o 404— para no filtrar la existencia de recursos de otras cuentas (RNF-53).
+- **Identificador ajeno, inexistente o mal formado**: los tres casos responden 404 y son indistinguibles
+  desde afuera —mismo código, mismo cuerpo, sin pistas en el mensaje— para no filtrar la existencia de
+  recursos de otras cuentas (FR-012).
 - **Última cuenta y cuenta bloqueada**: alcanzado el máximo de 5 cuentas, el alta de una sexta se
   rechaza; el límite se evalúa sobre cuentas activas (RNF-56).
 - **Arranque sin configuración crítica**: sin clave de cifrado o sin cadena de conexión, la aplicación
@@ -420,6 +481,10 @@ completo de un estudio ficticio.
 Cada requisito traza al identificador de `PRD2.md` que lo origina. Los identificadores del PRD son la
 referencia autoritativa: si esta sección y el PRD difirieran, prevalece el PRD.
 
+Los requisitos nacidos de las sesiones de clarificación fueron incorporados a `PRD2.md` en su **revisión 3**
+(RF-36 a RF-40, RNF-63 a RNF-67, AC-90 a AC-102) y esta sección los cita como a cualquier otro. No queda
+ninguna deuda de trazabilidad: todo requisito de este spec traza a un identificador permanente del PRD.
+
 ### Requisitos Funcionales
 
 **Autenticación y sesión**
@@ -428,17 +493,24 @@ referencia autoritativa: si esta sección y el PRD difirieran, prevalece el PRD.
   metadato. *(RF-01, AC-01, AC-02)*
 - **FR-002**: El sistema DEBE permitir iniciar sesión con credenciales válidas. *(RF-02, AC-03)*
 - **FR-003**: El sistema DEBE devolver un mensaje de error de autenticación idéntico cuando el usuario no
-  existe y cuando la contraseña es incorrecta. *(RNF-13, AC-04)*
+  existe y cuando la contraseña es incorrecta. La indistinguibilidad alcanza a todo el comportamiento
+  observable, no solo al texto: el tiempo de respuesta DEBE ser comparable en ambos casos, de modo que
+  no permita deducir si la cuenta existe. *(RNF-13, RNF-65, AC-04, AC-98)*
 - **FR-004**: El sistema DEBE permitir cerrar la sesión manualmente e invalidarla en ese acto. *(RF-03,
   RNF-12, AC-05)*
 - **FR-005**: El sistema DEBE expirar la sesión tras 30 minutos de inactividad y exigir una nueva
-  autenticación. *(RF-04, RNF-04, AC-06)*
-- **FR-006**: El sistema DEBE limitar la duración absoluta de la sesión a 24 horas y exigir una nueva
-  autenticación al alcanzarla. *(RF-05, RNF-05, AC-07)*
-- **FR-007**: El sistema DEBE rechazar todo inicio de sesión de una cuenta con 5 intentos fallidos dentro
-  de una ventana de 15 minutos, mantener el rechazo 15 minutos desde el quinto fallo, reiniciar el
-  contador ante un ingreso exitoso y usar durante el bloqueo un mensaje indistinguible del de
-  credenciales inválidas. *(RNF-60, AC-69, AC-86, AC-87)*
+  autenticación. La ventana es deslizante: toda solicitud autenticada reinicia la cuenta de 30 minutos.
+  *(RF-04, RNF-04, AC-06)*
+- **FR-006**: El sistema DEBE limitar la duración absoluta de la sesión a 24 horas contadas desde la
+  autenticación y exigir una nueva autenticación al alcanzarla. Este límite prevalece sobre la ventana
+  deslizante de FR-005: alcanzadas las 24 horas la sesión termina aunque el usuario esté activo, y
+  ninguna solicitud puede prolongarla. *(RF-05, RNF-05, AC-07)*
+- **FR-007**: El sistema DEBE rechazar todo inicio de sesión con 5 intentos fallidos dentro de una
+  ventana de 15 minutos, mantener el rechazo 15 minutos desde el quinto fallo, reiniciar el contador
+  ante un ingreso exitoso y usar durante el bloqueo un mensaje indistinguible del de credenciales
+  inválidas. El contador se lleva contra el nombre de usuario ingresado, corresponda o no a una cuenta
+  existente, de modo que el bloqueo se manifieste igual en ambos casos. *(RNF-60, RNF-65, AC-69, AC-86,
+  AC-87, AC-98)*
 - **FR-008**: Las cookies de autenticación DEBEN emitirse con Secure, HttpOnly y SameSite=Strict.
   *(RNF-11, AC-58)*
 - **FR-009**: Las contraseñas DEBEN almacenarse con Argon2id (memoria ≥ 19 MiB, 2 iteraciones,
@@ -451,14 +523,17 @@ referencia autoritativa: si esta sección y el PRD difirieran, prevalece el PRD.
 **Propiedad de los datos y aislamiento**
 
 - **FR-012**: Cada estudio y cada archivo DEBEN tener un propietario, y el sistema DEBE entregar
-  exclusivamente los recursos cuyo propietario sea el usuario autenticado, respondiendo 403 o 404 ante
-  cualquier solicitud sobre un recurso ajeno aunque se conozca su identificador. *(RNF-53, RNF-08,
-  AC-47, AC-48)*
+  exclusivamente los recursos cuyo propietario sea el usuario autenticado. Ante cualquier solicitud de
+  un usuario autenticado sobre un recurso ajeno, el sistema DEBE responder 404, con una respuesta
+  indistinguible de la que produce un identificador inexistente o mal formado, y sin cuerpo que revele
+  la existencia del recurso ni metadato alguno. *(RNF-53, RNF-08, AC-47, AC-48; RNF-53 admite 403 o 404
+  y este proyecto adopta 404 de manera uniforme)*
 - **FR-013**: El listado, la búsqueda, los filtros y el contador de resultados DEBEN considerar
   únicamente los estudios del usuario autenticado. *(RNF-53, AC-49)*
 - **FR-014**: El sistema NO DEBE ofrecer ningún mecanismo para compartir, delegar o transferir estudios a
-  otra cuenta, ni roles con visibilidad sobre datos ajenos; un intento construido a mano DEBE responder
-  403, 404 o 405. *(RNF-57, AC-63)*
+  otra cuenta, ni roles con visibilidad sobre datos ajenos. Un intento construido a mano DEBE responder
+  404 cuando la ruta no existe o el recurso es ajeno, y 405 cuando la ruta existe pero no admite ese
+  método. *(RNF-57, AC-63)*
 
 **Creación y metadatos del estudio**
 
@@ -466,7 +541,7 @@ referencia autoritativa: si esta sección y el PRD difirieran, prevalece el PRD.
 - **FR-016**: El sistema DEBE rechazar la creación de un estudio con título vacío. *(RF-34, AC-10)*
 - **FR-017**: El sistema DEBE rechazar la creación de un estudio con fecha ausente o inválida. La fecha
   del estudio es una fecha de calendario sin hora, y es inválida si no existe en el calendario, si no
-  respeta el formato esperado o si es posterior al día en curso. *(RF-35, AC-11)*
+  respeta el formato esperado o si es posterior al día en curso. *(RF-35, RF-37, AC-11, AC-91)*
 - **FR-018**: Los usuarios DEBEN poder registrar el profesional del estudio como texto libre. *(RF-29,
   AC-13)*
 - **FR-019**: Los usuarios DEBEN poder registrar la institución del estudio como texto libre. *(RF-30,
@@ -483,6 +558,14 @@ referencia autoritativa: si esta sección y el PRD difirieran, prevalece el PRD.
   *(RNF-31, AC-79)*
 - **FR-025**: Los errores de validación DEBEN mostrarse junto al campo o al archivo que los produjo.
   *(RNF-32, AC-80)*
+- **FR-025c**: Cuando el envío de un formulario se rechaza por validación, el sistema DEBE devolver el
+  formulario con los metadatos tecleados intactos —título, fecha, profesional, institución, descripción
+  y etiquetas— y DEBE advertir explícitamente que los archivos deben volver a adjuntarse. Ningún archivo
+  queda retenido esperando un segundo envío. *(RNF-67, AC-100)*
+- **FR-025b**: Mientras una carga de archivos está en curso, el sistema DEBE indicar que la operación
+  está en progreso e impedir que el formulario vuelva a enviarse, de modo que una espera larga no se
+  confunda con una aplicación detenida ni derive en la creación duplicada del estudio. No se exige
+  informar el avance por archivo ni un porcentaje. *(RNF-66, AC-99)*
 
 **Validación y custodia de archivos**
 
@@ -499,8 +582,8 @@ referencia autoritativa: si esta sección y el PRD difirieran, prevalece el PRD.
 - **FR-030b**: Cuando una carga incluya varios archivos y alguno sea rechazado, el sistema DEBE aceptar
   los archivos válidos y crear o actualizar el estudio con ellos, e informar por separado cada archivo
   rechazado junto a su motivo, sin descartar los válidos ni exigir volver a adjuntarlos. El rechazo de
-  un archivo NO DEBE impedir la creación del estudio cuando el título y la fecha son válidos. *(RNF-32,
-  AC-80; derivado de la sesión de clarificación)*
+  un archivo NO DEBE impedir la creación del estudio cuando el título y la fecha son válidos. *(RF-36,
+  AC-90)*
 - **FR-031**: El sistema DEBE calcular y almacenar una huella SHA-256 por cada archivo cargado. *(RNF-19,
   AC-25)*
 - **FR-032**: Los archivos originales NO DEBEN modificarse durante la carga, la visualización ni la
@@ -519,7 +602,7 @@ referencia autoritativa: si esta sección y el PRD difirieran, prevalece el PRD.
   las cuentas, e informar el límite sin revelar qué cuenta consumió el espacio ni metadatos ajenos.
   DEBE rechazar toda carga cuyo tamaño, sumado al espacio ya ocupado, superaría el cupo, evaluando la
   condición antes de escribir nada en el almacenamiento definitivo, de modo que el total nunca lo exceda.
-  El espacio se mide por el que los archivos ocupan en disco. *(RNF-52, AC-55, AC-64)*
+  El espacio se mide por el que los archivos ocupan en disco. *(RNF-52, RNF-64, AC-55, AC-64, AC-97)*
 
 **Consulta, descarga y eliminación**
 
@@ -538,12 +621,15 @@ referencia autoritativa: si esta sección y el PRD difirieran, prevalece el PRD.
   confirma. La eliminación es física y definitiva: la misma operación DEBE borrar los metadatos del
   estudio y el contenido cifrado de cada uno de sus archivos del almacenamiento, sin conservar estado
   "eliminado" ni copia recuperable desde la aplicación. El espacio liberado DEBE volver a estar
-  disponible en el cupo compartido de inmediato. *(RF-14, AC-19; el historial de eliminaciones está
-  fuera de alcance)*
+  disponible en el cupo compartido de inmediato. *(RF-14, AC-19, AC-102; el historial de eliminaciones
+  está fuera de alcance)*
 - **FR-045**: Los archivos privados NO DEBEN estar disponibles mediante URLs públicas permanentes, y toda
   entrega DEBE validar autenticación y autorización. *(RNF-06, RNF-08, AC-84, AC-02)*
-- **FR-046**: Las URLs temporales de acceso a archivos DEBEN expirar en un máximo de 5 minutos. *(RNF-07,
-  AC-08)*
+- **FR-046**: El acceso al contenido de un archivo DEBE realizarse por una ruta que porta un token de
+  acceso temporal con una vida máxima de 5 minutos. El token y la sesión son condiciones acumulativas:
+  el sistema DEBE rechazar la entrega cuando el token está vencido, y DEBE rechazarla siempre que no
+  exista sesión válida del propietario, aun cuando el token siga vigente. Un token NO DEBE, por sí solo,
+  habilitar la entrega a un solicitante sin sesión. *(RNF-07, AC-08, AC-84)*
 
 **Búsqueda, filtros y paginación**
 
@@ -551,19 +637,32 @@ referencia autoritativa: si esta sección y el PRD difirieran, prevalece el PRD.
   y etiquetas. *(RF-16, AC-29, AC-30, AC-71, AC-72, AC-73)*
 - **FR-048**: La búsqueda y los filtros de texto libre DEBEN ser insensibles a mayúsculas y acentos e
   ignorar los espacios al inicio y al final del término ingresado. *(RNF-55, AC-45, AC-46)*
+- **FR-048b**: El término de búsqueda y los valores de los filtros NO DEBEN viajar en la dirección de la
+  solicitud: se envían en su cuerpo, de modo que ningún dato médico pueda quedar registrado por la
+  infraestructura que anota las direcciones solicitadas. Esta restricción alcanza también a la
+  navegación entre páginas del listado. *(RNF-63, AC-96)*
 - **FR-049**: Los usuarios DEBEN poder filtrar estudios por rango de fechas, con ambos extremos
   incluidos en el resultado y cada extremo opcional por separado. *(RF-17, AC-31)*
 - **FR-050**: Los usuarios DEBEN poder filtrar estudios por institución eligiéndola de una lista de las
   instituciones distintas presentes en sus propios estudios, ordenada alfabéticamente. La coincidencia
   DEBE ser exacta sobre el valor elegido, y la lista NO DEBE incluir instituciones provenientes de
-  estudios de otra cuenta. *(RF-20, RNF-53, AC-34)*
+  estudios de otra cuenta. *(RF-20, RF-38, RNF-53, AC-34, AC-92)*
 - **FR-051**: Los usuarios DEBEN poder combinar la búsqueda textual con uno o más filtros. *(RF-21,
   AC-35)*
 - **FR-052**: Los usuarios DEBEN poder limpiar todos los filtros con una única acción. *(RF-22, AC-36)*
 - **FR-053**: El sistema DEBE mostrar la cantidad de estudios encontrados tras aplicar una búsqueda o un
   filtro. *(RF-23, AC-37)*
+- **FR-053b**: El sistema DEBE distinguir dos estados de listado vacío. Cuando la cuenta no tiene ningún
+  estudio, DEBE mostrar un mensaje que lo indique junto con la acción para crear el primero. Cuando la
+  búsqueda o los filtros no arrojan resultados, DEBE indicarlo con un mensaje propio, informar cero
+  resultados y ofrecer la acción para limpiar los filtros y volver al listado completo. Ninguno de los
+  dos mensajes DEBE revelar la existencia de estudios de otra cuenta. *(RF-39, AC-93, AC-94)*
 - **FR-054**: El sistema DEBE paginar el listado mostrando como máximo 25 estudios por página y ofrecer
-  un control para avanzar. *(RNF-27, AC-54)*
+  controles para avanzar y para retroceder, además de indicar la página en la que se encuentra el
+  usuario. *(RNF-27, AC-54, AC-101)*
+- **FR-054b**: El término de búsqueda y los filtros aplicados DEBEN conservarse al cambiar de página y al
+  volver al listado desde el detalle de un estudio, sin que el usuario deba volver a ingresarlos.
+  *(RF-40, AC-95)*
 
 **PWA, disponibilidad y adaptabilidad**
 
@@ -583,7 +682,10 @@ referencia autoritativa: si esta sección y el PRD difirieran, prevalece el PRD.
 - **FR-060**: El 100 % de las comunicaciones DEBE usar HTTPS con TLS 1.2 o superior, redirigiendo las
   solicitudes sin cifrar. *(RNF-01, AC-56)*
 - **FR-061**: Los títulos, profesionales, instituciones, descripciones, etiquetas, nombres originales de
-  archivo y resultados médicos NO DEBEN registrarse en logs técnicos. *(RNF-09, AC-43)*
+  archivo y resultados médicos NO DEBEN registrarse en logs técnicos. La prohibición alcanza a todo
+  registro producido durante la operación, incluidos los que genera la infraestructura por fuera de la
+  aplicación; el diseño DEBE impedir que esos datos lleguen a un registro, en lugar de depender de que
+  se los filtre después. *(RNF-09, AC-43)*
 - **FR-062**: Esos mismos datos NO DEBEN aparecer en métricas técnicas, incluidos nombres de métrica,
   etiquetas y valores. *(RNF-43, AC-85)*
 - **FR-063**: La aplicación NO DEBE incluir publicidad ni herramientas de seguimiento de comportamiento,
@@ -631,9 +733,10 @@ referencia autoritativa: si esta sección y el PRD difirieran, prevalece el PRD.
   varias.
 - **Sesión**: vínculo autenticado entre una cuenta y un dispositivo, con expiración por inactividad (30
   minutos) y duración máxima absoluta (24 horas). Se invalida al cerrar sesión.
-- **Registro de intentos de inicio de sesión**: acumulado por cuenta que sustenta el bloqueo temporal:
-  cantidad de fallos dentro de una ventana de 15 minutos y momento del último fallo. Se reinicia con un
-  ingreso exitoso.
+- **Registro de intentos de inicio de sesión**: acumulado por nombre de usuario ingresado —exista o no
+  una cuenta con ese nombre— que sustenta el bloqueo temporal: cantidad de fallos dentro de una ventana
+  de 15 minutos y momento del último fallo. Se reinicia con un ingreso exitoso. Al no estar acotado a
+  las cuentas existentes, necesita una regla de depuración de las entradas ya vencidas.
 - **Cupo de almacenamiento**: espacio total ocupado por los archivos de todas las cuentas, con un tope
   compartido de 20 GB y sin cuota individual.
 
@@ -690,6 +793,11 @@ referencia autoritativa: si esta sección y el PRD difirieran, prevalece el PRD.
 - **Instalación única**: una sola instancia de la aplicación, un solo almacenamiento de archivos y una
   sola base, compartidos por hasta 5 cuentas con concurrencia baja. No hay multi-inquilino más allá del
   aislamiento por propietario.
+- **Sin enlaces marcables a listados filtrados**: como consecuencia de FR-048b, no existe una dirección
+  que reproduzca una búsqueda o un filtro. El PRD no lo exige en ningún requerimiento y se acepta como
+  costo de mantener los datos médicos fuera de los registros.
+- **Idioma único**: la interfaz, los mensajes y los rótulos están en español, en línea con el resto del
+  proyecto. No se contempla más de un idioma ni un mecanismo de traducción; el PRD no lo pide.
 - **Los usuarios usan navegadores compatibles con PWA** y disponen de conexión para toda operación con
   datos médicos: sin conexión el sistema solo ofrece la pantalla controlada, nunca datos guardados.
 - **Respaldos, custodia de la clave y TLS son responsabilidad de la infraestructura**, provista por el
@@ -718,19 +826,28 @@ durante la implementación. Ninguna de ellas se implementa sin modificar antes e
   y notificaciones automáticas.
 - Servicios administrados de búsqueda, APIs de OCR y APIs de inteligencia artificial.
 - Edición del contenido interno de los archivos.
+- Compromisos de accesibilidad: navegación por teclado, foco visible, contraste, compatibilidad con
+  lectores de pantalla y cualquier conformidad con una norma de accesibilidad. `PRD2.md` no los
+  menciona y esta especificación no los incorpora; hacerlo requiere modificar antes el PRD. La única
+  exigencia vigente sobre la interfaz es la de RNF-29 y RNF-30, que trata sobre el ancho de pantalla y
+  el desplazamiento horizontal, no sobre accesibilidad. *(exclusión incorporada a `PRD2.md` en la
+  revisión 3)*
 
 ## Verificación de la Constitución
 
 - **I. Seguridad y privacidad por construcción**: FR-001, FR-012 a FR-014, FR-035, FR-036, FR-045,
   FR-057, FR-061 y FR-062 fijan aislamiento total, autenticación por omisión, cifrado, falla segura ante
   configuración faltante y ausencia de datos médicos en logs, métricas y caché.
-- **II. Trazabilidad al PRD**: los 73 requisitos funcionales y los criterios de éxito citan sus RF/RNF/AC
-  de origen. Esta especificación no incorpora ninguna capacidad ausente del PRD.
+- **II. Trazabilidad al PRD**: los 79 requisitos funcionales y los criterios de éxito citan sus RF/RNF/AC
+  de origen, sin excepciones. Los comportamientos surgidos de las sesiones de clarificación se
+  incorporaron a `PRD2.md` en su revisión 3 en lugar de quedar solo en este documento, de modo que el PRD
+  sigue siendo la fuente única del alcance.
 - **III. Invariantes centralizadas**: la especificación describe comportamiento observable y no prescribe
   dónde vive cada regla; el plan deberá resolver aislamiento, normalización, búsqueda, pipeline de
   archivos y tiempo en un único punto autoritativo.
 - **IV. Testing guiado por criterios de aceptación**: cada escenario de aceptación arrastra el
-  identificador AC que verifica, de modo que los tests puedan nombrarlo en su `DisplayName`. FR-073 fija
-  el uso exclusivo de datos ficticios.
+  identificador AC que verifica, de modo que los tests puedan nombrarlo en su `DisplayName`. Todo requisito
+  de este spec tiene un identificador del PRD al cual referirse; no existe un esquema de identificadores
+  propio del spec ni excepción alguna a esta convención. FR-073 fija el uso exclusivo de datos ficticios.
 - **V. Simplicidad antes que abstracción**: no se introduce ninguna capacidad que exija capas,
   integraciones o servicios adicionales; FR-071 y FR-072 acotan explícitamente las dependencias externas.

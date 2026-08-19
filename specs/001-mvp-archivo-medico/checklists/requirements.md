@@ -32,9 +32,9 @@ planificación
 
 ## Trazabilidad al PRD (Principio II de la constitución)
 
-- [x] Los 29 RF vigentes de `PRD2.md` están cubiertos por al menos un FR de la especificación
-- [x] Los 62 RNF de `PRD2.md` están cubiertos por al menos un FR o criterio de éxito
-- [x] Los 86 AC vigentes de `PRD2.md` aparecen en al menos un escenario de aceptación
+- [x] Los 34 RF vigentes de `PRD2.md` (revisión 3) están cubiertos por al menos un FR de la especificación
+- [x] Los 67 RNF de `PRD2.md` (revisión 3) están cubiertos por al menos un FR o criterio de éxito
+- [x] Los 99 AC vigentes de `PRD2.md` (revisión 3) aparecen en al menos un escenario de aceptación
 - [x] Ningún identificador retirado (RF-06, RF-09, RF-18, RF-19, RF-25, RF-27, AC-32, AC-33, AC-81) se
       cita como vigente
 - [x] La especificación no introduce ninguna capacidad ausente de `PRD2.md`

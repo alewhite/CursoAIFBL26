@@ -1,6 +1,6 @@
 # PRD-001: Mi Archivo Médico — Aplicación web progresiva de uso familiar para almacenar, organizar, consultar y encontrar estudios médicos de forma segura
 
-> **Estado**: vigente · **Alcance**: MVP · **Última actualización**: 2026-08-06 · **Revisión**: 2 (endurecida)
+> **Estado**: vigente · **Alcance**: MVP · **Última actualización**: 2026-08-19 · **Revisión**: 3 (comportamientos derivados de la especificación)
 >
 > Este documento es la fuente única de verdad del alcance. Convenciones de lectura:
 > **RF-nn** requerimiento funcional, **RNF-nn** requerimiento no funcional, **AC-nn** criterio de aceptación
@@ -20,6 +20,18 @@
 > conservan el mismo alcance y solo ganaron precisión o carácter binario. Los cambios de alcance se concentran
 > en identificadores nuevos, enumerados en [Trazabilidad](#trazabilidad-de-identificadores-nuevos-en-la-revisión-2).
 > AC-81 se creó y se retiró dentro de esta misma revisión; su identificador no se reutiliza.
+>
+> **Cambios respecto de la revisión 2**: la especificación `specs/001-mvp-archivo-medico/spec.md`, elaborada
+> con Spec Kit a partir de este PRD, produjo decisiones sobre comportamiento observable que la revisión 2 no
+> cubría con ningún identificador. Se las incorpora acá para sostener la regla de que este documento es la
+> fuente única del alcance y para que cada prueba pueda nombrar un RF, RNF o AC. Los identificadores nuevos
+> son RF-36 a RF-40, RNF-63 a RNF-67 y AC-90 a AC-102, enumerados en
+> [Trazabilidad de la revisión 3](#trazabilidad-de-identificadores-nuevos-en-la-revisión-3).
+>
+> Ningún identificador existente cambió de número ni de significado en esta revisión: los comportamientos
+> nuevos se expresan siempre como identificadores nuevos, incluso cuando refuerzan a uno anterior —RNF-64
+> refuerza el cupo de RNF-52 y RNF-65 refuerza el bloqueo de RNF-60— para no alterar lo que un identificador
+> ya exigía. La revisión 3 no retira ningún identificador.
 
 ## Contexto y Problema
 
@@ -102,6 +114,8 @@ La verificación cuantitativa de estos objetivos se enumera en [Indicadores de �
 - **RF-33**: El sistema debe permitir crear un estudio médico. *(proviene de RF-06)*
 - **RF-34**: El sistema debe rechazar la creación de un estudio cuyo título esté vacío. *(proviene de RF-06)*
 - **RF-35**: El sistema debe rechazar la creación de un estudio cuya fecha esté ausente o sea inválida. *(proviene de RF-06)*
+- **RF-36**: Cuando una carga incluya varios archivos y alguno sea rechazado por la validación, el sistema debe aceptar los archivos válidos e informar por separado cada archivo rechazado junto a su motivo. El rechazo de un archivo no debe impedir la creación del estudio cuando el título y la fecha son válidos, ni obligar a volver a adjuntar los archivos aceptados.
+- **RF-37**: El sistema debe rechazar la creación o la edición de un estudio cuya fecha sea posterior al día en curso. La fecha del estudio es una fecha de calendario sin hora. *(precisa qué se considera "inválida" en RF-35 y agrega la regla de fecha no futura)*
 
 ### Organización y búsqueda
 
@@ -114,6 +128,9 @@ La verificación cuantitativa de estos objetivos se enumera en [Indicadores de �
 - **RF-21**: El sistema debe permitir combinar la búsqueda textual con uno o más filtros.
 - **RF-22**: El sistema debe permitir limpiar todos los filtros mediante una única acción.
 - **RF-23**: El sistema debe mostrar la cantidad de estudios encontrados después de aplicar una búsqueda o filtro.
+- **RF-38**: El sistema debe ofrecer el filtro por institución como una selección entre las instituciones presentes en los estudios del propio usuario, ordenadas alfabéticamente, con coincidencia exacta sobre el valor elegido. La lista no debe incluir instituciones provenientes de estudios de otra cuenta.
+- **RF-39**: El sistema debe distinguir dos estados de listado vacío. Cuando la cuenta no tiene ningún estudio, debe indicarlo y ofrecer la acción de crear el primero. Cuando la búsqueda o los filtros no arrojan resultados, debe indicarlo con un mensaje propio, informar cero resultados y ofrecer la acción de limpiar los filtros.
+- **RF-40**: El sistema debe conservar el término de búsqueda y los filtros aplicados al cambiar de página del listado y al volver al listado desde el detalle de un estudio, sin que el usuario deba ingresarlos otra vez.
 
 ### PWA
 
@@ -152,6 +169,7 @@ La verificación cuantitativa de estos objetivos se enumera en [Indicadores de �
 - **RNF-58**: La clave de cifrado de archivos debe custodiarse fuera del entorno principal y fuera de los respaldos, de modo que su pérdida no sea posible sin perder simultáneamente el entorno y la custodia, y que el acceso a un respaldo por sí solo no permita descifrar los archivos.
 - **RNF-60**: El sistema debe rechazar todo intento de inicio de sesión de una cuenta que haya acumulado 5 intentos fallidos dentro de una ventana de 15 minutos, y mantener ese rechazo durante 15 minutos contados desde el quinto intento fallido. Un inicio de sesión exitoso debe reiniciar el contador de intentos fallidos a cero. El mensaje devuelto durante el bloqueo debe ser indistinguible del definido en RNF-13.
 - **RNF-62**: La clave de cifrado definida en RNF-02 no debe residir en el código fuente ni en archivos de configuración versionados. Si la clave no puede resolverse desde la configuración externa, la aplicación debe fallar al iniciar en lugar de almacenar archivos sin cifrar. *(proviene de RNF-02)*
+- **RNF-65**: El contador de intentos fallidos definido en RNF-60 debe llevarse contra el nombre de usuario ingresado, corresponda o no a una cuenta existente, y el tiempo de respuesta de un rechazo debe ser comparable en ambos casos. La indistinguibilidad exigida por RNF-13 alcanza así a todo el comportamiento observable y no solo al texto del mensaje. *(refuerza RNF-60 y RNF-13 sin alterar lo que exigen)*
 
 ### Validación de archivos
 
@@ -186,6 +204,8 @@ La verificación cuantitativa de estos objetivos se enumera en [Indicadores de �
 - **RNF-32**: Los errores de validación deben mostrarse junto al campo o archivo que los produjo.
 - **RNF-33**: La aplicación debe solicitar confirmación antes de realizar una eliminación irreversible.
 - **RNF-55**: La búsqueda y los filtros sobre metadatos de texto libre deben ser insensibles a mayúsculas, minúsculas y acentos, y deben ignorar los espacios al inicio y al final del término ingresado. Como SQLite no ofrece una intercalación insensible a acentos, la normalización (minúsculas, sin acentos, sin espacios sobrantes) debe resolverse en la aplicación: cada campo de texto buscable se persiste además en una columna normalizada e indexada, y el término ingresado se normaliza con la misma función antes de consultar.
+- **RNF-66**: Mientras una carga de archivos está en curso, la aplicación debe indicar que la operación está en progreso e impedir que el formulario vuelva a enviarse, de modo que la espera admitida por RNF-26 no se confunda con una aplicación detenida ni derive en la creación duplicada del estudio. No se exige informar el avance por archivo ni un porcentaje.
+- **RNF-67**: Cuando el envío de un formulario se rechaza por validación, la aplicación debe devolverlo con los metadatos ingresados intactos y debe advertir explícitamente que los archivos deben volver a adjuntarse. Ningún archivo queda retenido esperando un segundo envío.
 
 ### Respaldo y recuperación de infraestructura
 
@@ -205,6 +225,7 @@ La verificación cuantitativa de estos objetivos se enumera en [Indicadores de �
 - **RNF-43**: Las métricas técnicas no deben incluir títulos, descripciones, nombres de archivos ni datos médicos.
 - **RNF-44**: El contenido médico no debe utilizarse para entrenar modelos de inteligencia artificial.
 - **RNF-51**: La aplicación no debe mostrar información médica almacenada previamente cuando el usuario no esté autenticado. *(proviene de RF-27)*
+- **RNF-63**: El término de búsqueda y los valores de los filtros no deben viajar en la dirección de la solicitud, sino en su cuerpo, de modo que ningún dato médico pueda quedar registrado por la infraestructura que anota las direcciones solicitadas. La restricción alcanza también a la navegación entre páginas del listado. Como consecuencia, no existe una dirección que reproduzca una búsqueda o un filtro. *(extiende RNF-09 y RNF-43 a los registros que la aplicación no controla)*
 
 ### Costos y dependencias externas
 
@@ -215,6 +236,7 @@ La verificación cuantitativa de estos objetivos se enumera en [Indicadores de �
 - **RNF-49**: El funcionamiento principal no debe depender de un motor de búsqueda administrado.
 - **RNF-50**: Todo servicio externo pago que se integre debe poder deshabilitarse mediante un cambio de configuración, sin desplegar código nuevo, y con él deshabilitado deben seguir funcionando la carga, la organización, la visualización y la búsqueda por metadatos.
 - **RNF-52**: El almacenamiento total de archivos del MVP no debe superar los 20 GB, compartidos entre las hasta 5 cuentas y sin cuota individual. El sistema debe rechazar nuevas cargas de cualquier cuenta cuando se alcance ese límite e informarlo al usuario.
+- **RNF-64**: El sistema debe rechazar toda carga cuyo tamaño, sumado al espacio ya ocupado, superaría el límite de RNF-52, evaluando la condición antes de escribir en el almacenamiento definitivo, de modo que el total nunca lo exceda. El espacio se mide por el que los archivos ocupan en disco. *(refuerza RNF-52 sin alterar lo que exige)*
 
 ## Criterios de Aceptación
 
@@ -233,6 +255,7 @@ La verificación cuantitativa de estos objetivos se enumera en [Indicadores de �
 - **AC-84 (RNF-06)**: Dada la URL con la que un usuario autorizado accedió a un archivo, cuando esa misma URL se solicita sin sesión válida, tanto de inmediato como pasados 5 minutos, entonces en ningún caso se entrega el archivo. No existe ninguna URL del archivo que lo entregue a un solicitante sin autenticar, sea esa URL estable o de un solo uso.
 - **AC-86 (RNF-60)**: Dada una cuenta bloqueada por 5 intentos fallidos, cuando se intenta iniciar sesión con la contraseña correcta una vez transcurridos 15 minutos desde el quinto fallo, entonces el acceso se concede.
 - **AC-87 (RNF-60)**: Dada una cuenta con 4 intentos fallidos consecutivos seguidos de un inicio de sesión exitoso, cuando a continuación se registran 4 nuevos intentos fallidos, entonces la cuenta no queda bloqueada, porque el inicio de sesión exitoso reinició el contador.
+- **AC-98 (RNF-65, RNF-13)**: Dado un nombre de usuario que no corresponde a ninguna cuenta, cuando se realizan 5 intentos fallidos dentro de una ventana de 15 minutos y luego un sexto intento, entonces el rechazo devuelto y su demora son indistinguibles de los que produce una cuenta existente en la misma situación.
 
 ### Creación y edición de estudios
 
@@ -248,6 +271,10 @@ La verificación cuantitativa de estos objetivos se enumera en [Indicadores de �
 - **AC-82 (RF-31)**: Dado un estudio existente, cuando el usuario agrega una descripción, entonces la descripción queda almacenada y se muestra en el detalle del estudio.
 - **AC-88 (RF-30)**: Dado un estudio existente, cuando el usuario agrega una institución, entonces la institución queda almacenada y se muestra en el detalle del estudio.
 - **AC-89 (RF-32)**: Dado un estudio existente, cuando el usuario agrega dos etiquetas, entonces ambas quedan almacenadas y se muestran en el detalle del estudio.
+- **AC-90 (RF-36)**: Dado un estudio nuevo con título y fecha válidos y tres archivos de los cuales el segundo es inválido, cuando se envía la carga, entonces el estudio queda creado con los dos archivos válidos, el motivo del rechazo se informa junto al segundo archivo y ese archivo no existe en el almacenamiento definitivo.
+- **AC-91 (RF-37)**: Dada una fecha posterior al día en curso, cuando el usuario intenta crear un estudio con ella, entonces el sistema no lo crea y muestra un error; dada la fecha del día en curso, el estudio se crea.
+- **AC-99 (RNF-66)**: Dada una carga de archivos en curso, cuando el usuario intenta enviar el formulario otra vez, entonces el sistema lo impide, sigue indicando que la operación está en progreso y no se crea un segundo estudio.
+- **AC-100 (RNF-67)**: Dado un formulario de creación rechazado por validación, cuando se lo devuelve al usuario, entonces los metadatos que había ingresado siguen en sus campos y un aviso indica que los archivos deben adjuntarse otra vez.
 
 ### Visualización, descarga y eliminación
 
@@ -259,6 +286,7 @@ La verificación cuantitativa de estos objetivos se enumera en [Indicadores de �
 - **AC-77 (RNF-18)**: Dado un archivo con un hash SHA-256 conocido antes de la carga, cuando se lo carga, se lo visualiza y luego se lo descarga, entonces el hash del archivo descargado es idéntico al hash previo a la carga.
 - **AC-78 (RNF-28)**: Dado el listado de estudios y el detalle de un estudio con archivos asociados, cuando el usuario los abre sin seleccionar "Visualizar" ni "Descargar", entonces no se emite ninguna solicitud de red que transfiera el contenido de un archivo médico.
 - **AC-81**: *(retirado)* Reformulaba AC-17 con un "Dado" universal que no era binario. RNF-33 queda verificado por AC-17, que lo declara. Identificador retirado; no reutilizar.
+- **AC-102 (RF-14, RNF-52)**: Dado un almacenamiento que alcanzó su límite, cuando se elimina un estudio con archivos asociados, entonces el espacio que ocupaban vuelve a estar disponible y una carga que antes se rechazaba por cupo se completa.
 
 ### Validación de archivos
 
@@ -293,6 +321,11 @@ La verificación cuantitativa de estos objetivos se enumera en [Indicadores de �
 - **AC-71 (RF-16)**: Dado un estudio cuyo título es "Ecografía abdominal", cuando el usuario busca "abdominal", entonces el estudio aparece entre los resultados.
 - **AC-72 (RF-16)**: Dado un estudio cuya descripción es "control anual de rutina", cuando el usuario busca "rutina", entonces el estudio aparece entre los resultados.
 - **AC-73 (RF-16)**: Dado un estudio cuyo profesional es "Dra. Rivas", cuando el usuario busca "Rivas", entonces el estudio aparece entre los resultados.
+- **AC-92 (RF-38, RNF-53)**: Dados estudios de dos propietarios con instituciones distintas, cuando un usuario autenticado abre la lista de instituciones del filtro, entonces solo figuran las instituciones presentes en sus propios estudios.
+- **AC-93 (RF-39)**: Dada una cuenta sin ningún estudio cargado, cuando el usuario abre el listado, entonces se le indica esa situación y se le ofrece la acción de crear el primer estudio.
+- **AC-94 (RF-39)**: Dada una búsqueda que no coincide con ningún estudio propio, cuando se muestra el listado, entonces informa cero resultados, lo indica con un mensaje propio y ofrece la acción de limpiar los filtros.
+- **AC-95 (RF-40)**: Dada una búsqueda con resultados repartidos en dos páginas, cuando el usuario avanza de página, abre un estudio y vuelve al listado, entonces la búsqueda y los filtros siguen aplicados sin volver a ingresarlos.
+- **AC-101 (RNF-27)**: Dada una colección de 26 estudios y el usuario situado en la segunda página, cuando se muestra el listado, entonces existe un control para volver a la página anterior y la página en la que se encuentra está indicada.
 
 ### PWA y privacidad local
 
@@ -303,6 +336,7 @@ La verificación cuantitativa de estos objetivos se enumera en [Indicadores de �
 - **AC-42 (RF-28)**: Dada una carga interrumpida por pérdida de conexión, cuando la operación falla, entonces el sistema informa que el archivo no fue cargado.
 - **AC-43 (RNF-09)**: Dado un estudio de prueba cuyo título, profesional, institución, descripción, etiquetas y nombre original de archivo son cadenas únicas e irrepetibles, cuando se lo crea, se lo visualiza y se lo elimina, entonces la búsqueda de cada una de esas cadenas sobre la totalidad de los logs técnicos generados durante esas operaciones no arroja ninguna coincidencia.
 - **AC-85 (RNF-43)**: Dado el mismo estudio de prueba de AC-43, cuando se crea, se visualiza y se elimina, entonces la búsqueda de cada una de esas cadenas únicas sobre la totalidad de las métricas técnicas emitidas durante esas operaciones —incluidos nombres de métrica, etiquetas y valores— no arroja ninguna coincidencia.
+- **AC-96 (RNF-63)**: Dado un término de búsqueda que es una cadena única e irrepetible, cuando el usuario lo busca y avanza a la página siguiente de resultados, entonces esa cadena no aparece en la dirección de ninguna de las solicitudes emitidas.
 
 ### Propiedad de los datos y control de acceso
 
@@ -321,6 +355,7 @@ La verificación cuantitativa de estos objetivos se enumera en [Indicadores de �
 - **AC-54 (RNF-27)**: Dada una colección de 26 estudios, cuando se abre el listado, entonces se muestran como máximo 25 estudios y existe un control para avanzar a la página siguiente.
 - **AC-55 (RNF-52)**: Dado un almacenamiento compartido que alcanzó los 20 GB, cuando cualquiera de las cuentas intenta cargar un archivo adicional, entonces el sistema rechaza la carga e informa que se alcanzó el límite de almacenamiento.
 - **AC-64 (RNF-52, RNF-53)**: Dado el aviso de límite de almacenamiento alcanzado, cuando se muestra al usuario, entonces no revela qué cuenta consumió el espacio ni ningún metadato de estudios ajenos.
+- **AC-97 (RNF-64)**: Dado un almacenamiento con espacio libre insuficiente para la carga solicitada, cuando el usuario la confirma, entonces se rechaza antes de escribir en el almacenamiento definitivo y el total ocupado sigue sin superar el límite de RNF-52.
 
 ### Transporte y almacenamiento seguro
 
@@ -372,6 +407,8 @@ La verificación cuantitativa de estos objetivos se enumera en [Indicadores de �
 - APIs de OCR.
 - APIs de inteligencia artificial.
 - Edición del contenido interno de los archivos.
+- Compromisos de accesibilidad: navegación por teclado, foco visible, contraste, compatibilidad con lectores de pantalla y conformidad con cualquier norma de accesibilidad. La única exigencia del MVP sobre la interfaz es la de RNF-29 y RNF-30, que trata el ancho de pantalla y el desplazamiento horizontal. *(incorporado en la revisión 3: la exclusión estaba implícita y ahora es explícita)*
+- Direcciones que reproduzcan una búsqueda o un listado filtrado, como consecuencia de RNF-63.
 
 ## Riesgos y Dependencias
 
@@ -570,3 +607,34 @@ El MVP será considerado exitoso cuando:
 | AC-85 | RNF-43 | Detectado en la segunda pasada: AC-43 cubre los logs, no el canal de métricas. |
 | AC-86, AC-87 | RNF-60 | Detectado en la cuarta pasada: AC-69 mezclaba dos escenarios, y el reinicio del contador tras un inicio de sesión exitoso no estaba verificado. |
 | AC-88, AC-89 | RF-30, RF-32 | Detectado en la cuarta pasada: AC-13 verificaba tres RF juntos, reintroduciendo a nivel de AC la no-atomicidad que se había corregido en los RF. |
+
+### Trazabilidad de identificadores nuevos en la revisión 3
+
+Todos provienen de decisiones tomadas al elaborar `specs/001-mvp-archivo-medico/spec.md` con Spec Kit, sobre
+comportamiento que la revisión 2 no cubría con ningún identificador. La columna «Origen» indica qué
+requerimiento existente quedaba incompleto o ambiguo.
+
+| Nuevo | Origen | Motivo |
+|---|---|---|
+| RF-36 | RF-07, RNF-21 | Ninguno definía qué ocurre con el resto de una carga múltiple cuando un archivo es rechazado. |
+| RF-37 | RF-35 | RF-35 exigía rechazar una fecha "inválida" sin definir el término ni prohibir una fecha futura. |
+| RF-38 | RF-20 | RF-20 no definía si la institución se elige de una lista o se escribe, ni de dónde sale esa lista. |
+| RF-39 | RF-15, RF-23 | No había requerimiento para el listado vacío, ni distinción entre cuenta sin estudios y búsqueda sin resultados. |
+| RF-40 | RF-21, RNF-27 | Al no viajar la búsqueda en la dirección (RNF-63), la persistencia de los filtros al paginar dejó de estar implícita. |
+| RNF-63 | RNF-09, RNF-43 | Ambos prohibían datos médicos en logs y métricas de la aplicación, pero el término de búsqueda quedaba registrado por la infraestructura al viajar en la dirección. |
+| RNF-64 | RNF-52 | RNF-52 exigía rechazar cargas "cuando se alcance" el límite, lo que permitía superarlo con la carga en curso. |
+| RNF-65 | RNF-60, RNF-13 | El bloqueo por cuenta y el mensaje idéntico no impedían enumerar cuentas por la diferencia de comportamiento ante un usuario inexistente. |
+| RNF-66 | RNF-26, RNF-32 | RNF-26 admite hasta 15 segundos de carga sin exigir ninguna señal al usuario ni impedir el reenvío. |
+| RNF-67 | RNF-32 | RNF-32 ubicaba los errores de validación sin decir qué ocurre con los datos ya ingresados. |
+| AC-90 | RF-36 | Verificación de la carga parcial. |
+| AC-91 | RF-37 | Verificación del rechazo de fecha futura y la aceptación de la fecha del día. |
+| AC-92 | RF-38 | Verificación de que la lista de instituciones no cruza cuentas. |
+| AC-93, AC-94 | RF-39 | Verificación de los dos estados de listado vacío. |
+| AC-95 | RF-40 | Verificación de la persistencia de búsqueda y filtros. |
+| AC-96 | RNF-63 | Verificación de que el término de búsqueda no aparece en ninguna dirección solicitada. |
+| AC-97 | RNF-64 | Verificación del rechazo anticipado por cupo. |
+| AC-98 | RNF-65 | Verificación de la indistinguibilidad ante un nombre de usuario inexistente. |
+| AC-99 | RNF-66 | Verificación del bloqueo del reenvío durante una carga. |
+| AC-100 | RNF-67 | Verificación de la conservación de los metadatos ingresados. |
+| AC-101 | RNF-27 | RNF-27 exigía paginar y AC-54 solo verificaba el control de avance. |
+| AC-102 | RF-14, RNF-52 | La liberación del cupo al eliminar un estudio no tenía verificación. |

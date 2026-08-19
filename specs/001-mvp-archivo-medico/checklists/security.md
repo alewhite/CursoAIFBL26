@@ -35,7 +35,7 @@ inequívocos, consistentes entre sí y verificables objetivamente, antes de pasa
       la redirección de la solicitud sin cifrar? [Hueco, Spec §FR-060]
 - [ ] CHK011 - ¿Está definido qué sí puede registrarse en logs —identificadores técnicos, códigos de
       error— y no únicamente lo que está prohibido? [Completitud, Spec §FR-061]
-- [ ] CHK012 - ¿Están cubiertos por el requisito de no registrar datos médicos los logs que produce la
+- [x] CHK012 - ¿Están cubiertos por el requisito de no registrar datos médicos los logs que produce la
       infraestructura por fuera de la aplicación, en particular los que registran la URL completa con el
       término de búsqueda? [Hueco, Spec §FR-061]
 - [ ] CHK013 - ¿Está especificada la política positiva de la caché del navegador —qué puede guardarse—, y
@@ -47,14 +47,14 @@ inequívocos, consistentes entre sí y verificables objetivamente, antes de pasa
 
 ## Claridad y Ausencia de Ambigüedad
 
-- [ ] CHK016 - ¿Está definido si la expiración por inactividad es deslizante —se renueva con cada
+- [x] CHK016 - ¿Está definido si la expiración por inactividad es deslizante —se renueva con cada
       solicitud— o cuenta desde el inicio de la sesión? [Ambigüedad, Spec §FR-005]
-- [ ] CHK017 - ¿Está definido qué solicitudes cuentan como "actividad" a efectos de esa expiración, en
+- [x] CHK017 - ¿Está definido qué solicitudes cuentan como "actividad" a efectos de esa expiración, en
       particular si una solicitud emitida por la aplicación instalada mantiene viva la sesión?
       [Ambigüedad, Spec §FR-005]
-- [ ] CHK018 - ¿Está resuelto si un recurso ajeno debe responder 403 o 404, dado que 403 confirma la
+- [x] CHK018 - ¿Está resuelto si un recurso ajeno debe responder 403 o 404, dado que 403 confirma la
       existencia del recurso y 404 no? [Ambigüedad, Spec §FR-012]
-- [ ] CHK019 - ¿Está definido si el contador de intentos fallidos se acumula también para nombres de
+- [x] CHK019 - ¿Está definido si el contador de intentos fallidos se acumula también para nombres de
       usuario inexistentes, de modo que la diferencia de comportamiento no permita enumerar cuentas?
       [Ambigüedad, Spec §FR-007]
 - [ ] CHK020 - ¿Está especificado si un intento realizado durante el bloqueo extiende la ventana de 15
@@ -72,7 +72,7 @@ inequívocos, consistentes entre sí y verificables objetivamente, antes de pasa
 
 ## Consistencia entre Requisitos
 
-- [ ] CHK026 - ¿Son consistentes el requisito de URLs temporales con expiración de 5 minutos y el que
+- [x] CHK026 - ¿Son consistentes el requisito de URLs temporales con expiración de 5 minutos y el que
       exige que ninguna URL entregue un archivo sin sesión válida, o el primero describe un mecanismo que
       el segundo vuelve innecesario? [Conflicto, Spec §FR-045, §FR-046]
 - [ ] CHK027 - ¿Es consistente el borrado físico e inmediato de un estudio con la retención de 30 días de
@@ -98,7 +98,7 @@ inequívocos, consistentes entre sí y verificables objetivamente, antes de pasa
 - [ ] CHK033 - ¿Está definido el universo sobre el que se busca la ausencia de datos médicos en logs y
       métricas —qué canales se recolectan y durante qué operaciones—, de modo que el criterio pueda darse
       por cumplido? [Medibilidad, Spec §AC-43, §AC-85]
-- [ ] CHK034 - ¿Está especificado que el mensaje ante credenciales inválidas debe ser indistinguible
+- [x] CHK034 - ¿Está especificado que el mensaje ante credenciales inválidas debe ser indistinguible
       también en tiempo de respuesta, o solo en su texto? [Medibilidad, Spec §FR-003]
 - [ ] CHK035 - ¿Puede verificarse el criterio de que ninguna ruta acepta una creación de cuenta sin
       depender de una enumeración manual y por lo tanto incompleta? [Medibilidad, Spec §AC-50, §AC-63]
@@ -113,7 +113,7 @@ inequívocos, consistentes entre sí y verificables objetivamente, antes de pasa
 - [ ] CHK038 - ¿Está definido el comportamiento esperado ante solicitudes simultáneas de la misma cuenta
       desde varios dispositivos, y si existe un límite de sesiones concurrentes?
       [Cobertura, Escenario alterno, Spec §FR-005]
-- [ ] CHK039 - ¿Están cubiertos por un requisito los identificadores inexistentes y los mal formados con
+- [x] CHK039 - ¿Están cubiertos por un requisito los identificadores inexistentes y los mal formados con
       el mismo tratamiento que los ajenos, para que las tres respuestas sean indistinguibles?
       [Cobertura, Caso límite, Spec §FR-012]
 - [ ] CHK040 - ¿Está especificado qué debe ocurrir si el borrado del contenido cifrado falla después de
@@ -125,7 +125,7 @@ inequívocos, consistentes entre sí y verificables objetivamente, antes de pasa
       lo restringe carece de objeto? [Supuesto, Spec §FR-062]
 - [ ] CHK042 - ¿Está documentado quién custodia la clave de cifrado y bajo qué procedimiento, dado que el
       requisito solo exige que esté fuera del entorno y de los respaldos? [Supuesto, Spec §FR-068]
-- [ ] CHK043 - ¿Está registrado como decisión explícita, con su justificación, que el bloqueo por
+- [x] CHK043 - ¿Está registrado como decisión explícita, con su justificación, que el bloqueo por
       intentos fallidos opera por cuenta y habilita una denegación de servicio dirigida?
       [Trazabilidad, Spec §FR-007, Casos Límite]
 - [ ] CHK044 - ¿Trazan los requisitos de seguridad del spec a los riesgos enumerados en `PRD2.md`, de modo
