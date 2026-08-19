@@ -1,4 +1,7 @@
 using System.Security.Claims;
+using System.Text.Encodings.Web;
+using System.Text.Unicode;
+using Microsoft.Extensions.WebEncoders;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using MiArchivoMedico.Web.Controllers;
@@ -44,6 +47,9 @@ constructor.Services.AddSingleton(TimeProvider.System);
 constructor.Services.AddHttpContextAccessor();
 constructor.Services.AddScoped<IUsuarioActual, UsuarioActual>();
 constructor.Services.AddScoped<ControlDeIntentosDeInicioDeSesion>();
+constructor.Services.AddSingleton<ValidadorDeArchivos>();
+constructor.Services.AddSingleton<IAlmacenamientoDeArchivos, AlmacenamientoCifradoEnDisco>();
+constructor.Services.AddScoped<ServicioDeCargaDeArchivos>();
 
 constructor.Services.AddDbContext<ArchivoMedicoDbContext>(o => o.UseSqlite(cadenaDeConexion));
 
@@ -129,6 +135,13 @@ constructor.Services.AddSession(o =>
     o.IdleTimeout = TimeSpan.FromMinutes(30);
 });
 
+// El codificador de HTML, por omisión, convierte todo lo que sale de Basic Latin en entidades
+// numéricas: en una aplicación en español eso vuelve ilegible cualquier texto acentuado del marcado.
+// Ampliarlo al suplemento Latin-1 no relaja el escapado de <, >, & ni de las comillas, que es lo que
+// evita la inyección.
+constructor.Services.Configure<WebEncoderOptions>(o =>
+    o.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement));
+
 constructor.Services.AddControllersWithViews();
 
 var aplicacion = constructor.Build();
@@ -150,6 +163,10 @@ aplicacion.UseSession();
 aplicacion.MapControllerRoute("por-omision", "{controller=Home}/{action=Index}/{id?}");
 
 await InicializadorDeBaseDeDatos.InicializarAsync(aplicacion.Services);
+
+// Restos que un corte pudiera haber dejado en el área de tránsito.
+using (var alcanceDeArranque = aplicacion.Services.CreateScope())
+    alcanceDeArranque.ServiceProvider.GetRequiredService<ServicioDeCargaDeArchivos>().PurgarTransito();
 
 aplicacion.Run();
 

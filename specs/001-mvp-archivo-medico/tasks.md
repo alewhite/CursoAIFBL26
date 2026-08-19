@@ -134,33 +134,33 @@ almacenado, en qué estado y con qué huella, sin necesidad de búsqueda, edici�
 
 ### Tests de la Historia 2
 
-- [ ] T050 [P] [US2] Escribir los tests de creación y de metadatos obligatorios en `tests/MiArchivoMedico.Tests/CreacionDeEstudiosTests.cs` (AC-09, AC-10, AC-11, AC-91)
-- [ ] T051 [P] [US2] Escribir los tests de metadatos opcionales en `tests/MiArchivoMedico.Tests/MetadatosDeEstudioTests.cs` (AC-13, AC-82, AC-88, AC-89)
-- [ ] T052 [P] [US2] Escribir los tests de formatos aceptados en `tests/MiArchivoMedico.Tests/ValidacionDeArchivosTests.cs` (AC-12, AC-20, AC-74, AC-75)
-- [ ] T053 [P] [US2] Escribir los tests de rechazo por tamaño, firma incoherente, 0 bytes y PDF truncado en `tests/MiArchivoMedico.Tests/ValidacionDeArchivosTests.cs` (AC-21, AC-22, AC-23, AC-24, AC-44)
-- [ ] T054 [P] [US2] Escribir el test de que un archivo rechazado no queda en el almacenamiento definitivo en `tests/MiArchivoMedico.Tests/ValidacionDeArchivosTests.cs` (AC-27)
-- [ ] T055 [P] [US2] Escribir los tests de huella SHA-256, nombre físico GUID y nombre original sanitizado en `tests/MiArchivoMedico.Tests/CustodiaDeArchivosTests.cs` (AC-25, AC-65, AC-66)
-- [ ] T056 [P] [US2] Escribir el test de cifrado en reposo, leyendo el archivo directamente del almacenamiento temporal, en `tests/MiArchivoMedico.Tests/CustodiaDeArchivosTests.cs` (AC-57)
-- [ ] T057 [P] [US2] Escribir los tests de límite de 20 archivos por estudio y de cupo compartido, con cupo diminuto configurado, en `tests/MiArchivoMedico.Tests/LimitesDeCargaTests.cs` (AC-70, AC-55, AC-64, AC-97)
-- [ ] T058 [P] [US2] Escribir el test de carga parcial con un archivo inválido entre tres en `tests/MiArchivoMedico.Tests/CargaParcialTests.cs` (AC-90)
-- [ ] T059 [P] [US2] Escribir el test de rechazo por largo máximo de los campos de texto en `tests/MiArchivoMedico.Tests/CreacionDeEstudiosTests.cs` (AC-106)
-- [ ] T060 [P] [US2] Escribir los tests de ubicación de los errores de validación y de conservación de los metadatos ingresados en `tests/MiArchivoMedico.Tests/FormularioDeEstudioTests.cs` (AC-80, AC-100)
-- [ ] T061 [P] [US2] Escribir el test de doble envío del mismo formulario, que debe producir un único estudio, en `tests/MiArchivoMedico.Tests/FormularioDeEstudioTests.cs` (AC-99, RNF-66)
+- [X] T050 [P] [US2] Escribir los tests de creación y de metadatos obligatorios en `tests/MiArchivoMedico.Tests/CreacionDeEstudiosTests.cs` (AC-09, AC-10, AC-11, AC-91)
+- [X] T051 [P] [US2] Escribir los tests de metadatos opcionales en `tests/MiArchivoMedico.Tests/MetadatosDeEstudioTests.cs` (AC-13, AC-82, AC-88, AC-89)
+- [X] T052 [P] [US2] Escribir los tests de formatos aceptados en `tests/MiArchivoMedico.Tests/ValidacionDeArchivosTests.cs` (AC-12, AC-20, AC-74, AC-75)
+- [X] T053 [P] [US2] Escribir los tests de rechazo por tamaño, firma incoherente, 0 bytes y PDF truncado en `tests/MiArchivoMedico.Tests/ValidacionDeArchivosTests.cs` (AC-21, AC-22, AC-23, AC-24, AC-44)
+- [X] T054 [P] [US2] Escribir el test de que un archivo rechazado no queda en el almacenamiento definitivo en `tests/MiArchivoMedico.Tests/ValidacionDeArchivosTests.cs` (AC-27)
+- [X] T055 [P] [US2] Escribir los tests de huella SHA-256, nombre físico GUID y nombre original sanitizado en `tests/MiArchivoMedico.Tests/CustodiaDeArchivosTests.cs` (AC-25, AC-65, AC-66)
+- [X] T056 [P] [US2] Escribir el test de cifrado en reposo, leyendo el archivo directamente del almacenamiento temporal, en `tests/MiArchivoMedico.Tests/CustodiaDeArchivosTests.cs` (AC-57)
+- [X] T057 [P] [US2] Escribir los tests de límite de 20 archivos por estudio y de cupo compartido, con cupo diminuto configurado, en `tests/MiArchivoMedico.Tests/LimitesDeCargaTests.cs` (AC-70, AC-55, AC-64, AC-97)
+- [X] T058 [P] [US2] Escribir el test de carga parcial con un archivo inválido entre tres en `tests/MiArchivoMedico.Tests/CargaParcialTests.cs` (AC-90)
+- [X] T059 [P] [US2] Escribir el test de rechazo por largo máximo de los campos de texto en `tests/MiArchivoMedico.Tests/CreacionDeEstudiosTests.cs` (AC-106)
+- [X] T060 [P] [US2] Escribir los tests de ubicación de los errores de validación y de conservación de los metadatos ingresados en `tests/MiArchivoMedico.Tests/FormularioDeEstudioTests.cs` (AC-80, AC-100)
+- [X] T061 [P] [US2] Escribir el test de doble envío del mismo formulario, que debe producir un único estudio, en `tests/MiArchivoMedico.Tests/FormularioDeEstudioTests.cs` (AC-99, RNF-66)
 
 ### Implementación de la Historia 2
 
-- [ ] T062 [P] [US2] Implementar `ValidadorDeArchivos` en `src/MiArchivoMedico.Web/Servicios/ValidadorDeArchivos.cs`: extensión, tipo declarado, firma binaria y validación estructural de PDF e imágenes con ImageSharp (RNF-15, RNF-16, RNF-17)
-- [ ] T063 [P] [US2] Definir `IAlmacenamientoDeArchivos` en `src/MiArchivoMedico.Web/Servicios/IAlmacenamientoDeArchivos.cs`
-- [ ] T064 [US2] Implementar `AlmacenamientoCifradoEnDisco` en `src/MiArchivoMedico.Web/Servicios/AlmacenamientoCifradoEnDisco.cs`: AES-256-CBC en flujo, `[IV 16 bytes][cifrado]`, nombre físico GUID, sin materializar el archivo entero en memoria (RNF-02, RNF-22, research.md §5)
-- [ ] T065 [US2] Implementar `ServicioDeCargaDeArchivos` en `src/MiArchivoMedico.Web/Servicios/ServicioDeCargaDeArchivos.cs`: recepción en `<Almacenamiento:Ruta>/transito/`, validación, cálculo de SHA-256, control de cupo y de cantidad, traslado al almacenamiento definitivo, borrado de los rechazados del tránsito y purga de restos al arrancar (RNF-19, RNF-21, RNF-61, RNF-64)
-- [ ] T066 [US2] Implementar la sanitización del nombre original en `src/MiArchivoMedico.Web/Servicios/ServicioDeCargaDeArchivos.cs`: sin separadores de ruta, sin caracteres de control, sin `..`, truncado a 255, conservando la extensión (RNF-23)
-- [ ] T067 [US2] Implementar el alta de estudio en `src/MiArchivoMedico.Web/Controllers/EstudiosController.cs`, con carga parcial: acepta los archivos válidos e informa cada rechazado junto a ese archivo (RF-33, RF-36)
-- [ ] T068 [US2] Implementar la validación de título, fecha y largos máximos en `src/MiArchivoMedico.Web/Models/EstudioFormulario.cs`, incluyendo el rechazo de la fecha posterior al día en curso usando `TimeProvider` (RF-34, RF-35, RF-37, RNF-70, AC-106)
-- [ ] T069 [US2] Implementar la devolución del formulario con los metadatos intactos y el aviso de readjuntar los archivos en `src/MiArchivoMedico.Web/Controllers/EstudiosController.cs` (RNF-67)
-- [ ] T070 [P] [US2] Crear la vista de alta en `src/MiArchivoMedico.Web/Views/Estudios/Crear.cshtml`, con los mensajes de error junto a su campo y junto a su archivo, en un máximo de tres pasos (RNF-31, RNF-32)
-- [ ] T071 [P] [US2] Implementar `carga.js` en `src/MiArchivoMedico.Web/wwwroot/js/carga.js`: indicador de operación en curso y bloqueo del reenvío del formulario (RNF-66)
-- [ ] T072 [US2] Implementar el control de envío único en `src/MiArchivoMedico.Web/Controllers/EstudiosController.cs`: el formulario porta una marca de envío que el servidor consume, de modo que un segundo envío del mismo formulario no cree un estudio duplicado aunque el navegador no ejecute JavaScript (RNF-66, AC-99)
-- [ ] T073 [US2] Implementar la ruta de agregar archivos a un estudio existente en `src/MiArchivoMedico.Web/Controllers/EstudiosController.cs` (RF-07)
+- [X] T062 [P] [US2] Implementar `ValidadorDeArchivos` en `src/MiArchivoMedico.Web/Servicios/ValidadorDeArchivos.cs`: extensión, tipo declarado, firma binaria y validación estructural de PDF e imágenes con ImageSharp (RNF-15, RNF-16, RNF-17)
+- [X] T063 [P] [US2] Definir `IAlmacenamientoDeArchivos` en `src/MiArchivoMedico.Web/Servicios/IAlmacenamientoDeArchivos.cs`
+- [X] T064 [US2] Implementar `AlmacenamientoCifradoEnDisco` en `src/MiArchivoMedico.Web/Servicios/AlmacenamientoCifradoEnDisco.cs`: AES-256-CBC en flujo, `[IV 16 bytes][cifrado]`, nombre físico GUID, sin materializar el archivo entero en memoria (RNF-02, RNF-22, research.md §5)
+- [X] T065 [US2] Implementar `ServicioDeCargaDeArchivos` en `src/MiArchivoMedico.Web/Servicios/ServicioDeCargaDeArchivos.cs`: recepción en `<Almacenamiento:Ruta>/transito/`, validación, cálculo de SHA-256, control de cupo y de cantidad, traslado al almacenamiento definitivo, borrado de los rechazados del tránsito y purga de restos al arrancar (RNF-19, RNF-21, RNF-61, RNF-64)
+- [X] T066 [US2] Implementar la sanitización del nombre original en `src/MiArchivoMedico.Web/Servicios/ServicioDeCargaDeArchivos.cs`: sin separadores de ruta, sin caracteres de control, sin `..`, truncado a 255, conservando la extensión (RNF-23)
+- [X] T067 [US2] Implementar el alta de estudio en `src/MiArchivoMedico.Web/Controllers/EstudiosController.cs`, con carga parcial: acepta los archivos válidos e informa cada rechazado junto a ese archivo (RF-33, RF-36)
+- [X] T068 [US2] Implementar la validación de título, fecha y largos máximos en `src/MiArchivoMedico.Web/Models/EstudioFormulario.cs`, incluyendo el rechazo de la fecha posterior al día en curso usando `TimeProvider` (RF-34, RF-35, RF-37, RNF-70, AC-106)
+- [X] T069 [US2] Implementar la devolución del formulario con los metadatos intactos y el aviso de readjuntar los archivos en `src/MiArchivoMedico.Web/Controllers/EstudiosController.cs` (RNF-67)
+- [X] T070 [P] [US2] Crear la vista de alta en `src/MiArchivoMedico.Web/Views/Estudios/Crear.cshtml`, con los mensajes de error junto a su campo y junto a su archivo, en un máximo de tres pasos (RNF-31, RNF-32)
+- [X] T071 [P] [US2] Implementar `carga.js` en `src/MiArchivoMedico.Web/wwwroot/js/carga.js`: indicador de operación en curso y bloqueo del reenvío del formulario (RNF-66)
+- [X] T072 [US2] Implementar el control de envío único en `src/MiArchivoMedico.Web/Controllers/EstudiosController.cs`: el formulario porta una marca de envío que el servidor consume, de modo que un segundo envío del mismo formulario no cree un estudio duplicado aunque el navegador no ejecute JavaScript (RNF-66, AC-99)
+- [X] T073 [US2] Implementar la ruta de agregar archivos a un estudio existente en `src/MiArchivoMedico.Web/Controllers/EstudiosController.cs` (RF-07)
 
 **Punto de control**: las Historias 1 y 2 funcionan por separado. Ya es un producto entregable: guarda
 estudios de forma privada y segura, aunque todavía no los muestre bien ni permita buscarlos.

@@ -1,0 +1,73 @@
+@model MiArchivoMedico.Web.Models.EstudioFormulario
+@{
+    ViewData["Titulo"] = "Nuevo estudio";
+}
+<h1>Nuevo estudio</h1>
+
+@* Una sola pantalla de principio a fin: la creación no supera los tres pasos que fija RNF-31. *@
+<form method="post" enctype="multipart/form-data" class="tarjeta" id="formulario-de-estudio">
+    <input type="hidden" asp-for="MarcaDeEnvio" />
+
+    @if (Model.DebeReadjuntarArchivos)
+    {
+        <p class="aviso error">Revisá los datos marcados. Los archivos hay que volver a adjuntarlos.</p>
+    }
+
+    <div class="campo">
+        <label asp-for="Titulo">Título</label>
+        <input asp-for="Titulo" />
+        <span class="error" data-error-de="Titulo" asp-validation-for="Titulo"></span>
+    </div>
+
+    <div class="campo">
+        <label asp-for="Fecha">Fecha</label>
+        <input asp-for="Fecha" type="date" />
+        <span class="error" data-error-de="Fecha" asp-validation-for="Fecha"></span>
+    </div>
+
+    <div class="campo">
+        <label asp-for="Profesional">Profesional</label>
+        <input asp-for="Profesional" />
+        <span class="error" data-error-de="Profesional" asp-validation-for="Profesional"></span>
+    </div>
+
+    <div class="campo">
+        <label asp-for="Institucion">Institución</label>
+        <input asp-for="Institucion" />
+        <span class="error" data-error-de="Institucion" asp-validation-for="Institucion"></span>
+    </div>
+
+    <div class="campo">
+        <label asp-for="Descripcion">Descripción</label>
+        <textarea asp-for="Descripcion" rows="4"></textarea>
+        <span class="error" data-error-de="Descripcion" asp-validation-for="Descripcion"></span>
+    </div>
+
+    <div class="campo">
+        <label asp-for="Etiquetas">Etiquetas</label>
+        <input asp-for="Etiquetas" placeholder="separadas por coma" />
+        <span class="error" data-error-de="Etiquetas" asp-validation-for="Etiquetas"></span>
+    </div>
+
+    <div class="campo">
+        <label asp-for="Archivos">Archivos</label>
+        <input asp-for="Archivos" type="file" multiple accept=".pdf,.jpg,.jpeg,.png" />
+        @* Cada rechazo se muestra junto al archivo que lo produjo, no en un aviso general (RNF-32). *@
+        @foreach (var rechazado in Model.Rechazados)
+        {
+            <span class="error" data-error-de-archivo="@rechazado.NombreOriginal">
+                @rechazado.NombreOriginal: @rechazado.Motivo
+            </span>
+        }
+    </div>
+
+    <div class="acciones">
+        <button type="submit" id="boton-guardar">Guardar estudio</button>
+        <a class="boton secundario" asp-action="Index">Cancelar</a>
+    </div>
+    <p class="aviso neutro" id="aviso-en-curso" hidden>Guardando el estudio…</p>
+</form>
+
+@section Scripts {
+    <script src="~/js/carga.js" asp-append-version="true"></script>
+}

@@ -4,11 +4,53 @@
 }
 <h1>@Model.Titulo</h1>
 
+@if (TempData["Mensaje"] is string mensaje)
+{
+    <p class="aviso exito">@mensaje</p>
+}
+@if (TempData["Rechazos"] is string rechazos)
+{
+    <p class="aviso error">@rechazos</p>
+}
+
 <div class="tarjeta">
     <p><strong>Fecha:</strong> @Model.Fecha.ToString("dd/MM/yyyy")</p>
     @if (!string.IsNullOrWhiteSpace(Model.Profesional)) { <p><strong>Profesional:</strong> @Model.Profesional</p> }
     @if (!string.IsNullOrWhiteSpace(Model.Institucion)) { <p><strong>Institución:</strong> @Model.Institucion</p> }
     @if (!string.IsNullOrWhiteSpace(Model.Descripcion)) { <p>@Model.Descripcion</p> }
+
+    @if (Model.Etiquetas.Count > 0)
+    {
+        <p><strong>Etiquetas:</strong>
+            @string.Join(", ", Model.Etiquetas.OrderBy(e => e.Texto, StringComparer.CurrentCulture).Select(e => e.Texto))
+        </p>
+    }
+</div>
+
+<div class="tarjeta">
+    <h2>Archivos</h2>
+    @if (Model.Archivos.Count == 0)
+    {
+        <p>Este estudio no tiene archivos.</p>
+    }
+    else
+    {
+        @* Se listan sin transferir su contenido: nada se descarga hasta que el usuario lo pida (RNF-28). *@
+        <ul>
+            @foreach (var archivo in Model.Archivos.OrderBy(a => a.CargadoEn))
+            {
+                <li>@archivo.NombreOriginal</li>
+            }
+        </ul>
+    }
+
+    <form method="post" enctype="multipart/form-data" asp-action="AgregarArchivos" asp-route-id="@Model.Id">
+        <div class="campo">
+            <label for="archivos">Agregar archivos</label>
+            <input id="archivos" name="archivos" type="file" multiple accept=".pdf,.jpg,.jpeg,.png" />
+        </div>
+        <button type="submit" class="secundario">Agregar</button>
+    </form>
 </div>
 
 <p><a class="boton secundario" asp-action="Index">Volver al listado</a></p>
