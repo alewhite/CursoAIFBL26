@@ -22,11 +22,14 @@ La búsqueda es exclusivamente sobre metadatos cargados a mano: el sistema nunca
 ## Cómo correr
 ```bash
 dotnet restore                  # instalar dependencias
-dotnet ef database update       # aplicar migraciones (requiere dotnet-ef: dotnet tool install --global dotnet-ef)
 dotnet run                      # levantar en desarrollo (URL en Properties/launchSettings.json)
 dotnet test                     # correr tests
 dotnet build                    # verificación de compilación antes de dar algo por terminado
 ```
+Las migraciones se aplican solas al arrancar (`InicializadorDeBaseDeDatos.InicializarAsync`), que además
+reafirma `PRAGMA journal_mode=WAL` y siembra `CuentasIniciales`. `dotnet ef database update` a mano solo hace
+falta para inspeccionar la base (requiere `dotnet tool install --global dotnet-ef`).
+
 Antes de levantar por primera vez: definir la cadena de conexión a SQLite (`Data Source=<ruta>/archivo-medico.db`) y la ruta de almacenamiento de archivos
 por user-secrets (`dotnet user-secrets set`) o variables de entorno, nunca en `appsettings.json` versionado.
 
