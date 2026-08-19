@@ -16,6 +16,16 @@ identificadores RF/RNF/AC, según el Principio II de la constitución del proyec
 
 ---
 
+## Clarificaciones
+
+### Sesión 2026-08-19
+
+- Q: ¿Qué debe ocurrir con el contenido de los archivos cuando se confirma la eliminación de un estudio? → A: Borrado físico: se borran la fila del estudio y los archivos cifrados del disco en la misma operación; el cupo se libera de inmediato y no queda estado "eliminado" en el modelo.
+- Q: Si al crear un estudio uno de los archivos adjuntos falla la validación, ¿qué debe hacer el sistema con el resto? → A: Carga parcial con aviso: el estudio se crea con los archivos válidos y el rechazado se informa junto a ese archivo, indicando el motivo, para poder reintentarlo solo a él.
+- Q: ¿En qué momento debe rechazarse una carga por el cupo compartido de 20 GB? → A: Cuando el tamaño de la carga, sumado a lo ya ocupado, superaría los 20 GB, evaluado antes de escribir nada en el almacenamiento definitivo y medido sobre el espacio ocupado en disco.
+- Q: ¿Qué reglas debe cumplir la fecha de un estudio para considerarse válida? → A: Fecha de calendario sin hora; se rechaza la inexistente o mal formada y la posterior al día de hoy. El filtro por rango incluye ambos extremos.
+- Q: ¿Cómo debe elegir el usuario la institución al filtrar el listado de estudios? → A: Con una lista desplegable de las instituciones distintas presentes en sus propios estudios, ordenadas alfabéticamente y con coincidencia exacta sobre el valor elegido.
+
 ## Escenarios de Usuario y Pruebas *(obligatorio)*
 
 Las historias están ordenadas por prioridad. Cada una es una porción independientemente construible,
@@ -157,13 +167,20 @@ edición ni PWA.
     carga se rechaza informando que se alcanzó el límite de archivos por estudio. *(AC-70)*
 24. **Dado** un almacenamiento compartido que alcanzó los 20 GB, **cuando** cualquier cuenta intenta
     cargar un archivo adicional, **entonces** la carga se rechaza informando el límite. *(AC-55)*
-25. **Dado** ese aviso de límite, **cuando** se muestra al usuario, **entonces** no revela qué cuenta
+25. **Dado** un almacenamiento compartido con espacio libre insuficiente para la carga solicitada,
+    **cuando** el usuario la confirma, **entonces** se rechaza antes de escribir en el almacenamiento
+    definitivo y el total ocupado sigue sin superar los 20 GB. *(FR-037)*
+26. **Dado** ese aviso de límite, **cuando** se muestra al usuario, **entonces** no revela qué cuenta
     consumió el espacio ni ningún metadato de estudios ajenos. *(AC-64)*
-26. **Dado** un usuario que inicia la creación de un estudio con título, fecha y un archivo, **cuando**
+27. **Dado** un usuario que inicia la creación de un estudio con título, fecha y un archivo, **cuando**
     completa la operación, **entonces** atraviesa como máximo tres pantallas o pasos. *(AC-79)*
-27. **Dado** un formulario de creación con el título vacío y un archivo de 0 bytes, **cuando** se envía,
+28. **Dado** un formulario de creación con el título vacío y un archivo de 0 bytes, **cuando** se envía,
     **entonces** el error del título se muestra junto al campo título y el del archivo junto a ese
     archivo, no en un aviso general desvinculado del origen. *(AC-80)*
+29. **Dado** un estudio nuevo con título y fecha válidos y tres archivos de los cuales el segundo es
+    inválido, **cuando** se envía la carga, **entonces** el estudio queda creado con los dos archivos
+    válidos, se informa el motivo de rechazo junto al segundo archivo y este no existe en el
+    almacenamiento definitivo. *(FR-030b)*
 
 ---
 
@@ -246,13 +263,16 @@ paginación.
    aparecen los incluidos en el rango. *(AC-31)*
 9. **Dados** estudios de diferentes instituciones, **cuando** se filtra por una institución,
    **entonces** solo aparecen los estudios asociados. *(AC-34)*
-10. **Dados** estudios de distintas instituciones, **cuando** el usuario busca "ecografía" y filtra por
+10. **Dados** estudios de dos propietarios con instituciones distintas, **cuando** un usuario abre la
+   lista de instituciones del filtro, **entonces** solo figuran las que aparecen en sus propios
+   estudios. *(FR-050, RNF-53)*
+11. **Dados** estudios de distintas instituciones, **cuando** el usuario busca "ecografía" y filtra por
     "Hospital Central", **entonces** solo aparecen los que cumplen ambas condiciones. *(AC-35)*
-11. **Dados** varios filtros activos, **cuando** el usuario elige "Limpiar filtros", **entonces** se
+12. **Dados** varios filtros activos, **cuando** el usuario elige "Limpiar filtros", **entonces** se
     restablece el listado completo. *(AC-36)*
-12. **Dada** una búsqueda con cinco resultados, **cuando** se muestra el listado, **entonces** la
+13. **Dada** una búsqueda con cinco resultados, **cuando** se muestra el listado, **entonces** la
     interfaz informa que se encontraron cinco estudios. *(AC-37)*
-13. **Dada** una colección de 26 estudios, **cuando** se abre el listado, **entonces** se muestran como
+14. **Dada** una colección de 26 estudios, **cuando** se abre el listado, **entonces** se muestran como
     máximo 25 y existe un control para avanzar a la página siguiente. *(AC-54)*
 
 ---
@@ -349,22 +369,31 @@ completo de un estudio ficticio.
 
 ### Casos Límite
 
+- **Fecha en el borde**: un estudio fechado hoy se acepta y uno fechado mañana se rechaza; el filtro por
+  rango devuelve los estudios fechados exactamente en el día inicial y en el día final (FR-017, FR-049).
 - **Sesión al filo**: una solicitud que llega exactamente al minuto 30 de inactividad, o a la hora 24 de
   vida de la sesión, debe resolverse como expirada y exigir autenticación (RNF-04, RNF-05).
 - **Bloqueo y competencia**: intentos fallidos de dos orígenes distintos contra la misma cuenta suman al
   mismo contador; el bloqueo es por cuenta y se acepta que un tercero que conozca un nombre de usuario
   pueda dejar a esa cuenta sin acceso 15 minutos (riesgo aceptado en el PRD).
-- **Sexto archivo sobre el límite y último byte del cupo**: una carga que combine varios archivos debe
-  rechazarse por completo si supera los 20 archivos por estudio o el cupo total de 20 GB, sin dejar
-  archivos parcialmente aceptados ni residuos en el almacenamiento definitivo (RNF-52, RNF-61, RNF-21).
+- **Sexto archivo sobre el límite y último byte del cupo**: una carga debe rechazarse si supera los 20
+  archivos por estudio o si su tamaño llevaría el total por encima de los 20 GB, sin dejar archivos
+  parcialmente aceptados ni residuos en el almacenamiento definitivo (FR-023, FR-037, RNF-21).
 - **Archivo que se corrompe a mitad de la subida**: la conexión se corta con el cuerpo incompleto; el
   usuario debe recibir un aviso de que el archivo no se cargó, y nada debe quedar en el almacenamiento
   definitivo (RF-28, RNF-21).
+- **Carga mixta**: en una carga de varios archivos donde solo algunos son inválidos, los válidos quedan
+  asociados al estudio, los inválidos se informan uno por uno y ninguno de estos últimos llega al
+  almacenamiento definitivo (FR-030, FR-030b).
+- **Todos los archivos rechazados**: si ningún archivo de la carga es válido pero el título y la fecha
+  lo son, el estudio se crea sin archivos y se informa el rechazo de cada uno (FR-030b).
 - **Nombre de archivo hostil**: separadores de ruta, secuencias `..`, caracteres de control, nombres de
   más de 255 caracteres y nombres con marcado que podría interpretarse en la interfaz (RNF-23).
 - **Extensión, tipo declarado y contenido en desacuerdo**: cualquier combinación de las tres que no sea
   coherente se rechaza, incluido un archivo cuyo contenido real sea un formato permitido pero distinto
   del declarado (RNF-15, RNF-16).
+- **Filtro de institución sin opciones**: un usuario cuyos estudios no tienen institución cargada ve la
+  lista de filtro vacía o deshabilitada, no un filtro que no devuelve nada sin explicación (FR-050).
 - **Búsqueda sin resultados y término solo con espacios**: el contador debe informar cero resultados y
   el término normalizado vacío debe comportarse como ausencia de búsqueda, no como error (RF-23,
   RNF-55).
@@ -377,6 +406,12 @@ completo de un estudio ficticio.
   rechaza; el límite se evalúa sobre cuentas activas (RNF-56).
 - **Arranque sin configuración crítica**: sin clave de cifrado o sin cadena de conexión, la aplicación
   no debe iniciar ni atender solicitudes en modo degradado (RNF-62).
+- **Eliminación con el cupo lleno**: eliminado un estudio, el espacio que ocupaban sus archivos vuelve
+  a estar disponible y una carga que antes se rechazaba por cupo debe poder completarse (FR-037,
+  FR-044).
+- **Eliminación a medio camino**: si el borrado del contenido de un archivo falla, el estudio no debe
+  quedar visible con archivos irrecuperables ni el contenido debe quedar huérfano en el almacenamiento
+  (FR-044, RNF-59).
 - **Colección en el techo previsto**: con 2.000 estudios y 20 GB ocupados, búsqueda, listado y paginación
   deben seguir dentro de los tiempos comprometidos (RNF-24, RNF-25).
 
@@ -429,8 +464,9 @@ referencia autoritativa: si esta sección y el PRD difirieran, prevalece el PRD.
 
 - **FR-015**: Los usuarios DEBEN poder crear un estudio médico. *(RF-33, AC-09)*
 - **FR-016**: El sistema DEBE rechazar la creación de un estudio con título vacío. *(RF-34, AC-10)*
-- **FR-017**: El sistema DEBE rechazar la creación de un estudio con fecha ausente o inválida. *(RF-35,
-  AC-11)*
+- **FR-017**: El sistema DEBE rechazar la creación de un estudio con fecha ausente o inválida. La fecha
+  del estudio es una fecha de calendario sin hora, y es inválida si no existe en el calendario, si no
+  respeta el formato esperado o si es posterior al día en curso. *(RF-35, AC-11)*
 - **FR-018**: Los usuarios DEBEN poder registrar el profesional del estudio como texto libre. *(RF-29,
   AC-13)*
 - **FR-019**: Los usuarios DEBEN poder registrar la institución del estudio como texto libre. *(RF-30,
@@ -460,6 +496,11 @@ referencia autoritativa: si esta sección y el PRD difirieran, prevalece el PRD.
   estructural de su formato declarado. *(RNF-17, AC-24, AC-44)*
 - **FR-030**: Los archivos rechazados NO DEBEN permanecer en el almacenamiento definitivo. *(RNF-21,
   AC-27)*
+- **FR-030b**: Cuando una carga incluya varios archivos y alguno sea rechazado, el sistema DEBE aceptar
+  los archivos válidos y crear o actualizar el estudio con ellos, e informar por separado cada archivo
+  rechazado junto a su motivo, sin descartar los válidos ni exigir volver a adjuntarlos. El rechazo de
+  un archivo NO DEBE impedir la creación del estudio cuando el título y la fecha son válidos. *(RNF-32,
+  AC-80; derivado de la sesión de clarificación)*
 - **FR-031**: El sistema DEBE calcular y almacenar una huella SHA-256 por cada archivo cargado. *(RNF-19,
   AC-25)*
 - **FR-032**: Los archivos originales NO DEBEN modificarse durante la carga, la visualización ni la
@@ -475,8 +516,10 @@ referencia autoritativa: si esta sección y el PRD difirieran, prevalece el PRD.
   versionados, y si no puede resolverse desde la configuración externa la aplicación DEBE fallar al
   iniciar en lugar de almacenar archivos sin cifrar. *(RNF-62, AC-83)*
 - **FR-037**: El sistema DEBE limitar el almacenamiento total de archivos a 20 GB compartidos entre todas
-  las cuentas, rechazar nuevas cargas al alcanzarlo e informar el límite sin revelar qué cuenta consumió
-  el espacio ni metadatos ajenos. *(RNF-52, AC-55, AC-64)*
+  las cuentas, e informar el límite sin revelar qué cuenta consumió el espacio ni metadatos ajenos.
+  DEBE rechazar toda carga cuyo tamaño, sumado al espacio ya ocupado, superaría el cupo, evaluando la
+  condición antes de escribir nada en el almacenamiento definitivo, de modo que el total nunca lo exceda.
+  El espacio se mide por el que los archivos ocupan en disco. *(RNF-52, AC-55, AC-64)*
 
 **Consulta, descarga y eliminación**
 
@@ -492,7 +535,11 @@ referencia autoritativa: si esta sección y el PRD difirieran, prevalece el PRD.
 - **FR-043**: El sistema DEBE solicitar confirmación explícita antes de eliminar un estudio y NO DEBE
   eliminarlo si la confirmación se cancela. *(RF-13, RNF-33, AC-17, AC-18)*
 - **FR-044**: El sistema DEBE eliminar el estudio y sus archivos asociados cuando la eliminación se
-  confirma. *(RF-14, AC-19)*
+  confirma. La eliminación es física y definitiva: la misma operación DEBE borrar los metadatos del
+  estudio y el contenido cifrado de cada uno de sus archivos del almacenamiento, sin conservar estado
+  "eliminado" ni copia recuperable desde la aplicación. El espacio liberado DEBE volver a estar
+  disponible en el cupo compartido de inmediato. *(RF-14, AC-19; el historial de eliminaciones está
+  fuera de alcance)*
 - **FR-045**: Los archivos privados NO DEBEN estar disponibles mediante URLs públicas permanentes, y toda
   entrega DEBE validar autenticación y autorización. *(RNF-06, RNF-08, AC-84, AC-02)*
 - **FR-046**: Las URLs temporales de acceso a archivos DEBEN expirar en un máximo de 5 minutos. *(RNF-07,
@@ -504,8 +551,12 @@ referencia autoritativa: si esta sección y el PRD difirieran, prevalece el PRD.
   y etiquetas. *(RF-16, AC-29, AC-30, AC-71, AC-72, AC-73)*
 - **FR-048**: La búsqueda y los filtros de texto libre DEBEN ser insensibles a mayúsculas y acentos e
   ignorar los espacios al inicio y al final del término ingresado. *(RNF-55, AC-45, AC-46)*
-- **FR-049**: Los usuarios DEBEN poder filtrar estudios por rango de fechas. *(RF-17, AC-31)*
-- **FR-050**: Los usuarios DEBEN poder filtrar estudios por institución. *(RF-20, AC-34)*
+- **FR-049**: Los usuarios DEBEN poder filtrar estudios por rango de fechas, con ambos extremos
+  incluidos en el resultado y cada extremo opcional por separado. *(RF-17, AC-31)*
+- **FR-050**: Los usuarios DEBEN poder filtrar estudios por institución eligiéndola de una lista de las
+  instituciones distintas presentes en sus propios estudios, ordenada alfabéticamente. La coincidencia
+  DEBE ser exacta sobre el valor elegido, y la lista NO DEBE incluir instituciones provenientes de
+  estudios de otra cuenta. *(RF-20, RNF-53, AC-34)*
 - **FR-051**: Los usuarios DEBEN poder combinar la búsqueda textual con uno o más filtros. *(RF-21,
   AC-35)*
 - **FR-052**: Los usuarios DEBEN poder limpiar todos los filtros con una única acción. *(RF-22, AC-36)*
@@ -569,8 +620,9 @@ referencia autoritativa: si esta sección y el PRD difirieran, prevalece el PRD.
 - **Cuenta**: identidad de un integrante del grupo familiar. Atributos: nombre de usuario, correo,
   credencial almacenada de forma irreversible, estado activo. Máximo 5 activas. Se da de alta y se
   restablece fuera de la aplicación. No tiene roles ni visibilidad sobre otras cuentas.
-- **Estudio**: unidad de organización del repositorio. Atributos: título (obligatorio), fecha
-  (obligatoria y válida), profesional, institución, descripción, etiquetas y propietario. Agrupa de 0 a
+- **Estudio**: unidad de organización del repositorio. Atributos: título (obligatorio), fecha del
+  estudio (obligatoria, fecha de calendario sin hora, no posterior al día en curso), profesional,
+  institución, descripción, etiquetas y propietario. Agrupa de 0 a
   20 archivos. Todo estudio pertenece a exactamente una cuenta y nunca cambia de propietario.
 - **Archivo asociado**: documento adjunto a un estudio. Atributos: nombre original sanitizado, formato,
   tamaño, huella SHA-256, referencia al contenido almacenado bajo un identificador GUID, propietario
