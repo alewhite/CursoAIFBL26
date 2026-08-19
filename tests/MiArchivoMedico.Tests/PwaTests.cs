@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using MiArchivoMedico.Tests.Infraestructura;
 
 namespace MiArchivoMedico.Tests;
@@ -62,5 +63,74 @@ public class PwaTests : IAsyncLifetime
             Assert.Equal("image/png", respuesta.Content.Headers.ContentType?.MediaType);
             Assert.NotEmpty(await respuesta.Content.ReadAsByteArrayAsync());
         }
+    }
+
+    [Fact(DisplayName = "AC-40: la pantalla sin conexión se resuelve sin sesión y no contiene datos médicos")]
+    public async Task PantallaSinConexion_SeSirveSinSesionYSinDatosMedicos()
+    {
+        var cliente = _app.CrearCliente();
+
+        var respuesta = await cliente.GetAsync("/sin-conexion");
+
+        Assert.Equal(HttpStatusCode.OK, respuesta.StatusCode);
+
+        var html = await respuesta.Content.ReadAsStringAsync();
+        Assert.Contains("Sin conexión", html);
+        Assert.Contains("No hay conexión a internet", html);
+
+        // No enlaza ni nombra nada de la aplicación privada: es una pantalla terminal, no una portada.
+        Assert.DoesNotContain("/Estudios", html);
+        Assert.DoesNotContain("/Archivos", html);
+    }
+
+    [Fact(DisplayName = "AC-41: la pantalla sin conexión es idéntica con sesión y sin ella")]
+    public async Task PantallaSinConexion_NoDependeDeLaSesion()
+    {
+        var anonimo = _app.CrearCliente();
+        var autenticado = _app.CrearCliente();
+        await autenticado.IniciarSesionAsync(AplicacionDePrueba.Usuario, AplicacionDePrueba.Contrasena);
+
+        var sinSesion = await anonimo.GetStringAsync("/sin-conexion");
+        var conSesion = await autenticado.GetStringAsync("/sin-conexion");
+
+        // El service worker guarda una sola copia y la muestra a quien sea: si la página variara según la
+        // sesión, esa copia podría exponer algo de la cuenta que la guardó.
+        Assert.Equal(sinSesion, conSesion);
+    }
+
+    [Fact(DisplayName = "AC-41: el service worker solo precarga recursos que se resuelven sin sesión")]
+    public async Task ServiceWorker_SoloPrecargaRecursosAnonimos()
+    {
+        var cliente = _app.CrearCliente();
+
+        var codigo = await cliente.GetStringAsync("/sw.js");
+        var precargados = ExtraerListaDeEstaticos(codigo);
+
+        Assert.NotEmpty(precargados);
+        Assert.Contains("/sin-conexion", precargados);
+
+        foreach (var ruta in precargados)
+        {
+            var respuesta = await cliente.GetAsync(ruta);
+
+            // Una ruta privada acá respondería con la redirección al inicio de sesión, y eso significaría
+            // que el service worker está por guardar en el navegador algo que exige autenticación.
+            Assert.Equal(HttpStatusCode.OK, respuesta.StatusCode);
+        }
+    }
+
+    /// <summary>Lee la lista ESTATICOS del service worker tal como la ejecutaría el navegador.</summary>
+    private static List<string> ExtraerListaDeEstaticos(string codigo)
+    {
+        var lista = Regex.Match(codigo, @"const ESTATICOS = \[(?<cuerpo>.*?)\];", RegexOptions.Singleline);
+        Assert.True(lista.Success, "El service worker ya no declara la lista ESTATICOS.");
+
+        return Regex.Matches(lista.Groups["cuerpo"].Value, @"'(?<ruta>[^']+)'")
+            .Select(m => m.Groups["ruta"].Value)
+            .Concat(Regex.IsMatch(lista.Groups["cuerpo"].Value, @"\bPANTALLA_SIN_CONEXION\b")
+                ? ["/sin-conexion"]
+                : Array.Empty<string>())
+            .Distinct()
+            .ToList();
     }
 }
