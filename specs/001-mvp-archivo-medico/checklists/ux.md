@@ -46,10 +46,10 @@ inequívocos, consistentes entre sí y verificables objetivamente, antes de pasa
 - [x] CHK015 - ¿Está definido qué cuenta como "pantalla o paso" —si un diálogo de confirmación o una
       validación fallida suman—, de modo que el máximo de tres sea inequívoco?
       [Ambigüedad, Spec §FR-024]
-- [ ] CHK016 - ¿Está definido "utilizable" a 360 píxeles más allá de la ausencia de desplazamiento
+- [x] CHK016 - ¿Está definido "utilizable" a 360 píxeles más allá de la ausencia de desplazamiento
       horizontal, por ejemplo respecto de qué debe quedar visible sin desplazarse?
       [Ambigüedad, Spec §FR-059]
-- [ ] CHK017 - ¿Está definida la relación espacial que satisface "junto al campo o al archivo", de modo
+- [x] CHK017 - ¿Está definida la relación espacial que satisface "junto al campo o al archivo", de modo
       que pueda decidirse sin criterio personal si un mensaje la cumple? [Ambigüedad, Spec §FR-025]
 - [x] CHK018 - ¿Está definido qué distingue "visualizar dentro de la aplicación" de abrir el archivo en
       otra pestaña o en el visor del sistema operativo? [Ambigüedad, Spec §FR-039]
@@ -67,7 +67,7 @@ inequívocos, consistentes entre sí y verificables objetivamente, antes de pasa
 - [ ] CHK023 - ¿Es consistente el criterio de ubicación de los mensajes entre el error de validación de un
       campo, el aviso de carga interrumpida y el aviso de cupo alcanzado, o cada uno queda librado a su
       propio requisito? [Consistencia, Spec §FR-025, §FR-058, §FR-037]
-- [ ] CHK024 - ¿Se aplica un mismo criterio de redacción y ubicación a los tres límites que el sistema
+- [x] CHK024 - ¿Se aplica un mismo criterio de redacción y ubicación a los tres límites que el sistema
       informa —20 archivos por estudio, 50 MB por archivo, 20 GB de cupo—?
       [Consistencia, Spec §FR-023, §FR-027, §FR-037]
 - [x] CHK025 - ¿Es consistente el requisito de no transferir contenido de archivos hasta que se lo pida
@@ -87,12 +87,12 @@ inequívocos, consistentes entre sí y verificables objetivamente, antes de pasa
       resultado en dos evaluaciones? [Medibilidad, Spec §AC-39]
 - [x] CHK029 - ¿Puede evaluarse objetivamente el criterio de los tres pasos sin haber definido antes qué
       es un paso? [Medibilidad, Spec §AC-79, §FR-024]
-- [ ] CHK030 - ¿Es objetivamente verificable que el contenido "queda visible sin que el usuario deba
+- [x] CHK030 - ¿Es objetivamente verificable que el contenido "queda visible sin que el usuario deba
       descargarlo"? [Medibilidad, Spec §AC-15]
-- [ ] CHK031 - ¿Está definido el procedimiento de medición de los tiempos de tarea —quién los ejecuta, con
+- [x] CHK031 - ¿Está definido el procedimiento de medición de los tiempos de tarea —quién los ejecuta, con
       qué colección, cuántas repeticiones—, o los criterios de 60 y 10 segundos quedan sin forma de
       darse por cumplidos? [Medibilidad, Spec §SC-001, §SC-002]
-- [ ] CHK032 - ¿Está definido cómo se comprueba que un mensaje aparece "junto" a su origen y no en un
+- [x] CHK032 - ¿Está definido cómo se comprueba que un mensaje aparece "junto" a su origen y no en un
       aviso general? [Medibilidad, Spec §AC-80]
 
 ## Cobertura de Escenarios y Casos Límite
@@ -101,7 +101,7 @@ inequívocos, consistentes entre sí y verificables objetivamente, antes de pasa
       falla por validación? [Cobertura, Recuperación, Spec §FR-025]
 - [x] CHK034 - ¿Están definidos requisitos para el listado con una sola página, donde los controles de
       paginación no tienen destino? [Cobertura, Caso límite, Spec §FR-054]
-- [ ] CHK035 - ¿Está especificado el comportamiento esperado cuando el mismo usuario tiene la aplicación
+- [x] CHK035 - ¿Está especificado el comportamiento esperado cuando el mismo usuario tiene la aplicación
       abierta en dos dispositivos y edita el mismo estudio? [Cobertura, Escenario alterno, Spec §FR-022]
 - [ ] CHK036 - ¿Están definidos requisitos para una conexión lenta pero no caída, distinta del corte que
       contempla el aviso de carga interrumpida? [Cobertura, Excepción, Spec §FR-058]
@@ -128,7 +128,7 @@ inequívocos, consistentes entre sí y verificables objetivamente, antes de pasa
       aplicación? [Supuesto, Spec §FR-055]
 - [x] CHK043 - ¿Está validado el supuesto de que no hacen falta enlaces marcables a un listado filtrado,
       ahora que la búsqueda no viaja en la dirección? [Supuesto, Spec §FR-048b]
-- [ ] CHK044 - ¿Está documentado el supuesto de que el usuario opera con una única cuenta por dispositivo,
+- [x] CHK044 - ¿Está documentado el supuesto de que el usuario opera con una única cuenta por dispositivo,
       sin necesidad de cambiar de cuenta dentro de la aplicación? [Supuesto, Spec §FR-004]
 
 ## Notas

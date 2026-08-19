@@ -26,7 +26,7 @@ antes de pasar a `/speckit-plan` y `/speckit-tasks`
 - [x] CHK006 - ¿Está definido el método y el entorno con que se miden los percentiles de respuesta sobre
       una colección de 2.000 estudios, y si esa medición forma parte de la suite habitual?
       [Hueco, Spec §AC-51, §AC-52]
-- [ ] CHK007 - ¿Está definido cómo se reproduce una conexión de 10 Mbps para dar por cumplido el criterio
+- [x] CHK007 - ¿Está definido cómo se reproduce una conexión de 10 Mbps para dar por cumplido el criterio
       de carga en menos de 15 segundos? [Hueco, Spec §AC-53]
 - [x] CHK008 - ¿Está declarado que la negociación de TLS y la redirección desde HTTP se evalúan sobre un
       entorno desplegado y no sobre la aplicación en pruebas? [Hueco, Spec §AC-56]
@@ -46,9 +46,9 @@ antes de pasar a `/speckit-plan` y `/speckit-tasks`
 - [x] CHK013 - ¿Está registrado en el spec el listado de requisitos que `PRD2.md` declara verificables por
       inspección documental, de configuración o de dependencias, de modo que no se los confunda con
       huecos de cobertura? [Trazabilidad, Spec §Supuestos]
-- [ ] CHK014 - ¿Está definido qué constituye evidencia suficiente para dar por cumplido un requisito
+- [x] CHK014 - ¿Está definido qué constituye evidencia suficiente para dar por cumplido un requisito
       verificado por inspección, y quién la registra? [Hueco, Spec §FR-069, §FR-070]
-- [ ] CHK015 - ¿Está definido el alcance de la búsqueda de datos médicos sobre logs y métricas: qué
+- [x] CHK015 - ¿Está definido el alcance de la búsqueda de datos médicos sobre logs y métricas: qué
       canales se recolectan, durante qué operaciones y con qué nivel de detalle habilitado?
       [Medibilidad, Spec §AC-43, §AC-85]
 - [x] CHK016 - ¿Está definido cómo se enumeran "todas las rutas expuestas" para dar por cumplidos los
@@ -78,13 +78,13 @@ antes de pasar a `/speckit-plan` y `/speckit-tasks`
 
 ## Medibilidad de los Criterios de Éxito
 
-- [ ] CHK025 - ¿Está definido el procedimiento de medición de los tiempos de tarea, incluyendo quién los
+- [x] CHK025 - ¿Está definido el procedimiento de medición de los tiempos de tarea, incluyendo quién los
       ejecuta, sobre qué colección y cuántas repeticiones? [Medibilidad, Spec §SC-001, §SC-002]
 - [ ] CHK026 - ¿Está definido qué se cuenta como "intento de acceso cruzado ensayado" para poder afirmar
       que fueron cero las entregas indebidas? [Medibilidad, Spec §SC-007]
 - [ ] CHK027 - ¿Es evaluable el criterio de mantener el costo mensual dentro del límite, y está definido
       quién lo mide y con qué periodicidad? [Medibilidad, Spec §SC-014]
-- [ ] CHK028 - ¿Está definido el momento y el responsable de dar por validados los criterios de aceptación
+- [x] CHK028 - ¿Está definido el momento y el responsable de dar por validados los criterios de aceptación
       al 100 %, dado que ese criterio de éxito depende de todos los demás? [Medibilidad, Spec §SC-015]
 - [ ] CHK029 - ¿Se distinguen los criterios de éxito que se evalúan una vez antes de entregar de los que
       exigen observación continua en operación? [Claridad, Spec §SC-013, §SC-014]

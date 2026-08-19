@@ -90,12 +90,12 @@ inequívocos, consistentes entre sí y verificables objetivamente, antes de pasa
 
 ## Calidad de los Criterios de Aceptación
 
-- [ ] CHK031 - ¿Es objetivamente medible el criterio que verifica el cifrado, dado que comprobar que los
+- [x] CHK031 - ¿Es objetivamente medible el criterio que verifica el cifrado, dado que comprobar que los
       bytes "no corresponden al original en claro" lo satisface también un cifrado débil?
       [Medibilidad, Spec §AC-57]
 - [x] CHK032 - ¿Es objetivamente verificable el requisito de no usar contenido médico para entrenar
       modelos, o depende enteramente de una declaración? [Medibilidad, Spec §FR-063]
-- [ ] CHK033 - ¿Está definido el universo sobre el que se busca la ausencia de datos médicos en logs y
+- [x] CHK033 - ¿Está definido el universo sobre el que se busca la ausencia de datos médicos en logs y
       métricas —qué canales se recolectan y durante qué operaciones—, de modo que el criterio pueda darse
       por cumplido? [Medibilidad, Spec §AC-43, §AC-85]
 - [x] CHK034 - ¿Está especificado que el mensaje ante credenciales inválidas debe ser indistinguible
@@ -107,7 +107,7 @@ inequívocos, consistentes entre sí y verificables objetivamente, antes de pasa
 
 - [x] CHK036 - ¿Está definido qué ocurre cuando la duración máxima de la sesión vence en medio de una
       carga en curso? [Cobertura, Excepción, Spec §FR-006]
-- [ ] CHK037 - ¿Están especificados requisitos para el escenario de recuperación tras pérdida de la clave
+- [x] CHK037 - ¿Están especificados requisitos para el escenario de recuperación tras pérdida de la clave
       de cifrado, aunque sea para declarar que los archivos son irrecuperables?
       [Cobertura, Recuperación, Spec §FR-068]
 - [x] CHK038 - ¿Está definido el comportamiento esperado ante solicitudes simultáneas de la misma cuenta
@@ -121,9 +121,9 @@ inequívocos, consistentes entre sí y verificables objetivamente, antes de pasa
 
 ## Dependencias y Supuestos
 
-- [ ] CHK041 - ¿Está validado el supuesto de que existe un canal de métricas técnicas, o el requisito que
+- [x] CHK041 - ¿Está validado el supuesto de que existe un canal de métricas técnicas, o el requisito que
       lo restringe carece de objeto? [Supuesto, Spec §FR-062]
-- [ ] CHK042 - ¿Está documentado quién custodia la clave de cifrado y bajo qué procedimiento, dado que el
+- [x] CHK042 - ¿Está documentado quién custodia la clave de cifrado y bajo qué procedimiento, dado que el
       requisito solo exige que esté fuera del entorno y de los respaldos? [Supuesto, Spec §FR-068]
 - [x] CHK043 - ¿Está registrado como decisión explícita, con su justificación, que el bloqueo por
       intentos fallidos opera por cuenta y habilita una denegación de servicio dirigida?
