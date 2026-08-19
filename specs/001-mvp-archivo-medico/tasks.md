@@ -38,14 +38,14 @@ eso es un commit, aunque la historia esté a medio camino.
 
 **Propósito**: crear el árbol, las dependencias y la configuración. Nada de dominio todavía.
 
-- [ ] T001 Crear la solución `MiArchivoMedico.sln` en la raíz del repositorio
-- [ ] T002 Crear el proyecto web ASP.NET Core MVC sobre .NET 8 en `src/MiArchivoMedico.Web/MiArchivoMedico.Web.csproj`
-- [ ] T003 Crear el proyecto de tests xUnit en `tests/MiArchivoMedico.Tests/MiArchivoMedico.Tests.csproj` con referencia al proyecto web
-- [ ] T004 [P] Agregar los paquetes de datos e identidad (`Microsoft.EntityFrameworkCore.Sqlite`, `Microsoft.EntityFrameworkCore.Design`, `Microsoft.AspNetCore.Identity.EntityFrameworkCore`) en `src/MiArchivoMedico.Web/MiArchivoMedico.Web.csproj`
-- [ ] T005 [P] Agregar `SixLabors.ImageSharp` fijado en `3.1.12` en `src/MiArchivoMedico.Web/MiArchivoMedico.Web.csproj`, con comentario de que la línea 4.x exige licencia paga y rompe RNF-45
-- [ ] T006 [P] Agregar los paquetes de prueba (`Microsoft.AspNetCore.Mvc.Testing`, `Microsoft.Extensions.TimeProvider.Testing`, `SixLabors.ImageSharp`) en `tests/MiArchivoMedico.Tests/MiArchivoMedico.Tests.csproj`
-- [ ] T007 [P] Crear `.gitignore` en la raíz excluyendo `bin/`, `obj/`, `*.db`, `*.db-wal`, `*.db-shm` y la carpeta de almacenamiento local (RNF-34)
-- [ ] T008 Crear `src/MiArchivoMedico.Web/appsettings.json` sin ningún secreto, y documentar en él que la cadena de conexión, la ruta y la clave de cifrado se cargan por user-secrets o variables de entorno
+- [X] T001 Crear la solución `MiArchivoMedico.sln` en la raíz del repositorio
+- [X] T002 Crear el proyecto web ASP.NET Core MVC sobre .NET 8 en `src/MiArchivoMedico.Web/MiArchivoMedico.Web.csproj`
+- [X] T003 Crear el proyecto de tests xUnit en `tests/MiArchivoMedico.Tests/MiArchivoMedico.Tests.csproj` con referencia al proyecto web
+- [X] T004 [P] Agregar los paquetes de datos e identidad (`Microsoft.EntityFrameworkCore.Sqlite`, `Microsoft.EntityFrameworkCore.Design`, `Microsoft.AspNetCore.Identity.EntityFrameworkCore`) en `src/MiArchivoMedico.Web/MiArchivoMedico.Web.csproj`
+- [X] T005 [P] Agregar `SixLabors.ImageSharp` fijado en `3.1.12` en `src/MiArchivoMedico.Web/MiArchivoMedico.Web.csproj`, con comentario de que la línea 4.x exige licencia paga y rompe RNF-45
+- [X] T006 [P] Agregar los paquetes de prueba (`Microsoft.AspNetCore.Mvc.Testing`, `Microsoft.Extensions.TimeProvider.Testing`, `SixLabors.ImageSharp`) en `tests/MiArchivoMedico.Tests/MiArchivoMedico.Tests.csproj`
+- [X] T007 [P] Crear `.gitignore` en la raíz excluyendo `bin/`, `obj/`, `*.db`, `*.db-wal`, `*.db-shm` y la carpeta de almacenamiento local (RNF-34)
+- [X] T008 Crear `src/MiArchivoMedico.Web/appsettings.json` sin ningún secreto, y documentar en él que la cadena de conexión, la ruta y la clave de cifrado se cargan por user-secrets o variables de entorno
 
 **Punto de control**: `dotnet build` compila una solución vacía pero completa.
 
