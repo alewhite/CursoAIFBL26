@@ -6,6 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <IsPackable>false</IsPackable>
     <RootNamespace>MiArchivoMedico.Tests</RootNamespace>
+    <!-- La configuración de cobertura se aplica sola en `dotnet test`, sin pasar la opción settings. -->
+    <RunSettingsFilePath>$(MSBuildThisFileDirectory)../../coverlet.runsettings</RunSettingsFilePath>
   </PropertyGroup>
 
   <ItemGroup>

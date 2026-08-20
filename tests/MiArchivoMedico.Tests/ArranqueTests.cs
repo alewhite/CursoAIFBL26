@@ -20,7 +20,10 @@ public class ArranqueTests
     [Fact]
     public void Host_Arranca_Y_Resuelve_El_Contenedor()
     {
-        using var fabrica = new WebApplicationFactory<Program>();
+        // `AppFactory` y no `WebApplicationFactory<Program>` a secas: desde el Bloque 2 la
+        // aplicación aborta el arranque si no le declaran la ruta de la base, y este test verifica
+        // que el host arranca, no que la configuración falte.
+        using var fabrica = new AppFactory();
 
         // A propósito no se solicita ninguna ruta: FEAT-001b instalará autorización por defecto
         // en todas las rutas, y un smoke test apoyado en una ruta anónima obligaría a aquel
@@ -104,7 +107,8 @@ public class ArranqueTests
         // aplicación no expone ninguna ruta ni ninguna clave de configuración para esto. Aun así
         // se ejercita el pipeline real —el manejador genérico que arma `Program.cs`— porque el
         // filtro se monta por detrás de él.
-        using var fabrica = new WebApplicationFactory<Program>()
+        using var fabricaConBase = new AppFactory();
+        using var fabrica = fabricaConBase
             .WithWebHostBuilder(constructor =>
             {
                 constructor.UseEnvironment("Production");

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat code coverage">
+        <Configuration>
+          <Format>cobertura</Format>
+          <!--
+            Se excluye `Migrations/` de la medición de cobertura (NFR-06, AC-09) porque es código
+            generado por `dotnet ef migrations add`, no escrito a mano:
+
+            - `AppDbContextModelSnapshot.cs` es una descripción declarativa del modelo que usa la
+              herramienta para calcular la próxima migración. Por definición no lo ejecuta nadie en
+              tiempo de ejecución, así que su cobertura es 0 % de manera permanente e inevitable.
+            - El `Down()` de cada migración solo correría en una reversión de esquema, y tanto
+              ADR-001 como la sección "Reversión" de la spec descartan revertir migraciones.
+
+            Medir estas líneas no informa sobre la calidad del código propio: solo diluye el
+            porcentaje global con código que ninguna prueba puede ni debe ejercitar. Se excluye por
+            archivo y no con `[ExcludeFromCodeCoverage]` porque el atributo obligaría a editar
+            archivos generados, y EF regenera el snapshot completo en cada `migrations add`, con lo
+            que el atributo desaparecería solo en el próximo cambio de esquema.
+          -->
+          <ExcludeByFile>**/Migrations/*.cs</ExcludeByFile>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>
