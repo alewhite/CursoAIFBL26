@@ -8,3 +8,22 @@
 .daw-sessions/
 .daw-journal.jsonl
 # END DAW
+
+# Artefactos de compilación de .NET
+bin/
+obj/
+
+# Bases de datos SQLite y sus archivos auxiliares: nunca se versionan (NFR-04).
+*.db
+*.db-wal
+*.db-shm
+
+# Configuración local con secretos: nunca se versiona.
+appsettings.*.local.json
+
+# Resultados de tests y cobertura
+TestResults/
+
+# Artefactos de tooling en Python (scripts de DAW)
+__pycache__/
+*.pyc
