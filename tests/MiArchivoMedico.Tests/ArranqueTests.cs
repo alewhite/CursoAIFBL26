@@ -56,7 +56,7 @@ public class ArranqueTests
         // fija el host que ya arrancó y el segundo el .csproj. El riesgo que E1.1 dice mitigar
         // —que la máquina resuelva un SDK distinto de 8.0.x— solo lo cubre el archivo mismo, así
         // que se afirma su contenido real y no un efecto que sobreviviría a su borrado.
-        var rutaGlobalJson = Path.Combine(RaizDelRepositorio(), "global.json");
+        var rutaGlobalJson = Path.Combine(Repositorio.RaizDelRepositorio(), "global.json");
         Assert.True(File.Exists(rutaGlobalJson), $"No se encontró global.json en '{rutaGlobalJson}'.");
 
         using var documento = JsonDocument.Parse(File.ReadAllText(rutaGlobalJson));
@@ -84,7 +84,7 @@ public class ArranqueTests
     [Fact]
     public void Repositorio_Ignora_Artefactos_De_Build_Y_Bases()
     {
-        var rutaGitignore = Path.Combine(RaizDelRepositorio(), ".gitignore");
+        var rutaGitignore = Path.Combine(Repositorio.RaizDelRepositorio(), ".gitignore");
         Assert.True(File.Exists(rutaGitignore), $"No se encontró .gitignore en '{rutaGitignore}'.");
 
         var patrones = File.ReadAllLines(rutaGitignore)
@@ -139,21 +139,6 @@ public class ArranqueTests
         {
             Assert.DoesNotContain(filtracion, cuerpo, StringComparison.OrdinalIgnoreCase);
         }
-    }
-
-    /// <summary>Sube desde el directorio de ejecución hasta el directorio que contiene `.git`.</summary>
-    private static string RaizDelRepositorio()
-    {
-        var directorio = new DirectoryInfo(AppContext.BaseDirectory);
-
-        // En un worktree enlazado `.git` es un archivo, no un directorio: de ahí `Path.Exists`.
-        while (directorio is not null && !Path.Exists(Path.Combine(directorio.FullName, ".git")))
-        {
-            directorio = directorio.Parent;
-        }
-
-        Assert.NotNull(directorio);
-        return directorio.FullName;
     }
 }
 

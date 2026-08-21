@@ -1,4 +1,6 @@
+using MiArchivoMedico.Web.Accounts;
 using MiArchivoMedico.Web.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +18,39 @@ var ubicacionDeLaBase = SqliteLocation.Resolver(builder.Configuration, builder.E
 builder.Services.AddDbContext<AppDbContext>(opciones =>
     opciones.UseSqlite(ubicacionDeLaBase.CadenaDeConexion));
 
+// `AddIdentityCore` y no `AddIdentity<,>`: la segunda instala además el esquema de autenticación
+// por cookies con sus valores por defecto —14 días, deslizante—, que es justamente la política que
+// FEAT-001c tiene que endurecer, y la dejaría decidida por omisión antes de que nadie la decida.
+builder.Services
+    .AddIdentityCore<AppUser>(opciones =>
+    {
+        // NFR-03 exige el mínimo de longitud y nada más: las reglas de composición serían alcance
+        // no pedido. El mínimo lo aplica este mecanismo central, nunca una comprobación propia.
+        opciones.Password.RequiredLength = AccountProvisioner.LongitudMinimaDeLaContrasena;
+        opciones.Password.RequireDigit = false;
+        opciones.Password.RequireLowercase = false;
+        opciones.Password.RequireUppercase = false;
+        opciones.Password.RequireNonAlphanumeric = false;
+        opciones.Password.RequiredUniqueChars = 1;
+    })
+    .AddEntityFrameworkStores<AppDbContext>();
+
+// Parámetros del hash fijados en código y no en configuración externa (ADR-002): un despliegue con
+// `IterationCount: 1000` arrancaría sin que nada avisara.
+builder.Services.Configure<PasswordHasherOptions>(opciones =>
+{
+    opciones.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV3;
+    opciones.IterationCount = AccountProvisioner.IteracionesDePbkdf2;
+});
+
+// Las altas llegan por variables de entorno o user-secrets, jamás por un archivo versionado
+// (ADR-003, M-2). Se enlazan de forma diferida: el host de pruebas agrega su fuente de
+// configuración durante `Build()`, después de esta línea.
+builder.Services.Configure<AccountSeedOptions>(
+    builder.Configuration.GetSection(AccountSeedOptions.SeccionDeLaAplicacion));
+
+builder.Services.AddScoped<AccountProvisioner>();
+
 var app = builder.Build();
 
 // Modo WAL y migraciones, en ese orden y antes de cualquier otra cosa que toque la base (FR-04,
@@ -25,6 +60,10 @@ ubicacionDeLaBase.PrepararEnModoWal();
 using (var alcanceDeArranque = app.Services.CreateScope())
 {
     alcanceDeArranque.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
+
+    // La siembra corre DESPUÉS de las migraciones —escribe sobre el esquema de Identity— y sus
+    // rechazos no abortan el arranque: la aplicación levanta con las cuentas válidas (AC-03, AC-04).
+    await alcanceDeArranque.ServiceProvider.GetRequiredService<AccountProvisioner>().SembrarAsync();
 }
 
 // Manejo de errores: es lo ÚNICO que este sub-ticket configura en el pipeline. La autenticación,
