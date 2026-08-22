@@ -60,6 +60,12 @@ public class CuentaController(SignInManager<AppUser> signInManager, UserManager<
         // Fracaso: usuario inexistente, contraseña incorrecta, o cualquier otro motivo.
         // Mensaje único e indistinguible entre casos (AC-04).
         ModelState.AddModelError(string.Empty, "Nombre de usuario o contraseña no válidos");
+
+        // La contraseña nunca se re-renderiza en el HTML de la respuesta de rechazo (O6, AC-06,
+        // E3.1). FormTagHelper con [DataType(Password)] no renderiza el value del input, pero para
+        // ser explícito y defensivo, se limpia el modelo.
+        modelo.Contrasena = null;
+
         return View(modelo);
     }
 
@@ -80,8 +86,10 @@ public class CuentaController(SignInManager<AppUser> signInManager, UserManager<
     /// ruta por defecto (Program.cs). Exige autenticación (FallbackPolicy). Lee `User.Identity.Name`
     /// del `ClaimsPrincipal` sin consultar la base de datos y devuelve la vista con el nombre
     /// de la cuenta (AC-06, FR-04). No contiene datos médicos ni datos de otras cuentas.
+    /// La directiva [ResponseCache] previene que el navegador cachee esta página autenticada (O5).
     /// </summary>
     [Route("/")]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public IActionResult Privada()
     {
         var nombreDeUsuario = User.Identity!.Name;

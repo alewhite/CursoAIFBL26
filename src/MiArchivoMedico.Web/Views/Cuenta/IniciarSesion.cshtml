@@ -1,0 +1,25 @@
+@model MiArchivoMedico.Web.ViewModels.IniciarSesionViewModel
+
+@{
+    ViewData["Title"] = "Iniciar sesión";
+}
+
+<h1>Iniciar sesión</h1>
+
+<form method="post" asp-controller="Cuenta" asp-action="IniciarSesion">
+    <div asp-validation-summary="ModelOnly"></div>
+
+    <div>
+        <label asp-for="NombreDeUsuario"></label>
+        <input asp-for="NombreDeUsuario" />
+        <span asp-validation-for="NombreDeUsuario"></span>
+    </div>
+
+    <div>
+        <label asp-for="Contrasena"></label>
+        <input asp-for="Contrasena" />
+        <span asp-validation-for="Contrasena"></span>
+    </div>
+
+    <button type="submit">Iniciar sesión</button>
+</form>
