@@ -103,23 +103,23 @@ public class ArranqueTests
     [Fact]
     public async Task Fuera_De_Desarrollo_No_Expone_Pagina_De_Error_Detallada()
     {
-        // La excepción la provoca un middleware que vive SOLO en el proceso de tests: la
-        // aplicación no expone ninguna ruta ni ninguna clave de configuración para esto. Aun así
-        // se ejercita el pipeline real —el manejador genérico que arma `Program.cs`— porque el
-        // filtro se monta por detrás de él.
+        // La excepción la provoca un controlador que vive SOLO en el proceso de tests (E1.4 de
+        // FEAT-001b): ControladorDePruebasDeExcepcion se registra via AddApplicationPart del
+        // ensamblado de tests. La aplicación no expone ninguna ruta ni ninguna clave de
+        // configuración para esto. Aun así se ejercita el pipeline real —el manejador genérico
+        // que arma `Program.cs`— porque el controlador queda por delante de la autorización en
+        // el enrutado (tiene [AllowAnonymous]).
         using var fabricaConBase = new AppFactory();
         using var fabrica = fabricaConBase
             .WithWebHostBuilder(constructor =>
             {
                 constructor.UseEnvironment("Production");
-                constructor.ConfigureServices(servicios =>
-                    servicios.AddSingleton<IStartupFilter, FiltroQueProvocaUnaExcepcion>());
             });
 
         using var cliente = fabrica.CreateClient(
             new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
 
-        var respuesta = await cliente.GetAsync("/");
+        var respuesta = await cliente.PostAsync("/Pruebas/De-Excepcion/Provocar", null);
         var cuerpo = await respuesta.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.InternalServerError, respuesta.StatusCode);
@@ -130,7 +130,7 @@ public class ArranqueTests
 
         foreach (var filtracion in new[]
                  {
-                     FiltroQueProvocaUnaExcepcion.MarcadorDeExcepcion,
+                     ControladorDePruebasDeExcepcion.MarcadorDeExcepcion,
                      nameof(InvalidOperationException),
                      "stack",
                      "MiArchivoMedico.Web",
@@ -140,29 +140,4 @@ public class ArranqueTests
             Assert.DoesNotContain(filtracion, cuerpo, StringComparison.OrdinalIgnoreCase);
         }
     }
-}
-
-/// <summary>
-/// Monta un middleware terminal que lanza una excepción, exclusivamente dentro del proceso de
-/// tests. Se registra por <c>ConfigureServices</c> del <c>WebApplicationFactory</c>, así que la
-/// aplicación no gana ninguna ruta, ninguna clase ni ninguna clave de configuración por existir
-/// este mecanismo: la superficie HTTP de producción sigue vacía, como pide la spec.
-/// </summary>
-internal sealed class FiltroQueProvocaUnaExcepcion : IStartupFilter
-{
-    /// <summary>Marcador que la excepción provocada lleva en su mensaje.</summary>
-    internal const string MarcadorDeExcepcion = "MarcadorDeExcepcionDeDiagnostico";
-
-    /// <summary>
-    /// Invoca <paramref name="siguiente"/> PRIMERO y recién después agrega el middleware que
-    /// lanza. El orden importa: así el middleware queda por detrás del <c>UseExceptionHandler</c>
-    /// que registra <c>Program.cs</c> y la excepción la atrapa el pipeline real de la aplicación,
-    /// que es justamente lo que E1.4 tiene que verificar.
-    /// </summary>
-    public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> siguiente) =>
-        aplicacion =>
-        {
-            siguiente(aplicacion);
-            aplicacion.Run(_ => throw new InvalidOperationException(MarcadorDeExcepcion));
-        };
 }

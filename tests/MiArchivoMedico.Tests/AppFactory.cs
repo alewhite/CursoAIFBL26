@@ -1,6 +1,8 @@
+using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.DependencyInjection;
 using MiArchivoMedico.Web.Data;
 
 namespace MiArchivoMedico.Tests;
@@ -61,6 +63,12 @@ internal sealed class AppFactory : WebApplicationFactory<Program>
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        // El ensamblado de tests expone el controlador de solo-tests que ejercita el manejador de
+        // errores fuera de Development (E1.4). SE REGISTRA desde el build de pruebas, nunca desde el
+        // ensamblado de la aplicación: la producción no referencia el proyecto de tests (E1.2).
+        builder.ConfigureServices(servicios =>
+            servicios.AddControllers().AddApplicationPart(typeof(ControladorDePruebasDeExcepcion).Assembly));
+
         if (!declararLaRuta)
         {
             return;
