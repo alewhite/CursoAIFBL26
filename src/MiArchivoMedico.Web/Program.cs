@@ -1,5 +1,6 @@
 using MiArchivoMedico.Web.Accounts;
 using MiArchivoMedico.Web.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,6 +22,9 @@ builder.Services.AddDbContext<AppDbContext>(opciones =>
 // `AddIdentityCore` y no `AddIdentity<,>`: la segunda instala además el esquema de autenticación
 // por cookies con sus valores por defecto —14 días, deslizante—, que es justamente la política que
 // FEAT-001c tiene que endurecer, y la dejaría decidida por omisión antes de que nadie la decida.
+// El `AddSignInManager()` es obligatorio: el `CuentaController` inyecta `SignInManager<AppUser>` y
+// sin este registro el contenedor no lo resuelve; el `SignInManager` firma la cookie con
+// `IdentityConstants.ApplicationScheme` de forma hardcodeada.
 builder.Services
     .AddIdentityCore<AppUser>(opciones =>
     {
@@ -33,7 +37,39 @@ builder.Services
         opciones.Password.RequireNonAlphanumeric = false;
         opciones.Password.RequiredUniqueChars = 1;
     })
+    .AddSignInManager()
     .AddEntityFrameworkStores<AppDbContext>();
+
+// Esquema de cookies delimitado a este sub-ticket: LoginPath y AccessDeniedPath apuntan ambos al
+// inicio de sesión FEAT-001b. La cookie es SECURE en toda configuración sin excepciones por entorno
+// (NFR-01 no permite degradarla en desarrollo ni en tests), HttpOnly (inaccesible a JavaScript) y
+// SameSite=Strict. No se configura ExpireTimeSpan ni Cookie.Expiration: la cookie es de sesión del
+// navegador, caduca al cerrarlo (NFR-02). El bloqueo por intentos, la sesión única y la expiración
+// por inactividad pertenecen a FEAT-001c y quedan explícitamente fuera de este sub-ticket.
+builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
+    .AddCookie(IdentityConstants.ApplicationScheme, opciones =>
+    {
+        opciones.LoginPath = "/Cuenta/IniciarSesion";
+        opciones.AccessDeniedPath = "/Cuenta/IniciarSesion";
+        opciones.Cookie.Name = "MiArchivoMedico.Auth";
+        opciones.Cookie.HttpOnly = true;
+        opciones.Cookie.SameSite = SameSiteMode.Strict;
+        opciones.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    });
+
+// NFR-07: único mecanismo central de autorización. La FallbackPolicy exige usuario autenticado en
+// TODA ruta con endpoint; solo el par GET/POST de `IniciarSesion` declara `[AllowAnonymous]`
+// (FEAT-001b, Bloque 2). Las rutas no mapeadas no producen endpoint y quedan fuera de la política.
+builder.Services.AddAuthorization(opciones =>
+    opciones.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build());
+
+// Se declara `AddControllersWithViews` (Razor Views) aunque este sub-ticket aún no agrega
+// controladores: el pipeline necesita mapear la ruta por defecto y el host de pruebas agrega su
+// ApplicationPart del ensamblado de tests sobre esta base. El framework compartido lo provee el SDK
+// `Microsoft.NET.Sdk.Web`; no se agrega ningún PackageReference suelto.
+builder.Services.AddControllersWithViews();
 
 // Parámetros del hash fijados en código y no en configuración externa (ADR-002): un despliegue con
 // `IterationCount: 1000` arrancaría sin que nada avisara.
@@ -66,9 +102,15 @@ using (var alcanceDeArranque = app.Services.CreateScope())
     await alcanceDeArranque.ServiceProvider.GetRequiredService<AccountProvisioner>().SembrarAsync();
 }
 
-// Manejo de errores: es lo ÚNICO que este sub-ticket configura en el pipeline. La autenticación,
-// la autorización y la política de cookies pertenecen a FEAT-001b y FEAT-001c; dejarlas
-// configuradas por adelantado decidiría por ellas con los valores por defecto del framework.
+// Pipeline de middleware, en orden estricto (spec FEAT-001b, Bloque 1):
+//   1. UseExceptionHandler PRIMERO — heredado de FEAT-001a: 500 + text/plain genérico desde hoy.
+//   2. HSTS y redirección HTTPS SOLO fuera de Development (AC-08, NFR-04; NFR-01 no degrada la
+//      cookie a HTTP en desarrollo, E1.3).
+//   3. UseRouting explícito — exige endpoint routing para que la autorización sea por endpoint.
+//   4. UseAuthentication SIEMPRE antes de UseAuthorization: invertir el orden deja la
+//      FallbackPolicy sin sesión que evaluar y cada ruta redirigiría al login (E1.1).
+//   5. UseAuthorization — aplica la FallbackPolicy (NFR-07).
+//   6. MapControllerRoute — jamás MapFallback (NFR-07).
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -86,10 +128,20 @@ else
     }));
 }
 
-// No se mapea ninguna ruta: la superficie HTTP de este sub-ticket es deliberadamente vacía y
-// AC-02 lo verifica. Provocar una excepción para comprobar el manejador es cosa del proyecto de
-// tests, que la inyecta con un IStartupFilter; la aplicación no expone un atajo de diagnóstico
-// que además quedaría fuera de la autorización por defecto que instalará FEAT-001b.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHsts();
+    app.UseHttpsRedirection();
+}
+
+// La superficie HTTP privada se mapea al arrancar: `Cuenta` es el controlador por defecto y
+// `Privada` la acción por defecto, de modo que `/` resuelve a la página privada. Toda ruta mapeada
+// queda bajo la FallbackPolicy; las no mapeadas responden 404 real (Sup_FEAT-001b §Bloque 1).
+app.UseRouting();
+app.MapControllerRoute("default", "{controller=Cuenta}/{action=Privada}/{id?}");
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.Run();
 
 /// <summary>

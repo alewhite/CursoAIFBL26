@@ -1,0 +1,11 @@
+@model MiArchivoMedico.Web.ViewModels.IniciarSesionViewModel
+
+@{
+    ViewData["Title"] = "Página privada";
+}
+
+<h1>Bienvenido, @Model.NombreDeUsuario</h1>
+
+<form method="post" asp-controller="Cuenta" asp-action="CerrarSesion">
+    <button type="submit">Cerrar sesión</button>
+</form>

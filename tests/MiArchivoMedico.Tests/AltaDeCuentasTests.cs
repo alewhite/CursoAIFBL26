@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Net;
 using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MiArchivoMedico.Web.Accounts;
@@ -84,8 +85,12 @@ public class AltaDeCuentasTests
 
         // AC-03: el arranque completa igual. Que la aplicación conteste lo prueba; que el
         // proveedor de servicios se resuelva, no: eso ya ocurrió al leer las cuentas.
-        using var cliente = arranque.CreateClient();
-        Assert.Equal(HttpStatusCode.NotFound, (await cliente.GetAsync("/")).StatusCode);
+        // FEAT-001b instala una FallbackPolicy que exige usuario autenticado: la ruta `/` está
+        // mapeada y sin sesión responde 302 hacia el login ANTES de autorizar. Se pide no-redirect
+        // para observar el 302 (el `CreateClient` por defecto lo seguiría y enmascararía).
+        using var cliente = arranque.CreateClient(
+            new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+        Assert.Equal(HttpStatusCode.Redirect, (await cliente.GetAsync("/")).StatusCode);
     }
 
     [Fact]
@@ -115,8 +120,11 @@ public class AltaDeCuentasTests
         Assert.Contains("PasswordTooShort", rechazo, StringComparison.Ordinal);
         Assert.DoesNotContain(corta.Password, rechazo, StringComparison.Ordinal);
 
-        using var cliente = arranque.CreateClient();
-        Assert.Equal(HttpStatusCode.NotFound, (await cliente.GetAsync("/")).StatusCode);
+        // FEAT-001b: la FallbackPolicy exige sesión; sin una, `/` responde 302 al login. Se pide
+        // no-redirect para observar el 302.
+        using var cliente = arranque.CreateClient(
+            new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+        Assert.Equal(HttpStatusCode.Redirect, (await cliente.GetAsync("/")).StatusCode);
     }
 
     [Fact]
@@ -224,8 +232,11 @@ public class AltaDeCuentasTests
             await ConfiguracionDeAltas.VerificaLaContrasenaAsync(fabrica.Services, ana),
             "La cuenta dejó de validar su contraseña tras arrancar sin la configuración de altas.");
 
-        using var cliente = fabrica.CreateClient();
-        Assert.Equal(HttpStatusCode.NotFound, (await cliente.GetAsync("/")).StatusCode);
+        // FEAT-001b: la FallbackPolicy exige sesión; sin una, `/` responde 302 al login. Se pide
+        // no-redirect para observar el 302.
+        using var cliente = fabrica.CreateClient(
+            new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+        Assert.Equal(HttpStatusCode.Redirect, (await cliente.GetAsync("/")).StatusCode);
     }
 
     [Fact]
@@ -337,8 +348,11 @@ public class AltaDeCuentasTests
         }
 
         // AC-03: el rechazo no aborta el arranque. Que la aplicación conteste lo prueba.
-        using var cliente = arranque.CreateClient();
-        Assert.Equal(HttpStatusCode.NotFound, (await cliente.GetAsync("/")).StatusCode);
+        // FEAT-001b: la FallbackPolicy exige sesión; sin una, `/` responde 302 al login. Se pide
+        // no-redirect para observar el 302.
+        using var cliente = arranque.CreateClient(
+            new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+        Assert.Equal(HttpStatusCode.Redirect, (await cliente.GetAsync("/")).StatusCode);
     }
 
     [Fact]
@@ -449,8 +463,11 @@ public class AltaDeCuentasTests
         }
 
         // AC-03: los rechazos no abortan el arranque. Que la aplicación conteste lo prueba.
-        using var cliente = arranque.CreateClient();
-        Assert.Equal(HttpStatusCode.NotFound, (await cliente.GetAsync("/")).StatusCode);
+        // FEAT-001b: la FallbackPolicy exige sesión; sin una, `/` responde 302 al login. Se pide
+        // no-redirect para observar el 302.
+        using var cliente = arranque.CreateClient(
+            new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+        Assert.Equal(HttpStatusCode.Redirect, (await cliente.GetAsync("/")).StatusCode);
     }
 
     [Fact]
@@ -483,8 +500,11 @@ public class AltaDeCuentasTests
         Assert.DoesNotContain(excesiva.Password, rechazo, StringComparison.Ordinal);
         Assert.DoesNotContain("contrasena-excesiva", rechazo, StringComparison.Ordinal);
 
-        using var cliente = arranque.CreateClient();
-        Assert.Equal(HttpStatusCode.NotFound, (await cliente.GetAsync("/")).StatusCode);
+        // FEAT-001b: la FallbackPolicy exige sesión; sin una, `/` responde 302 al login. Se pide
+        // no-redirect para observar el 302.
+        using var cliente = arranque.CreateClient(
+            new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+        Assert.Equal(HttpStatusCode.Redirect, (await cliente.GetAsync("/")).StatusCode);
     }
 
     [Fact]
@@ -583,8 +603,11 @@ public class AltaDeCuentasTests
             rechazo,
             StringComparison.Ordinal);
 
-        using var cliente = segundo.CreateClient();
-        Assert.Equal(HttpStatusCode.NotFound, (await cliente.GetAsync("/")).StatusCode);
+        // FEAT-001b: la FallbackPolicy exige sesión; sin una, `/` responde 302 al login. Se pide
+        // no-redirect para observar el 302.
+        using var cliente = segundo.CreateClient(
+            new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+        Assert.Equal(HttpStatusCode.Redirect, (await cliente.GetAsync("/")).StatusCode);
     }
 
     /// <summary>Aplana un documento JSON a las claves de configuración que produciría.</summary>

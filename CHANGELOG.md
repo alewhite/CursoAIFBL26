@@ -9,3 +9,10 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
   aplicación) y alta administrativa de hasta 5 cuentas desde configuración externa, con
   contraseñas hasheadas mediante PBKDF2-HMAC-SHA256 (100.000 iteraciones). Sin superficie HTTP
   todavía: login y rutas privadas llegan con FEAT-001b.
+- FEAT-001b: inicio y cierre de sesión, protección de rutas privadas mediante FallbackPolicy
+  central, cookie de autenticación con atributos Secure/HttpOnly/SameSite=Strict sin persistencia
+  (sesión de navegador), rechazo de login indistinguible (usuario no existe ≡ contraseña
+  incorrecta), redirección HTTP→HTTPS + HSTS fuera de Development, página privada mínima
+  identificando la cuenta autenticada sin datos médicos. 4 bloques: Composition Root, 
+  CuentaController, Vistas+ViewModel, Tests de integración. 10 AC validados, 41 tests, 98.7% 
+  cobertura de líneas, 90% de ramas.

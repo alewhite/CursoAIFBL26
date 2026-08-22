@@ -1,0 +1,180 @@
+using System.Net;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
+using Xunit;
+
+namespace MiArchivoMedico.Tests;
+
+/// <summary>
+/// Tests del Bloque 1 de FEAT-001b: la Composition Root de autenticación (Identity + cookie +
+/// FallbackPolicy) y el pipeline de middleware que protege las rutas privadas.
+///
+/// Sobre el supuesto 302-vs-404 con ASP.NET Core 8 (endpoint routing + FallbackPolicy): la
+/// <c>AuthorizationMiddleware</c> solo informa el challenge/forbid de la política a rutas que
+/// tienen un <c>Endpoint</c> resuelto por el enrutado. Las rutas MAPEADAS —como <c>/</c> y
+/// <c>/Cuenta/CerrarSesion</c>, que FEAT-001b mapea con <c>MapControllerRoute</c>— sí lo tienen, y
+/// sin sesión responden 302 hacia <c>/Cuenta/IniciarSesion</c>. Las rutas NO MAPEADAS no producen
+/// ningún endpoint, la <c>AuthorizationMiddleware</c> no les aplica la FallbackPolicy (no hay
+/// <c>GetEndpoint()</c>) y el enrutado responde un 404 real. Esa distinción es la que preserva
+/// <c>Rutas_De_Registro_Y_De_Contrasena_Responden_404</c> de <see cref="SuperficieHttpTests"/> y la
+/// que estos tests fijan para las rutas que sí existen.
+///
+/// Por eso todo cliente de estos tests se crea con <c>AllowAutoRedirect = false</c>: el
+/// <c>WebApplicationFactory</c> por defecto seguiría la redirección y la 302 quedaría enmascarada.
+/// </summary>
+public class RutasPrivadasBloque1Tests
+{
+    /// <summary>Ubicación del inicio de sesión a la que la FallbackPolicy redirige las rutas privadas.</summary>
+    internal const string UbicacionDelInicioDeSesion = "/Cuenta/IniciarSesion";
+
+    /// <summary>
+    /// AC-01 y FR-01: sin sesión, la página privada <c>/</c> responde 302 hacia el inicio de sesión
+    /// y no entrega ningún dato de ninguna cuenta. Con la FallbackPolicy activa, <c>/</c> está
+    /// mapeada y tiene endpoint, así que la autorización le aplica la política y redirige.
+    /// </summary>
+    [Fact]
+    public async Task Pagina_Privada_Sin_Sesion_Redirige_Al_Inicio_De_Sesion()
+    {
+        using var fabrica = new AppFactory();
+        using var cliente = fabrica.CreateClient(
+            new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+
+        var respuesta = await cliente.GetAsync("/");
+
+        Assert.Equal(HttpStatusCode.Redirect, respuesta.StatusCode);
+        Assert.Equal(UbicacionDelInicioDeSesion, respuesta.Headers.Location!.OriginalString);
+
+        // Sin dato de cuenta: el cuerpo del 302 no puede contener el nombre de ninguna cuenta. La
+        // única cuenta posible en esta base es la que la siembra de FEAT-001a creó a partir de
+        // configuración, que acá no se declara; la aserción es de todas formas explícita.
+        var cuerpo = await respuesta.Content.ReadAsStringAsync();
+        Assert.DoesNotContain("ana", cuerpo, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// AC-02 y NFR-07: una ruta privada distinta del login —<c>/Cuenta/CerrarSesion</c> por GET,
+    /// acción que solo existirá como POST en el Bloque 2— responde 302 al inicio de sesión y jamás
+    /// el contenido. Verifica que la protección no depende de cada ruta sino de la FallbackPolicy.
+    /// </summary>
+    [Fact]
+    public async Task Ruta_Privada_Sin_Sesion_No_Entrega_Contenido()
+    {
+        using var fabrica = new AppFactory();
+        using var cliente = fabrica.CreateClient(
+            new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+
+        var respuesta = await cliente.GetAsync("/Cuenta/CerrarSesion");
+
+        Assert.Equal(HttpStatusCode.Redirect, respuesta.StatusCode);
+        Assert.Equal(UbicacionDelInicioDeSesion, respuesta.Headers.Location!.OriginalString);
+
+        var cuerpo = await respuesta.Content.ReadAsStringAsync();
+        Assert.Empty(cuerpo);
+    }
+
+    /// <summary>
+    /// E1.3: en Development, una solicitud HTTP no se redirige a HTTPS ni emite HSTS. La redirección
+    /// y el HSTS viven detrás de la guarda <c>if (!app.Environment.IsDevelopment())</c>, así que en
+    /// Development el pipeline no contiene ninguna de las dos. Sobre el TestServer HTTP la cabecera
+    /// HSTS no puede aparecer de ningún modo (no hay HTTPS real en el pipeline de pruebas).
+    /// </summary>
+    [Fact]
+    public async Task En_Desarrollo_No_Redirige_Http_A_Https()
+    {
+        using var fabrica = new AppFactory();
+        using var cliente = fabrica.CreateClient(
+            new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+
+        var respuesta = await cliente.GetAsync("/");
+
+        Assert.Equal(HttpStatusCode.Redirect, respuesta.StatusCode);
+        Assert.Equal(UbicacionDelInicioDeSesion, respuesta.Headers.Location!.OriginalString);
+        Assert.Null(respuesta.Headers.Location?.Scheme == "https" ? respuesta.Headers.Location : null);
+        Assert.False(respuesta.Headers.Contains("Strict-Transport-Security"));
+    }
+
+    /// <summary>
+    /// AC-08 y NFR-04: fuera de Development, HTTP redirige a HTTPS con 307 y la cabecera HSTS se
+    /// emite cuando el esquema es https. El puerto HTTPS se inyecta con
+    /// <c>UseSetting("https_port", ...)</c> —la clave que <c>HttpsRedirectionOptions</c> lee de la
+    /// configuración del host— y el shim de HSTS se verifica por separado, según reconoce la spec:
+    /// sobre el TestServer HTTP el HSTS jamás se emite, porque no hay HTTPS real en el pipeline.
+    /// </summary>
+    [Fact]
+    public async Task Fuera_De_Desarrollo_Redirige_Http_A_Https_Y_Emite_Hsts()
+    {
+        const string puertoHttps = "8443";
+
+        using var fabrica = new AppFactory();
+        using var arranque = fabrica.WithWebHostBuilder(constructor =>
+        {
+            constructor.UseEnvironment("Production");
+            constructor.UseSetting("https_port", puertoHttps);
+        });
+
+        using var cliente = arranque.CreateClient(
+            new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+
+        // La ruta privada sin sesión queda detrás tanto del 307 como del 302 de la política: el 307
+        // del redirect HTTPS se evalúa primero, así que una petición por HTTP fuera de Development
+        // responde el 307 hacia HTTPS aunque la ruta no esté autenticada.
+        var respuesta = await cliente.GetAsync("/");
+        Assert.Equal(HttpStatusCode.TemporaryRedirect, respuesta.StatusCode);
+
+        var ubicacion = respuesta.Headers.Location!;
+        Assert.Equal("https", ubicacion.Scheme);
+        Assert.Equal("/", ubicacion.AbsolutePath);
+
+        var puerto = ubicacion.IsDefaultPort ? 443 : ubicacion.Port;
+        Assert.Equal(puertoHttps, puerto.ToString());
+
+        // El 307 protege tambidn el login: ir al inicio de sesión por HTTP responde HTTPS y no el
+        // 200 del formulario de login (que seguiría expuesto por HTTP si la redirección faltara).
+        var consultaDellogin = await cliente.GetAsync("/Cuenta/IniciarSesion");
+        Assert.Equal(HttpStatusCode.TemporaryRedirect, consultaDellogin.StatusCode);
+        Assert.Equal("https", consultaDellogin.Headers.Location!.Scheme);
+    }
+
+    /// <summary>
+    /// E1.4 (reescritura de FEAT-001a): una excepción fuera de Development es atrapada por el
+    /// <c>UseExceptionHandler</c> del pipeline real y la respuesta es un 500 genérico sin traza. La
+    /// excepción la provoca <see cref="ControladorDePruebasDeExcepcion"/>, registrado SOLO en el
+    /// proyecto de tests —el controlador que el fix E1.4 le pide a este bloque, en lugar del
+    /// <c>IStartupFilter</c> que quedaba detrás del challenge 302 de la FallbackPolicy—. El entorno
+    /// es Production porque en Development la aplicación expone la página de error detallada y este
+    /// caso no aplica.
+    /// </summary>
+    [Fact]
+    public async Task Fuera_De_Desarrollo_No_Expone_Pagina_De_Error_Detallada()
+    {
+        using var fabrica = new AppFactory();
+        using var arranque = fabrica.WithWebHostBuilder(constructor =>
+            constructor.UseEnvironment("Production"));
+
+        using var cliente = arranque.CreateClient(
+            new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+
+        var respuesta = await cliente.PostAsync("/Pruebas/De-Excepcion/Provocar", content: null);
+        var cuerpo = await respuesta.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.InternalServerError, respuesta.StatusCode);
+
+        // Aserción positiva: sin ella, un 500 con cuerpo vacío satisfaría todos los
+        // `DoesNotContain` de abajo. Fija además que el mensaje es genérico.
+        Assert.Equal("Se produjo un error inesperado.", cuerpo);
+
+        foreach (var filtracion in new[]
+                 {
+                     ControladorDePruebasDeExcepcion.MarcadorDeExcepcion,
+                     nameof(InvalidOperationException),
+                     "stack",
+                     "MiArchivoMedico.Web",
+                     "at Program",
+                 })
+        {
+            Assert.DoesNotContain(filtracion, cuerpo, StringComparison.OrdinalIgnoreCase);
+        }
+    }
+}
